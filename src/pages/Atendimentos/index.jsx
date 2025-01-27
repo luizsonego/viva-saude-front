@@ -451,7 +451,7 @@ const Atendimentos = () => {
                 </Card>
                 <Card className="mt-5 ">
                   <CardBody>
-                    {dataModal?.etapas?.map((item) => {
+                    {/* {dataModal?.etapas?.map((item) => {
                       return (
                         <p>
                           <Typography className="text-xs">
@@ -463,7 +463,7 @@ const Atendimentos = () => {
                           <hr />
                         </p>
                       );
-                    })}
+                    })} */}
                   </CardBody>
                 </Card>
 
