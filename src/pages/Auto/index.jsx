@@ -189,7 +189,7 @@ const Autoatendimento = () => {
                   </Select>
                 )}
 
-                {loadingUnidades ? (
+                {/* {loadingUnidades ? (
                   "carregando..."
                 ) : (
                   <Select
@@ -204,7 +204,7 @@ const Autoatendimento = () => {
                       </Option>
                     ))}
                   </Select>
-                )}
+                )} */}
                 {/* consulta, exame, etc um select para o tipo de atendimento*/}
 
                 {loadingMedicos ? (

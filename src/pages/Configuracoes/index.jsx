@@ -194,21 +194,32 @@ const Config = () => {
                 Cadastrar
               </Button>
               <GenericTable
-                columns={[{ Header: "Prioridade", accessor: "nome" }]}
-                data={prioridadeData}
+                columns={[
+                  { Header: "Prioridade", accessor: "nome" },
+                  {
+                    Header: "Cor",
+                    accessor: "color",
+                  },
+                ]}
+                data={prioridadeData?.map((item) => ({
+                  nome: <p>{item.nome}</p>,
+                  color: (
+                    <Chip style={{ backgroundColor: item.cor, height: 25 }} />
+                  ),
+                }))}
               />
             </CustomCard>
           </div>
           <div>
-            <CustomCard title="Ações">
+            <CustomCard title="Procedimentos">
               <Button onClick={handleOpenAcoes} fullWidth>
                 Cadastrar
               </Button>
               <GenericTable
                 columns={[
                   { Header: "Nome", accessor: "nome" },
-                  { Header: "Descrição", accessor: "descricao" },
-                  { Header: "Tempo (min)", accessor: "tempo" },
+                  // { Header: "Descrição", accessor: "descricao" },
+                  // { Header: "Tempo (min)", accessor: "tempo" },
                 ]}
                 data={acoesData}
               />
@@ -253,7 +264,7 @@ const Config = () => {
         <form className="mt-0 mb-2 w-full " onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-1 flex flex-col gap-6">
             <InputForm label="servico" register={register} required />
-            <InputForm label="descricao" register={register} required />
+            <InputForm label="descricao" register={register} />
             <InputForm label="cor" register={register} type="color" />
           </div>
           <input
@@ -274,8 +285,8 @@ const Config = () => {
         >
           <div className="mb-1 flex flex-col gap-6">
             <InputForm label="nome" register={register} required />
-            <InputForm label="descricao" register={register} required />
-            <InputForm label="cor" register={register} required />
+            {/* <InputForm label="descricao" register={register} required /> */}
+            <InputForm label="cor" register={register} type="color" required />
           </div>
           <input
             value={pendingPrioridade ? "Enviando..." : "Enviar"}
@@ -285,9 +296,9 @@ const Config = () => {
         </form>
       </CustomDialog>
       <CustomDialog
-        title="Açoes"
+        title="Procedimentos"
         open={openModalAcoes}
-        handler={handleOpenPrioridade}
+        handler={handleOpenAcoes}
       >
         <form
           className="mt-0 mb-2 w-full "
@@ -295,8 +306,8 @@ const Config = () => {
         >
           <div className="mb-1 flex flex-col gap-6">
             <InputForm label="nome" register={register} required />
-            <InputForm label="descricao" register={register} required />
-            <InputForm type="time" label="tempo" register={register} required />
+            {/* <InputForm label="descricao" register={register} required />
+            <InputForm type="time" label="tempo" register={register} required /> */}
             {/* input de timer */}
           </div>
           <input
@@ -317,7 +328,7 @@ const Config = () => {
         >
           <div className="mb-1 flex flex-col gap-6">
             <InputForm label="nome" register={register} required />
-            <InputForm label="descricao" register={register} required />
+            <InputForm label="descricao" register={register} />
           </div>
           <input
             value={pendingUnidade ? "Enviando..." : "Enviar"}

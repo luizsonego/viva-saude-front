@@ -141,6 +141,25 @@ const getUnidades = async (values) => {
   }
 };
 
+const getMedico = async (values) => {
+  try {
+    const { data } = await api.get(
+      `${process.env.REACT_APP_API}/v1/get/medico?id=${values}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem(
+            process.env.REACT_APP_ACCESS_TOKEN
+          )}`,
+        },
+      }
+    );
+    return data.data;
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
 const getOrigem = async (values) => {
   try {
     const request = await api.patch(
@@ -241,5 +260,12 @@ export function useAtendenteFetch() {
   return useQuery({
     queryKey: ["atendentes"],
     queryFn: getAtendente,
+  });
+}
+
+export function useMedicoFetch(id) {
+  return useQuery({
+    queryKey: ["medico", id],
+    queryFn: () => getMedico(id),
   });
 }

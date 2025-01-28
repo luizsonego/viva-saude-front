@@ -1,11 +1,21 @@
-import { Card, CardBody, Input, Typography } from "@material-tailwind/react";
+import {
+  Card,
+  CardBody,
+  Input,
+  Option,
+  Select,
+  Typography,
+} from "@material-tailwind/react";
 import { useMutation } from "@tanstack/react-query";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useAtendentePost } from "../../hooks/post/usePost.query";
+import { useUnidadesFetch } from "../../hooks/get/useGet.query";
 
 const CreateAtendente = () => {
   const { register, handleSubmit } = useForm();
+
+  const { data: unidadesData, isLoading: loadingUnidades } = useUnidadesFetch();
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: useAtendentePost,
@@ -25,13 +35,45 @@ const CreateAtendente = () => {
             <InputForm label="Nome" name="name" register={register} />
             <InputForm label="Email" name="email" register={register} />
             <InputForm label="Senha" name="password" register={register} />
-            <InputForm label="Telefone" name="phone" register={register} />
-            <InputForm label="Whatsapp" name="whatsapp" register={register} />
-            <InputForm
-              label="Observação"
-              name="observation"
-              register={register}
-            />
+            {loadingUnidades ? (
+              "carregando..."
+            ) : (
+              <>
+                <Typography
+                  variant="h6"
+                  color="blue-gray"
+                  className="-mb-3"
+                  style={{ textTransform: "capitalize" }}
+                >
+                  Unidade
+                </Typography>
+                <Select
+                  name="onde_deseja_ser_atendido"
+                  // value={onde}
+                  // onChange={(val) => setOnde(val)}
+                >
+                  {unidadesData?.map((item) => (
+                    <Option key={item.id} value={item.id}>
+                      {item.nome}
+                    </Option>
+                  ))}
+                </Select>
+              </>
+            )}
+
+            <Typography
+              variant="h6"
+              color="blue-gray"
+              className="-mb-3"
+              style={{ textTransform: "capitalize" }}
+            >
+              Cargo
+            </Typography>
+            <Select name="cargo">
+              <Option>Administrador</Option>
+              <Option>Atendente</Option>
+              <Option>Supervisor</Option>
+            </Select>
           </div>
           <input
             value={isPending ? "Enviando..." : "Enviar"}

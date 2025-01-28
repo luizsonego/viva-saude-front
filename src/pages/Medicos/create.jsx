@@ -2,12 +2,17 @@ import {
   Button,
   Card,
   CardBody,
+  Checkbox,
   Chip,
   Dialog,
   DialogBody,
   DialogFooter,
   DialogHeader,
   Input,
+  List,
+  ListItem,
+  ListItemPrefix,
+  ListItemSuffix,
   Option,
   Select,
   Typography,
@@ -16,7 +21,11 @@ import { useMutation } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useMedicoPost } from "../../hooks/post/usePost.query";
-import { useGruposFetch, useUnidadesFetch } from "../../hooks/get/useGet.query";
+import {
+  useAcoesFetch,
+  useGruposFetch,
+  useUnidadesFetch,
+} from "../../hooks/get/useGet.query";
 import { format } from "date-fns";
 // import { DayPicker } from "react-day-picker";
 import { ChevronRightIcon, ChevronLeftIcon } from "@heroicons/react/24/outline";
@@ -51,13 +60,30 @@ const InputForm = ({
   );
 };
 
+const daysOfWeek = [
+  "Segunda-Feira",
+  "Terça-Feira",
+  "Quarta-Feira",
+  "Quinta-Feira",
+  "Sexta-Feira",
+];
+
+const lista = [];
 const Create = () => {
   const { register, handleSubmit } = useForm();
   const [onde, setOnde] = useState();
   const [modalSchedules, setModalSchedules] = useState();
   const [date, setDate] = useState();
+  const [listaProcedimentos, setListaProcedimentos] = useState(lista);
+  const [addProcedimento, setAddProcedimento] = useState("");
+  const [addProcedimentoValor, setAddProcedimentoValor] = useState("");
+
+  const [schedule, setSchedule] = useState([]);
+
   const { data: unidadesData, isLoading: loadingUnidades } = useUnidadesFetch();
   const { data: grupoData, isLoading: loadingGrupo } = useGruposFetch();
+  const { data: procedimentoData, isLoading: loadingProcedimento } =
+    useAcoesFetch();
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: useMedicoPost,
@@ -65,7 +91,10 @@ const Create = () => {
 
   const onSubmit = (data) => {
     const sendForm = {
-      local: onde,
+      // procedimento_valor: JSON.stringify(listaProcedimentos, null, 2),
+      // horarios: JSON.stringify(schedule, null, 2),
+      procedimento_valor: listaProcedimentos,
+      horarios: schedule,
       ...data,
     };
     mutateAsync(sendForm);
@@ -73,6 +102,77 @@ const Create = () => {
 
   const handleOpenModalSchedule = () => {
     setModalSchedules(!modalSchedules);
+  };
+
+  function handleChangeProcedimento(e) {
+    setAddProcedimento(e);
+  }
+  function handleChangeValor(e) {
+    setAddProcedimentoValor(e.target.value);
+  }
+
+  function handleAdd() {
+    let min = Math.ceil(1);
+    let max = Math.ceil(100);
+    let mt = Math.floor(Math.random() * (10 - 2) + 1);
+    const novaLista = listaProcedimentos.concat({
+      id: Math.floor(Math.random() * (max - min) + min) * mt,
+      procedimento: addProcedimento,
+      valor: addProcedimentoValor,
+    });
+    setListaProcedimentos(novaLista);
+  }
+
+  function handleRemove(id) {
+    const novaLista = listaProcedimentos.filter((item) => {
+      return item.id !== id;
+    });
+
+    setListaProcedimentos(novaLista);
+  }
+
+  const handleDayToggle = (day) => {
+    const dayExists = schedule.find((item) => item.day === day);
+
+    if (dayExists) {
+      // Remove the day if it's already selected
+      setSchedule(schedule.filter((item) => item.day !== day));
+    } else {
+      // Add the day with an empty times array
+      setSchedule([...schedule, { day, times: [] }]);
+    }
+  };
+  const handleAddTimeBlock = (day) => {
+    setSchedule((prev) =>
+      prev.map((item) =>
+        item.day === day
+          ? { ...item, times: [...item.times, { start: "", end: "" }] }
+          : item
+      )
+    );
+  };
+  const handleTimeChange = (day, index, type, value) => {
+    setSchedule((prev) =>
+      prev.map((item) =>
+        item.day === day
+          ? {
+              ...item,
+              times: item.times.map((time, i) =>
+                i === index ? { ...time, [type]: value } : time
+              ),
+            }
+          : item
+      )
+    );
+  };
+  const handleRemoveTimeBlock = (day, index) => {
+    setSchedule((prev) =>
+      prev.map((item) =>
+        item.day === day
+          ? { ...item, times: item.times.filter((_, i) => i !== index) }
+          : item
+      )
+    );
   };
 
   return (
@@ -85,34 +185,11 @@ const Create = () => {
           >
             <div className="mb-1 flex flex-col gap-6">
               <InputForm label="Nome" name="nome" register={register} />
-
-              {loadingUnidades ? (
-                "carregando..."
-              ) : (
-                <>
-                  <Typography
-                    variant="h6"
-                    color="blue-gray"
-                    className="-mb-3"
-                    style={{ textTransform: "capitalize" }}
-                  >
-                    Local de atendimento
-                  </Typography>
-                  <Select
-                    className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
-                    labelProps={{
-                      className: "before:content-none after:content-none",
-                    }}
-                    name="onde_deseja_ser_atendido"
-                    value={onde}
-                    onChange={(val) => setOnde(val)}
-                  >
-                    {unidadesData?.map((item) => (
-                      <Option value={item.nome}>{item.nome}</Option>
-                    ))}
-                  </Select>
-                </>
-              )}
+              <InputForm
+                label="Local de atendimentome"
+                name="local"
+                register={register}
+              />
 
               {/* <InputForm
                 label="Horarios Atendimento"
@@ -120,21 +197,174 @@ const Create = () => {
                 register={register}
               /> */}
               <hr />
-              <Button onClick={handleOpenModalSchedule}>
+              {/* <Button onClick={handleOpenModalSchedule}>
                 Adicionar Horario
-              </Button>
-              <hr />
-              <InputForm label="Valor" name="valor" register={register} />
+              </Button> */}
+              {daysOfWeek.map((day) => (
+                <div key={day} style={{ marginBottom: "-20px" }}>
+                  <Checkbox
+                    label={day}
+                    className=""
+                    checked={!!schedule.find((item) => item.day === day)}
+                    onChange={() => handleDayToggle(day)}
+                  />
 
-              {/* <InputForm label="Telefone" name="telefone" register={register} />
-              <InputForm label="Whatsapp" name="whatsapp" register={register} />
-              <InputForm label="Email" name="email" register={register} /> */}
-              <input
+                  {schedule.find((item) => item.day === day) && (
+                    <div style={{ marginLeft: "20px" }}>
+                      {schedule
+                        .find((item) => item.day === day)
+                        .times.map((time, index) => (
+                          <div
+                            key={index}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "10px",
+                            }}
+                          >
+                            <input
+                              style={{
+                                border: "1px solid #cecece",
+                                padding: "5px 10px",
+                                borderRadius: 5,
+                              }}
+                              type="time"
+                              value={time.start}
+                              onChange={(e) =>
+                                handleTimeChange(
+                                  day,
+                                  index,
+                                  "start",
+                                  e.target.value
+                                )
+                              }
+                            />
+                            <span>até</span>
+                            <input
+                              style={{
+                                border: "1px solid #cecece",
+                                padding: "5px 10px",
+                                borderRadius: 5,
+                              }}
+                              type="time"
+                              value={time.end}
+                              onChange={(e) =>
+                                handleTimeChange(
+                                  day,
+                                  index,
+                                  "end",
+                                  e.target.value
+                                )
+                              }
+                            />
+                            <Button
+                              variant="text"
+                              onClick={() => handleRemoveTimeBlock(day, index)}
+                              style={{ color: "red" }}
+                            >
+                              Remover
+                            </Button>
+                          </div>
+                        ))}
+                      <Button
+                        variant="gradient"
+                        type="button"
+                        onClick={() => handleAddTimeBlock(day)}
+                        style={{ marginTop: "10px" }}
+                      >
+                        Adicionar Horário
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              ))}
+              <hr />
+
+              <div className="flex gap-4">
+                <div>
+                  {loadingProcedimento ? (
+                    "carregando..."
+                  ) : (
+                    <>
+                      <Typography
+                        variant="h6"
+                        color="blue-gray"
+                        className=""
+                        style={{ textTransform: "capitalize" }}
+                      >
+                        Procedimento
+                      </Typography>
+                      <Select
+                        // name="onde_deseja_ser_atendido"
+                        value={addProcedimento}
+                        onChange={handleChangeProcedimento}
+                      >
+                        {procedimentoData?.map((item) => (
+                          <Option key={item.id} value={item.nome}>
+                            {item.nome}
+                          </Option>
+                        ))}
+                      </Select>
+                    </>
+                  )}
+                </div>
+                <div>
+                  <Typography
+                    variant="h6"
+                    color="blue-gray"
+                    className=""
+                    style={{ textTransform: "capitalize" }}
+                  >
+                    Valor
+                  </Typography>
+                  <Input
+                    type="text"
+                    onChange={handleChangeValor}
+                    value={addProcedimentoValor}
+                  />
+                </div>
+                <div>
+                  <Button
+                    type="button"
+                    onClick={handleAdd}
+                    className="mt-6"
+                    variant="text"
+                  >
+                    Adicionar
+                  </Button>
+                </div>
+              </div>
+              {listaProcedimentos.length < 1 ? (
+                ""
+              ) : (
+                <Card className="w-full md:w-96 overflow-hidden rounded-md">
+                  <List>
+                    {listaProcedimentos.map((item) => (
+                      <ListItem key={item.id}>
+                        {item.procedimento}
+                        <ListItemSuffix>{item.valor}</ListItemSuffix>
+                        <ListItemPrefix>
+                          <Button
+                            variant="gradient"
+                            className="h-5 p-4 pt-1 pb-3 ml-5"
+                            onClick={() => handleRemove(item.id)}
+                          >
+                            (x)
+                          </Button>
+                        </ListItemPrefix>
+                      </ListItem>
+                    ))}
+                  </List>
+                </Card>
+              )}
+
+              <hr />
+              {/* <input
                 label="Avatar"
                 name="avatar_url"
                 type="file"
                 register={register}
-              />
+              /> */}
             </div>
             <input
               value={isPending ? "Enviando..." : "Enviar"}
@@ -145,48 +375,9 @@ const Create = () => {
         </CardBody>
       </Card>
 
-      <Dialog open={modalSchedules} handler={handleOpenModalSchedule}>
-        <DialogHeader>Its a simple modal.</DialogHeader>
-        <DialogBody>
-          {/* <DayPicker
-            mode="single"
-            selected={date}
-            onSelect={setDate}
-            showOutsideDays
-            className="border-0"
-            classNames={{
-              caption: "flex justify-center py-2 mb-4 relative items-center",
-              caption_label: "text-sm font-medium text-gray-900",
-              nav: "flex items-center",
-              nav_button:
-                "h-6 w-6 bg-transparent hover:bg-blue-gray-50 p-1 rounded-md transition-colors duration-300",
-              nav_button_previous: "absolute left-1.5",
-              nav_button_next: "absolute right-1.5",
-              table: "w-full border-collapse",
-              head_row: "flex font-medium text-gray-900",
-              head_cell: "m-0.5 w-9 font-normal text-sm",
-              row: "flex w-full mt-2",
-              cell: "text-gray-600 rounded-md h-9 w-9 text-center text-sm p-0 m-0.5 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-gray-900/20 [&:has([aria-selected].day-outside)]:text-white [&:has([aria-selected])]:bg-gray-900/50 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-              day: "h-9 w-9 p-0 font-normal",
-              day_range_end: "day-range-end",
-              day_selected:
-                "rounded-md bg-gray-900 text-white hover:bg-gray-900 hover:text-white focus:bg-gray-900 focus:text-white",
-              day_today: "rounded-md bg-gray-200 text-gray-900",
-              day_outside:
-                "day-outside text-gray-500 opacity-50 aria-selected:bg-gray-500 aria-selected:text-gray-900 aria-selected:bg-opacity-10",
-              day_disabled: "text-gray-500 opacity-50",
-              day_hidden: "invisible",
-            }}
-            components={{
-              IconLeft: ({ ...props }) => (
-                <ChevronLeftIcon {...props} className="h-4 w-4 stroke-2" />
-              ),
-              IconRight: ({ ...props }) => (
-                <ChevronRightIcon {...props} className="h-4 w-4 stroke-2" />
-              ),
-            }}
-          /> */}
-        </DialogBody>
+      <Dialog open={modalSchedules} handler={handleOpenModalSchedule} size="xl">
+        <DialogHeader>Horarios de atendimento</DialogHeader>
+        <DialogBody></DialogBody>
         <DialogFooter>
           <Button
             variant="text"

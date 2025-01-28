@@ -16,6 +16,7 @@ import Create from "../pages/Medicos/create";
 import Atendentes from "../pages/Atendente";
 import CreateAtendente from "../pages/Atendente/create";
 import Autoatendimento from "../pages/Auto";
+import EditMedico from "../pages/Medicos/edit";
 
 export default function MainRouter() {
   return useRoutes([
@@ -49,6 +50,10 @@ export default function MainRouter() {
             {
               path: "criar",
               element: <Create />,
+            },
+            {
+              path: "editar/:id",
+              element: <EditMedico />,
             },
           ],
         },

@@ -1,6 +1,7 @@
 import {
   Avatar,
   Card,
+  Button,
   CardBody,
   CardHeader,
   Chip,
@@ -9,7 +10,15 @@ import {
 } from "@material-tailwind/react";
 import React from "react";
 
-const Table = ({ columns, data, title = "", loading }) => {
+const Table = ({
+  columns,
+  data,
+  title = "",
+  loading,
+  edit,
+  del,
+  loadingDel,
+}) => {
   return (
     <div className="mt-12 mb-8 flex flex-col gap-12">
       <Card>
@@ -51,6 +60,7 @@ const Table = ({ columns, data, title = "", loading }) => {
                 <>
                   {data.map((row, key) => {
                     const {
+                      id,
                       avatar,
                       nome,
                       email,
@@ -113,6 +123,22 @@ const Table = ({ columns, data, title = "", loading }) => {
                           <Typography className="text-xs font-semibold text-blue-gray-600">
                             {email}
                           </Typography>
+                        </td>
+                        <td className={className}>
+                          <Button
+                            variant="text"
+                            className="text-xs font-semibold text-blue-gray-600"
+                            onClick={() => edit(id)}
+                          >
+                            Editar
+                          </Button>
+                          <Button
+                            variant="text"
+                            className="text-xs font-semibold text-blue-gray-600"
+                            onClick={() => del(id)}
+                          >
+                            {loadingDel ? <Spinner /> : "Excluir"}
+                          </Button>
                         </td>
                       </tr>
                     );
