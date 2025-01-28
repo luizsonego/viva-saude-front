@@ -200,6 +200,14 @@ const Create = () => {
               {/* <Button onClick={handleOpenModalSchedule}>
                 Adicionar Horario
               </Button> */}
+              <Typography
+                variant="h6"
+                color="blue-gray"
+                className="-mb-3"
+                style={{ textTransform: "capitalize" }}
+              >
+                Horarios
+              </Typography>
               {daysOfWeek.map((day) => (
                 <div key={day} style={{ marginBottom: "-20px" }}>
                   <Checkbox
