@@ -186,8 +186,13 @@ const Create = () => {
             <div className="mb-1 flex flex-col gap-6">
               <InputForm label="Nome" name="nome" register={register} />
               <InputForm
-                label="Local de atendimentome"
+                label="Local de atendimento"
                 name="local"
+                register={register}
+              />
+              <InputForm
+                label="Especialidades"
+                name="especialidades"
                 register={register}
               />
 
@@ -200,7 +205,7 @@ const Create = () => {
               {/* <Button onClick={handleOpenModalSchedule}>
                 Adicionar Horario
               </Button> */}
-              <Typography
+              {/* <Typography
                 variant="h6"
                 color="blue-gray"
                 className="-mb-3"
@@ -285,7 +290,7 @@ const Create = () => {
                     </div>
                   )}
                 </div>
-              ))}
+              ))} */}
               <hr />
 
               <div className="flex gap-4">

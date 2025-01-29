@@ -67,7 +67,7 @@ function DashboardNavbar() {
           </Typography> */}
         </div>
 
-        <div className="flex items-center">
+        {/* <div className="flex items-center">
           <div className="mr-auto md:mr-4 md:w-56">
             <Input label="Search" />
           </div>
@@ -79,7 +79,7 @@ function DashboardNavbar() {
           >
             <Bars3Icon strokeWidth={3} className="h-6 w-6 text-blue-gray-500" />
           </IconButton>
-        </div>
+        </div> */}
       </div>
     </Navbar>
   );

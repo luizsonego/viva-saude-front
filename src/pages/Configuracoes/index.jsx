@@ -20,6 +20,7 @@ import {
   useGroupPost,
   useOrigemPost,
   usePrioridadePost,
+  useResourcePost,
   useUnidadesPost,
 } from "../../hooks/post/usePost.query";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -31,8 +32,16 @@ import {
   useOrigemFetch,
 } from "../../hooks/get/useGet.query";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import {
+  useDeleteMutation,
+  useEtiquetaDelete,
+  usegrupoDelete,
+  usePrioridadeDelete,
+} from "../../hooks/delete/useDelete.query";
+import { useNavigate } from "react-router-dom";
 
 const Config = () => {
+  const navigate = useNavigate();
   const { register, handleSubmit, reset } = useForm();
   const queryClient = useQueryClient();
 
@@ -46,66 +55,65 @@ const Config = () => {
     React.useState(false);
   const [dataEtiquetas, setDataEtiquetas] = React.useState([]);
 
-  const { data: grupoData } = useGruposFetch();
+  const { data: grupoData, isLoading: loadingGrupos } = useGruposFetch();
   const { data: prioridadeData } = usePrioridadesFetch();
   const { data: acoesData } = useAcoesFetch();
   const { data: unidadesData } = useUnidadesFetch();
   const { data: origemData } = useOrigemFetch();
 
-  const { mutateAsync: mutateGroup, isPending: pendingGroup } = useMutation({
-    mutationFn: useGroupPost,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["grupo"] });
+  const { mutateAsync: mutateGroup, isPending: pendingGroup } = useResourcePost(
+    "grupos",
+    "grupo",
+    () => {
       setOpenModalGroup(false);
-    },
-  });
-
-  const { mutateAsync: mutateEtiqueta, isPending: pendingEtiqueta } =
-    useMutation({
-      mutationFn: useEtiquetaPost,
-      onSuccess: () => {
-        setOpenModalCadastroEtiqueta(false);
-      },
-    });
-
-  const { mutateAsync: mutatePrioridade, isPending: pendingPrioridade } =
-    useMutation({
-      mutationFn: usePrioridadePost,
-      onSuccess: () => {
-        queryClient.invalidateQueries("prioridades");
-        setOpenModalPrioridade(false);
-        reset();
-      },
-    });
-
-  const { mutateAsync: mutateAcoes, isPending: pendingAcoes } = useMutation({
-    mutationFn: useAcoesPost,
-    onSuccess: () => {
-      queryClient.invalidateQueries("acoes");
-      setOpenModalAcoes(false);
       reset();
-    },
-  });
-
-  const { mutateAsync: mutateUnidade, isPending: pendingUnidade } = useMutation(
-    {
-      mutationFn: useUnidadesPost,
-      onSuccess: () => {
-        queryClient.invalidateQueries("unidades");
-        setOpenModalUnidades(false);
-        reset();
-      },
     }
   );
-
-  const { mutateAsync: mutateOrigem, isPending: pendingOrigem } = useMutation({
-    mutationFn: useOrigemPost,
-    onSuccess: () => {
-      queryClient.invalidateQueries("origem");
+  const { mutateAsync: mutateEtiqueta, isPending: pendingEtiqueta } =
+    useResourcePost("grupos", "etiqueta", () => {
+      setOpenModalCadastroEtiqueta(false);
+      reset();
+    });
+  const { mutateAsync: mutatePrioridade, isPending: pendingPrioridade } =
+    useResourcePost("prioridades", "prioridade", () => {
+      setOpenModalPrioridade(false);
+      reset();
+    });
+  const { mutateAsync: mutateAcoes, isPending: pendingAcoes } = useResourcePost(
+    "acoes",
+    "acoes",
+    () => {
+      setOpenModalAcoes(false);
+      reset();
+    }
+  );
+  const { mutateAsync: mutateUnidade, isPending: pendingUnidade } =
+    useResourcePost("unidades", "unidade", () => {
+      setOpenModalUnidades(false);
+      reset();
+    });
+  const { mutateAsync: mutateOrigem, isPending: pendingOrigem } =
+    useResourcePost("origem", "origem", () => {
       setOpenModalOrigem(false);
       reset();
-    },
-  });
+    });
+
+  const { mutate: deleteGrupo, isPending: deletingGrupo } = useDeleteMutation(
+    "grupos",
+    "grupo"
+  );
+  const { mutate: deleteEtiqueta, isPending: deletingEtiqueta } =
+    useDeleteMutation("grupos", "etiqueta");
+  const { mutate: deletePrioridade, isPending: deletingPrioridade } =
+    useDeleteMutation("prioridades", "prioridade");
+  const { mutate: deleteProcedimento, isPending: deletingProcedimento } =
+    useDeleteMutation("acoes", "procedimento");
+  const { mutate: deleteUnidade, isPending: deletingUnidade } =
+    useDeleteMutation("unidades", "unidade");
+  const { mutate: deleteOrigem, isPending: deletingOrigem } = useDeleteMutation(
+    "origem",
+    "origem"
+  );
 
   const onSubmit = (data) => {
     mutateGroup(data);
@@ -137,7 +145,43 @@ const Config = () => {
   const handleOpenModalEtiquetas = (e) => {
     setOpenModalEtiquetas(!openModalEtiquetas);
     setDataEtiquetas(e);
-    console.log(e);
+  };
+
+  const handleDeleteGrupo = (id) => {
+    deleteGrupo(id);
+  };
+  const handleDeleteEtiqueta = (id) => {
+    deleteEtiqueta(id);
+  };
+  const handleDeletePrioridade = (id) => {
+    deletePrioridade(id);
+  };
+  const handleDeleteProcedimento = (id) => {
+    deleteProcedimento(id);
+  };
+  const handleDeleteUnidade = (id) => {
+    deleteUnidade(id);
+  };
+  const handleDeleteOrigem = (id) => {
+    deleteOrigem(id);
+  };
+  const handleEditGrupo = (id, resource) => {
+    navigate(`editar/${resource}/${id}`);
+  };
+  const handleEditEtiqueta = (id, resource) => {
+    navigate(`editar/${resource}/${id}`);
+  };
+  const handleEditPrioridade = (id, resource) => {
+    navigate(`editar/${resource}/${id}`);
+  };
+  const handleEditProcedimento = (id, resource) => {
+    navigate(`editar/${resource}/${id}`);
+  };
+  const handleEditUnidade = (id, resource) => {
+    navigate(`editar/${resource}/${id}`);
+  };
+  const handleEditOrigem = (id, resource) => {
+    navigate(`editar/${resource}/${id}`);
   };
 
   return (
@@ -168,9 +212,6 @@ const Config = () => {
                   name: (
                     <p style={{ display: "flex", alignItems: "center" }}>
                       {item.servico}
-                      <Tooltip content={item.descricao}>
-                        <InformationCircleIcon className="w-5 h-5 text-inherit ml-1" />
-                      </Tooltip>
                     </p>
                   ),
                   etiquetas: (
@@ -178,13 +219,20 @@ const Config = () => {
                       variant="text"
                       onClick={() => handleOpenModalEtiquetas(item)}
                     >
-                      Ver etiquetas
+                      Etiquetas
                     </Button>
                   ),
                   color: (
                     <Chip style={{ backgroundColor: item.cor, height: 25 }} />
                   ),
+                  id: item.id,
+                  etiqueta: item.etiqueta,
+                  resource: "grupo",
                 }))}
+                actionDelete={handleDeleteGrupo}
+                actionEdit={handleEditGrupo}
+                isLoading={loadingGrupos}
+                isDeleting={deletingGrupo}
               />
             </CustomCard>
           </div>
@@ -202,11 +250,16 @@ const Config = () => {
                   },
                 ]}
                 data={prioridadeData?.map((item) => ({
+                  id: item.id,
                   nome: <p>{item.nome}</p>,
                   color: (
                     <Chip style={{ backgroundColor: item.cor, height: 25 }} />
                   ),
+                  resource: "prioridade",
                 }))}
+                actionDelete={handleDeletePrioridade}
+                actionEdit={handleEditPrioridade}
+                isDeleting={deletingPrioridade}
               />
             </CustomCard>
           </div>
@@ -216,12 +269,15 @@ const Config = () => {
                 Cadastrar
               </Button>
               <GenericTable
-                columns={[
-                  { Header: "Nome", accessor: "nome" },
-                  // { Header: "Descrição", accessor: "descricao" },
-                  // { Header: "Tempo (min)", accessor: "tempo" },
-                ]}
-                data={acoesData}
+                columns={[{ Header: "Nome", accessor: "nome" }]}
+                data={acoesData?.map((item) => ({
+                  id: item.id,
+                  nome: item.nome,
+                  resource: "acao",
+                }))}
+                actionDelete={handleDeleteProcedimento}
+                actionEdit={handleEditProcedimento}
+                isDeleting={deletingProcedimento}
               />
             </CustomCard>
           </div>
@@ -235,7 +291,15 @@ const Config = () => {
                   { Header: "Nome", accessor: "nome" },
                   { Header: "Descrição", accessor: "descricao" },
                 ]}
-                data={unidadesData}
+                data={unidadesData?.map((item) => ({
+                  id: item.id,
+                  nome: item.nome,
+                  descricao: item.descricao,
+                  resource: "unidade",
+                }))}
+                actionDelete={handleDeleteUnidade}
+                actionEdit={handleEditUnidade}
+                isDeleting={deletingUnidade}
               />
             </CustomCard>
           </div>
@@ -249,7 +313,15 @@ const Config = () => {
                   { Header: "Nome", accessor: "nome" },
                   { Header: "Descrição", accessor: "descricao" },
                 ]}
-                data={origemData}
+                data={origemData?.map((item) => ({
+                  id: item.id,
+                  nome: item.nome,
+                  descricao: item.descricao,
+                  resource: "origem",
+                }))}
+                actionDelete={handleDeleteOrigem}
+                actionEdit={handleEditOrigem}
+                isDeleting={deletingOrigem}
               />
             </CustomCard>
           </div>
@@ -264,7 +336,6 @@ const Config = () => {
         <form className="mt-0 mb-2 w-full " onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-1 flex flex-col gap-6">
             <InputForm label="servico" register={register} required />
-            <InputForm label="descricao" register={register} />
             <InputForm label="cor" register={register} type="color" />
           </div>
           <input
@@ -358,7 +429,7 @@ const Config = () => {
         </form>
       </CustomDialog>
       <CustomDialog
-        title="etiquetas"
+        title="Etiquetas"
         open={openModalEtiquetas}
         handler={handleOpenModalEtiquetas}
       >
@@ -368,9 +439,17 @@ const Config = () => {
         <GenericTable
           columns={[
             { Header: "Nome", accessor: "servico" },
-            { Header: "Descrição", accessor: "descricao" },
+            { Headers: "Cor", accessor: "cor" },
           ]}
-          data={dataEtiquetas?.etiqueta}
+          data={dataEtiquetas?.etiqueta?.map((item) => ({
+            id: item.id,
+            servico: <p>{item.servico}</p>,
+            cor: <Chip style={{ backgroundColor: item.cor, height: 25 }} />,
+            resource: "etiqueta",
+          }))}
+          actionDelete={handleDeleteEtiqueta}
+          actionEdit={handleEditEtiqueta}
+          isDeleting={deletingEtiqueta}
         />
         <CustomDialog
           title="Cadastro Etiqueta"
@@ -384,12 +463,12 @@ const Config = () => {
           >
             <div className="mb-1 flex flex-col gap-6">
               <InputForm label="servico" register={register} required />
-              <InputForm label="descricao" register={register} required />
               <InputForm
                 defaultValue={dataEtiquetas.cor}
                 label="cor"
                 register={register}
                 type="color"
+                disabled
               />
             </div>
             <InputForm

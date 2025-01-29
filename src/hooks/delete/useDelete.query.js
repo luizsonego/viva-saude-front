@@ -1,21 +1,29 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../../services/api";
 
-const deleteMedico = async (values) => {
+const deleteResource = async (resource, id) => {
   try {
-    const data = await api.post(
-      `${process.env.REACT_APP_API}/v1/delete/medico?id=${values}`,
+    const response = await api.post(
+      `${process.env.REACT_APP_API}/v1/delete/${resource}?id=${id}`,
       {
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       }
     );
-    return data;
+    return response;
   } catch (error) {
-    console.log(error.message);
+    console.error(`Erro ao deletar ${resource}:`, error.message);
+    throw error;
   }
 };
 
-export function useMedicoDelete(data) {
-  return deleteMedico(data);
-}
+export const useDeleteMutation = (queries, resource) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id) => deleteResource(resource, id),
+    onSuccess: () => {
+      console.log(resource);
+      queryClient.invalidateQueries({ queryKey: [queries] });
+    },
+  });
+};

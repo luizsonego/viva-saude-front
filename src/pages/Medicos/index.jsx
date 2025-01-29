@@ -2,9 +2,8 @@ import React from "react";
 import Table from "./Table";
 import { avatar, Button } from "@material-tailwind/react";
 import { Link, useNavigate } from "react-router-dom";
-import { useMedicosFetch } from "../../hooks/get/useGet.query";
-import { useMedicoDelete } from "../../hooks/delete/useDelete.query";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useGetResources } from "../../hooks/get/useGet.query";
+import { useDeleteMutation } from "../../hooks/delete/useDelete.query";
 
 const columns = [
   {
@@ -12,24 +11,21 @@ const columns = [
     accessor: "nome",
   },
   {
+    Header: "Local",
+    accessor: "local",
+  },
+  {
     Header: "Especialidade",
-    accessor: "specialty",
+    accessor: "especialidade",
   },
 ];
 
 const Medicos = () => {
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const { data, isLoading } = useMedicosFetch();
+  const { data, isLoading } = useGetResources("medicos", "medicos");
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: useMedicoDelete,
-    onSuccess: (data) => {
-      console.log(data);
-      queryClient.invalidateQueries({ queryKey: ["medicos"] });
-    },
-  });
+  const { mutate, isPending } = useDeleteMutation("medicos", "medico");
 
   const handleEdit = (id) => {
     navigate(`editar/${id}`);

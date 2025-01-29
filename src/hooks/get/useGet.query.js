@@ -1,5 +1,80 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../../services/api";
+
+const getResources = async (resource) => {
+  try {
+    const response = await api.post(
+      `${process.env.REACT_APP_API}/v1/get/${resource}`,
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
+    const { data } = response.data;
+    return data;
+  } catch (error) {
+    console.error(`Erro ao deletar ${resource}:`, error.message);
+    throw error;
+  }
+};
+const getResource = async (resource, id) => {
+  try {
+    const response = await api.post(
+      `${process.env.REACT_APP_API}/v1/view/${resource}?id=${id}`,
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
+    const { data } = response.data;
+    return data;
+  } catch (error) {
+    console.error(`Erro ao deletar ${resource}:`, error.message);
+    throw error;
+  }
+};
+
+/**
+ * Essa função é responsavel por buscar no controllet GET da api, ela trás os dados de todas as colunas do controller
+ * @example
+ *  useGetResources("querie", "controller")
+ *
+ * @param {String} queries  é a querie responsavel por armazenas os dados, usado para recarregar os dados
+ * @param {String} resource é o controller para buscar na api
+ */
+export function useGetResources(queries, resource) {
+  return useQuery({
+    queryKey: [queries],
+    queryFn: () => getResources(resource),
+  });
+}
+
+/**
+ * Essa função é responsavel por buscar no controllet VIEW da api, ela trás os dados especificos da tabela buscando pelo ID
+ * @example
+ *  useGetResource("querie", "controller", id)
+ *
+ * @param {String} queries  é a querie responsavel por armazenas os dados, usado para recarregar os dados
+ * @param {String} resource é o controller para buscar na api
+ * @param {Number} id é o o parametro de id para busca na api
+ */
+export function useGetResource(queries, resource, id) {
+  return useQuery({
+    queryKey: [queries],
+    queryFn: () => getResource(resource, id),
+  });
+}
+// export const useDeleteMutation = (queries, resource) => {
+//   const queryClient = useQueryClient();
+
+//   return useMutation({
+//     mutationFn: (id) => getResources(resource, id),
+//     onSuccess: () => {
+//       console.log(resource);
+//       queryClient.invalidateQueries({ queryKey: [queries] });
+//     },
+//   });
+// };
 
 const getAtendimentos = async (values) => {
   try {

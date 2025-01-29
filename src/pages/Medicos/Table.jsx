@@ -58,17 +58,8 @@ const Table = ({
                 </tr>
               ) : (
                 <>
-                  {data.map((row, key) => {
-                    const {
-                      id,
-                      avatar,
-                      nome,
-                      email,
-                      crm,
-                      especialidade,
-                      telefone,
-                      whatsapp,
-                    } = row;
+                  {data?.map((row, key) => {
+                    const { id, avatar, nome, local, especialidade } = row;
                     const className = `py-3 px-5 ${
                       key === row.length - 1
                         ? ""
@@ -79,7 +70,7 @@ const Table = ({
                         <td className={className}>
                           <div className="flex items-center gap-4">
                             <Avatar
-                              src={`https://i.pravatar.cc/150?u=${nome}`}
+                              src={`https://ameliarodrigues.org.br/wp-content/uploads/2020/08/sem-imagem-avatar.png`}
                               alt={nome}
                               size="sm"
                               variant="rounded"
@@ -92,15 +83,12 @@ const Table = ({
                               >
                                 {nome}
                               </Typography>
-                              <Typography className="text-xs font-normal text-blue-gray-500">
-                                {email}
-                              </Typography>
                             </div>
                           </div>
                         </td>
                         <td className={className}>
                           <Typography className="text-xs font-semibold text-blue-gray-600">
-                            {crm}
+                            {local}
                           </Typography>
                         </td>
                         <td className={className}>
@@ -110,19 +98,6 @@ const Table = ({
                             value={especialidade}
                             className="py-0.5 px-2 text-[11px] font-medium w-fit"
                           />
-                        </td>
-                        <td className={className}>
-                          <Typography className="text-xs font-semibold text-blue-gray-600">
-                            {telefone}
-                          </Typography>
-                          <Typography className="text-xs font-semibold text-blue-gray-600">
-                            {whatsapp}
-                          </Typography>
-                        </td>
-                        <td className={className}>
-                          <Typography className="text-xs font-semibold text-blue-gray-600">
-                            {email}
-                          </Typography>
                         </td>
                         <td className={className}>
                           <Button

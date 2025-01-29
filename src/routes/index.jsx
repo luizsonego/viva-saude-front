@@ -17,6 +17,7 @@ import Atendentes from "../pages/Atendente";
 import CreateAtendente from "../pages/Atendente/create";
 import Autoatendimento from "../pages/Auto";
 import EditMedico from "../pages/Medicos/edit";
+import EditConfigs from "../pages/Configuracoes/edit";
 
 export default function MainRouter() {
   return useRoutes([
@@ -36,9 +37,22 @@ export default function MainRouter() {
           path: "/dashboard/atendimentos",
           element: <Atendimentos />,
         },
+        // {
+        //   path: "/dashboard/cadastros",
+        //   element: <Config />,
+        // },
         {
-          path: "/dashboard/cadastros",
-          element: <Config />,
+          path: "cadastros",
+          children: [
+            {
+              path: "",
+              element: <Config />,
+            },
+            {
+              path: "editar/:resource/:id",
+              element: <EditConfigs />,
+            },
+          ],
         },
         {
           path: "medicos",

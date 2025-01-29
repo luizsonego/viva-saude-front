@@ -8,7 +8,7 @@ import {
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
-import { useMedicoFetch } from "../../hooks/get/useGet.query";
+import { useGetResource, useMedicoFetch } from "../../hooks/get/useGet.query";
 import { useEffect } from "react";
 
 const InputForm = ({
@@ -45,7 +45,7 @@ const EditMedico = () => {
   const { id } = useParams();
   const { register, handleSubmit, setValue } = useForm();
 
-  const { data } = useMedicoFetch(id);
+  const { data, isLoading } = useGetResource("medicos", "medico", id);
 
   useEffect(() => {
     if (data) {
@@ -64,34 +64,18 @@ const EditMedico = () => {
           >
             <div className="mb-1 flex flex-col gap-6">
               <InputForm label="Nome" name="nome" register={register} />
-
-              {/* {loadingUnidades ? (
-                "carregando..."
-              ) : ( */}
-
-              {/* )} */}
-
-              {/* <InputForm
-                label="Horarios Atendimento"
-                name="atendimento_horarios"
+              <InputForm
+                label="Local de atendimento"
+                name="local"
                 register={register}
-              /> */}
-              <hr />
-              {/* <Button onClick={handleOpenModalSchedule}>
-                Adicionar Horario
-              </Button> */}
-              <hr />
-              <InputForm label="Valor" name="valor" register={register} />
-
-              {/* <InputForm label="Telefone" name="telefone" register={register} />
-              <InputForm label="Whatsapp" name="whatsapp" register={register} />
-              <InputForm label="Email" name="email" register={register} /> */}
-              {/* <input
-                label="Avatar"
-                name="avatar_url"
-                type="file"
+              />
+              <InputForm
+                label="Especialidade"
+                name="especialidade"
                 register={register}
-              /> */}
+              />
+
+              <hr />
             </div>
             <input
               // value={isPending ? "Enviando..." : "Enviar"}
