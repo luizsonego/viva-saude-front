@@ -2,7 +2,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../../services/api";
 
 const postResource = async (resource, data) => {
-  console.log(resource, data);
   try {
     const response = await api.post(
       `${process.env.REACT_APP_API}/v1/create/${resource}`,
@@ -18,12 +17,21 @@ const postResource = async (resource, data) => {
   }
 };
 
-export const useResourcePost = (queries, resource, onSuccessCallback) => {
+export const useResourcePost = (queries, resource, onSuccessCallback, onErrorCallback) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data) => postResource(resource, data),
-    onSuccess: () => {
-      console.log(resource);
+    onSuccess: ({data}) => {
+      
+      if (data.status === 400) {
+        if(onErrorCallback) {
+          onErrorCallback(data.message);
+        }
+        console.log('err', data.message)
+        return;
+      }
+
+      console.log("success: ", data);
       queryClient.invalidateQueries({ queryKey: [queries] });
 
       if (onSuccessCallback) {

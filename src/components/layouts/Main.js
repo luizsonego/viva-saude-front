@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Children } from "react";
 import { Outlet } from "react-router-dom";
 import DashboardNavbar from "./dashboard-navbar";
 import { Sidenav } from "./sidenav";
@@ -32,6 +32,32 @@ export const routes = [
         icon: <InformationCircleIcon {...icon} />,
         name: "cadastros",
         path: "/cadastros",
+        children: [
+          {
+            name: "grupos",
+            path: "/cadastros/grupos",
+          },
+          {
+            name: "prioridades",
+            path: "/cadastros/prioridades",
+          },
+          {
+            name: "especialidades",
+            path: "/cadastros/especialidades",
+          },
+          {
+            name: "procedimentos",
+            path: "/cadastros/procedimentos",
+          },
+          {
+            name: "unidades",
+            path: "/cadastros/unidades",
+          },
+          {
+            name: "origem",
+            path: "/cadastros/origem",
+          },
+        ],
         // element: <Notifications />,
       },
       {

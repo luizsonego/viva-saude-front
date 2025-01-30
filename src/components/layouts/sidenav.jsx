@@ -1,8 +1,28 @@
-import { XMarkIcon } from "@heroicons/react/24/outline";
-import { Button, IconButton, Typography } from "@material-tailwind/react";
+import {
+  ChevronDownIcon,
+  ChevronRightIcon,
+  PresentationChartBarIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
+import {
+  Accordion,
+  AccordionBody,
+  AccordionHeader,
+  Button,
+  IconButton,
+  List,
+  ListItem,
+  ListItemPrefix,
+  Typography,
+} from "@material-tailwind/react";
+import React from "react";
 import { Link, NavLink } from "react-router-dom";
 
 export function Sidenav({ brandImg, brandName, routes }) {
+  const [openSubMenu, setOpenSubMenu] = React.useState(0);
+  const handleOpenSubMenu = (value) => {
+    setOpenSubMenu(openSubMenu === value ? 0 : value);
+  };
   return (
     <aside
       className={`translate-x-0 fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 xl:translate-x-0 border border-blue-gray-100`}
@@ -14,9 +34,6 @@ export function Sidenav({ brandImg, brandName, routes }) {
             alt="Logo viva saude"
             className="w-24 h-24 aspect-square text-center mx-auto"
           />
-          {/* <Typography variant="h6" color={"blue-gray"}>
-            {brandName}
-          </Typography> */}
         </Link>
         <IconButton
           variant="text"
@@ -31,41 +48,90 @@ export function Sidenav({ brandImg, brandName, routes }) {
       </div>
       <div className="m-4">
         {routes.map(({ layout, title, pages }, key) => (
-          <ul key={key} className="mb-4 flex flex-col gap-1">
-            {title && (
-              <li className="mx-3.5 mt-4 mb-2">
-                <Typography
-                  variant="small"
-                  color={"blue-gray"}
-                  className="font-black uppercase opacity-75"
-                >
-                  {title}
-                </Typography>
-              </li>
-            )}
-            {pages.map(({ icon, name, path }) => (
-              <li key={name}>
-                <NavLink to={`/${layout}${path}`}>
-                  {({ isActive }) => (
-                    <Button
-                      variant={isActive ? "gradient" : "text"}
-                      color={isActive ? "white" : "blue-gray"}
-                      className="flex items-center gap-4 px-4 capitalize"
-                      fullWidth
-                    >
-                      {icon}
-                      <Typography
-                        color="inherit"
-                        className="font-medium capitalize"
+          <List key={key}>
+            <Accordion
+              open={openSubMenu}
+              icon={
+                <ChevronDownIcon
+                  strokeWidth={2.5}
+                  className={`mx-auto h-4 w-4 transition-transform ${
+                    openSubMenu === 1 ? "rotate-180" : ""
+                  }`}
+                />
+              }
+            >
+              {title && (
+                <ListItem>
+                  <Typography
+                    variant="small"
+                    color={"blue-gray"}
+                    className="font-black uppercase opacity-75"
+                  >
+                    {title}
+                  </Typography>
+                </ListItem>
+              )}
+              {pages.map(({ icon, name, path, children }) =>
+                children ? (
+                  <>
+                    {console.log("childres", children)}
+                    <ListItem key={name} className="pb-3">
+                      <AccordionHeader
+                        className="border-b-0 p-0 pl-0"
+                        onClick={() => handleOpenSubMenu(1)}
                       >
-                        {name}
-                      </Typography>
-                    </Button>
-                  )}
-                </NavLink>
-              </li>
-            ))}
-          </ul>
+                        <ListItemPrefix>{icon}</ListItemPrefix>
+                        <Typography
+                          color="blue-gray"
+                          className="gradient w-full h-auto rounded-lg font-medium capitalize "
+                        >
+                          {name}
+                        </Typography>
+                      </AccordionHeader>
+                    </ListItem>
+                    <AccordionBody className="py-1">
+                      <List className="p-0 pl-3">
+                        {children.map(({ name, path }) => (
+                          <NavLink
+                            to={`/${layout}${path}`}
+                            className={({ isActive }) =>
+                              isActive
+                                ? "gradient w-full h-auto bg-gray-300 rounded-lg font-medium capitalize "
+                                : "text capitalize"
+                            }
+                          >
+                            <ListItem key={name} className="pb-3">
+                              <ListItemPrefix>
+                                <ChevronRightIcon
+                                  strokeWidth={3}
+                                  className="h-3 w-5"
+                                />
+                              </ListItemPrefix>
+                              {name}
+                            </ListItem>
+                          </NavLink>
+                        ))}
+                      </List>
+                    </AccordionBody>
+                  </>
+                ) : (
+                  <NavLink
+                    to={`/${layout}${path}`}
+                    className={({ isActive }) =>
+                      isActive
+                        ? "gradient w-full h-auto bg-gray-300 rounded-lg font-medium capitalize "
+                        : "text capitalize"
+                    }
+                  >
+                    <ListItem key={name} className="pb-3">
+                      <ListItemPrefix>{icon}</ListItemPrefix>
+                      {name}
+                    </ListItem>
+                  </NavLink>
+                )
+              )}
+            </Accordion>
+          </List>
         ))}
       </div>
     </aside>

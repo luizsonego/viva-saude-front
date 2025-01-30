@@ -23,6 +23,7 @@ import { useForm } from "react-hook-form";
 import { useMedicoPost } from "../../hooks/post/usePost.query";
 import {
   useAcoesFetch,
+  useGetResources,
   useGruposFetch,
   useUnidadesFetch,
 } from "../../hooks/get/useGet.query";
@@ -77,6 +78,7 @@ const Create = () => {
   const [listaProcedimentos, setListaProcedimentos] = useState(lista);
   const [addProcedimento, setAddProcedimento] = useState("");
   const [addProcedimentoValor, setAddProcedimentoValor] = useState("");
+  const [especialidade, setEspecialidade] = useState("");
 
   const [schedule, setSchedule] = useState([]);
 
@@ -84,6 +86,8 @@ const Create = () => {
   const { data: grupoData, isLoading: loadingGrupo } = useGruposFetch();
   const { data: procedimentoData, isLoading: loadingProcedimento } =
     useAcoesFetch();
+  const { data: especialidadeData, isLoading: loadingEspecialidade } =
+    useGetResources("especialidade", "especialidade");
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: useMedicoPost,
@@ -95,6 +99,7 @@ const Create = () => {
       // horarios: JSON.stringify(schedule, null, 2),
       procedimento_valor: listaProcedimentos,
       horarios: schedule,
+      especialidade,
       ...data,
     };
     mutateAsync(sendForm);
@@ -104,6 +109,9 @@ const Create = () => {
     setModalSchedules(!modalSchedules);
   };
 
+  function handleChangeEspecialidade(e) {
+    setEspecialidade(e);
+  }
   function handleChangeProcedimento(e) {
     setAddProcedimento(e);
   }
@@ -190,11 +198,32 @@ const Create = () => {
                 name="local"
                 register={register}
               />
-              <InputForm
-                label="Especialidades"
-                name="especialidades"
-                register={register}
-              />
+
+              {loadingEspecialidade ? (
+                "carregando..."
+              ) : (
+                <>
+                  <Typography
+                    variant="h6"
+                    color="blue-gray"
+                    className=""
+                    style={{ textTransform: "capitalize" }}
+                  >
+                    Especialidade
+                  </Typography>
+                  <Select
+                    // name="onde_deseja_ser_atendido"
+                    value={especialidade}
+                    onChange={handleChangeEspecialidade}
+                  >
+                    {especialidadeData?.map((item) => (
+                      <Option key={item.id} value={item.nome}>
+                        {item.nome}
+                      </Option>
+                    ))}
+                  </Select>
+                </>
+              )}
 
               {/* <InputForm
                 label="Horarios Atendimento"

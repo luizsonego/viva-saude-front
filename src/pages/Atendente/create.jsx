@@ -7,13 +7,15 @@ import {
   Typography,
 } from "@material-tailwind/react";
 import { useMutation } from "@tanstack/react-query";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useAtendentePost } from "../../hooks/post/usePost.query";
 import { useUnidadesFetch } from "../../hooks/get/useGet.query";
 
 const CreateAtendente = () => {
   const { register, handleSubmit } = useForm();
+  const [unidade, setUnidade] = useState("");
+  const [cargo, setCargo] = useState("");
 
   const { data: unidadesData, isLoading: loadingUnidades } = useUnidadesFetch();
 
@@ -22,7 +24,12 @@ const CreateAtendente = () => {
   });
 
   const onSubmit = (data) => {
-    mutateAsync(data);
+    const dataForm = {
+      unidade,
+      cargo,
+      ...data,
+    };
+    mutateAsync(dataForm);
   };
   return (
     <Card shadow={false} className="w-full justify-center">
@@ -48,9 +55,9 @@ const CreateAtendente = () => {
                   Unidade
                 </Typography>
                 <Select
-                  name="onde_deseja_ser_atendido"
-                  // value={onde}
-                  // onChange={(val) => setOnde(val)}
+                  name="unidade"
+                  value={unidade}
+                  onChange={(val) => setUnidade(val)}
                 >
                   {unidadesData?.map((item) => (
                     <Option key={item.id} value={item.id}>
@@ -69,10 +76,14 @@ const CreateAtendente = () => {
             >
               Cargo
             </Typography>
-            <Select name="cargo">
-              <Option>Administrador</Option>
-              <Option>Atendente</Option>
-              <Option>Supervisor</Option>
+            <Select
+              name="cargo"
+              value={cargo}
+              onChange={(val) => setCargo(val)}
+            >
+              <Option value="administrador">Administrador</Option>
+              <Option value="atendente">Atendente</Option>
+              <Option value="supervisor">Supervisor</Option>
             </Select>
           </div>
           <input

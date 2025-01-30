@@ -18,6 +18,12 @@ import CreateAtendente from "../pages/Atendente/create";
 import Autoatendimento from "../pages/Auto";
 import EditMedico from "../pages/Medicos/edit";
 import EditConfigs from "../pages/Configuracoes/edit";
+import Grupos from "../pages/Configuracoes/grupos";
+import Prioridades from "../pages/Configuracoes/prioridades";
+import Especialidades from "../pages/Configuracoes/especialidades";
+import Procedimentos from "../pages/Configuracoes/procedimentos";
+import Unidades from "../pages/Configuracoes/unidades";
+import Origem from "../pages/Configuracoes/origem";
 
 export default function MainRouter() {
   return useRoutes([
@@ -49,7 +55,31 @@ export default function MainRouter() {
               element: <Config />,
             },
             {
-              path: "editar/:resource/:id",
+              path: "grupos",
+              element: <Grupos />,
+            },
+            {
+              path: "prioridades",
+              element: <Prioridades />,
+            },
+            {
+              path: "especialidades",
+              element: <Especialidades />,
+            },
+            {
+              path: "procedimentos",
+              element: <Procedimentos />,
+            },
+            {
+              path: "unidades",
+              element: <Unidades />,
+            },
+            {
+              path: "origem",
+              element: <Origem />,
+            },
+            {
+              path: ":path/editar/:resource/:id",
               element: <EditConfigs />,
             },
           ],

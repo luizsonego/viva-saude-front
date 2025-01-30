@@ -62,7 +62,11 @@ const EditConfigs = () => {
                   </div>
                 ))}
 
-              <Button>Enviar</Button>
+              <input
+                value={isPending ? "Enviando..." : "Enviar"}
+                type="submit"
+                className="bg-green-500 text-white p-2 rounded-md w-full mt-10"
+              />
             </form>
           </CardBody>
         </Card>
