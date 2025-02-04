@@ -1,6 +1,7 @@
 import { IconButton, Spinner, Typography } from "@material-tailwind/react";
 import { dataTagErrorSymbol } from "@tanstack/react-query";
 import React from "react";
+import { Link, useLocation } from "react-router-dom";
 
 const GenericTable = ({
   columns = [],
@@ -27,13 +28,39 @@ const GenericTable = ({
               </Typography>
             </th>
           ))}
+          {actionEdit && (
+            <th
+              className="border-b border-blue-gray-50 py-3 px-5 text-left"
+              width={20}
+            >
+              <Typography
+                variant="small"
+                className="text-[11px] font-bold uppercase text-blue-gray-400"
+              >
+                Editar
+              </Typography>
+            </th>
+          )}
+          {actionDelete && (
+            <th
+              className="border-b border-blue-gray-50 py-3 px-5 text-left"
+              width={20}
+            >
+              <Typography
+                variant="small"
+                className="text-[11px] font-bold uppercase text-blue-gray-400"
+              >
+                Excluir
+              </Typography>
+            </th>
+          )}
         </tr>
       </thead>
       {isLoading ? (
         "carregando"
       ) : (
         <tbody>
-          {data.map((row) => {
+          {data?.map((row) => {
             const className = `py-3 px-5 border-b border-blue-gray-50`;
             return (
               <tr key={row.name}>
@@ -42,28 +69,32 @@ const GenericTable = ({
                     {row[column.accessor]}
                   </td>
                 ))}
-                <td>
-                  <IconButton
-                    variant="gradient"
-                    onClick={() => actionEdit(row.id, row.resource)}
-                  >
-                    <i class="fa-solid fa-pen" />
-                  </IconButton>
-                </td>
-                <td>
-                  {isDeleting ? (
-                    <IconButton variant="outlined" disabled>
-                      <Spinner />
-                    </IconButton>
-                  ) : (
+                {actionEdit && (
+                  <td className={className}>
                     <IconButton
-                      variant="outlined"
-                      onClick={() => actionDelete(row.id)}
+                      variant="gradient"
+                      onClick={() => actionEdit(row.id, row.resource)}
                     >
-                      <i class="fa-solid fa-trash-can" />
+                      <i class="fa-solid fa-pen" />
                     </IconButton>
-                  )}
-                </td>
+                  </td>
+                )}
+                {actionDelete && (
+                  <td className={className}>
+                    {isDeleting ? (
+                      <IconButton variant="outlined" disabled>
+                        <Spinner />
+                      </IconButton>
+                    ) : (
+                      <IconButton
+                        variant="outlined"
+                        onClick={() => actionDelete(row.id)}
+                      >
+                        <i class="fa-solid fa-trash-can" />
+                      </IconButton>
+                    )}
+                  </td>
+                )}
               </tr>
             );
           })}

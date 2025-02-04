@@ -1,5 +1,5 @@
-import { Card, Input, Typography } from "@material-tailwind/react";
-import { useMutation } from "@tanstack/react-query";
+import { Card, Checkbox, Input, Typography } from "@material-tailwind/react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Select, Option } from "@material-tailwind/react";
@@ -12,6 +12,9 @@ import FormWizard from "react-form-wizard-component";
 import "react-form-wizard-component/dist/style.css";
 import { InputMask, useMask } from "@react-input/mask";
 import { useAtendimentoPost } from "../../hooks/post/usePost.query";
+import { useSearchResource } from "../../hooks/search/useSearch.query";
+
+// AÇÃO È OS PROCEDIMENTOS
 
 const InputForm = ({
   label = "",
@@ -57,10 +60,19 @@ const Autoatendimento = () => {
   const [onde, setOnde] = useState();
   const [qualMedico, setQualMedico] = useState();
   const [outro, setOutro] = useState(false);
+  const [openLocal, setOpenLocal] = useState(false);
 
   const { data: unidadesData, isLoading: loadingUnidades } = useUnidadesFetch();
-  const { data: medicosData, isLoading: loadingMedicos } = useMedicosFetch();
-  const { data: acaoData, isLoading: loadingAcao } = useAcoesFetch();
+  // const { data: medicosData, isLoading: loadingMedicos } = useMedicosFetch();
+  const { data: acaoData = [], isLoading: loadingAcao } = useAcoesFetch();
+
+  const { data: searchMedicos = [], isLoading: loadingMedicos } =
+    useSearchResource(
+      "medicosSearch",
+      "medicos-procedimento",
+      queDeseja,
+      queDeseja
+    );
 
   const [tipoAtendimento, setTipoAtendimento] = React.useState();
 
@@ -98,11 +110,11 @@ const Autoatendimento = () => {
   return (
     <>
       <Card className="container mx-auto w-full md:w-3/5  mt-10 p-4">
-        <img
+        {/* <img
           src={"img/logo.png"}
           alt="Logo viva saude"
           className="w-24 h-24 aspect-square text-center mx-auto"
-        />
+        /> */}
         <form className="" onSubmit={handleSubmit(onSubmit)}>
           <FormWizard
             stepSize="sm"
@@ -179,51 +191,51 @@ const Autoatendimento = () => {
                     label="O que deseja realizar?"
                     name="o_que_deseja"
                     value={queDeseja}
-                    onChange={(val) => setQueDeseja(val)}
+                    onChange={(val) => {
+                      setQueDeseja(val);
+                      setOpenLocal(false);
+                    }}
                   >
                     {acaoData?.map((item) => (
-                      <Option key={item.id} value={item.id}>
+                      <Option key={item.id} value={item.nome}>
                         {item.nome}
                       </Option>
                     ))}
                   </Select>
                 )}
 
-                {/* {loadingUnidades ? (
-                  "carregando..."
-                ) : (
-                  <Select
-                    label="Onde deseja ser atendido"
-                    name="onde_deseja_ser_atendido"
-                    value={onde}
-                    onChange={(val) => setOnde(val)}
-                  >
-                    {unidadesData?.map((item) => (
-                      <Option key={item.id} value={item.id}>
-                        {item.nome}
-                      </Option>
-                    ))}
-                  </Select>
-                )} */}
-                {/* consulta, exame, etc um select para o tipo de atendimento*/}
-
                 {loadingMedicos ? (
                   "carregando..."
                 ) : (
                   <Select
+                    disabled={!queDeseja || loadingMedicos}
                     label="Selecione o medico que deseja"
                     name="medico_atendimento"
                     value={qualMedico}
-                    onChange={(val) => setQualMedico(val)}
+                    onChange={(val) => {
+                      setQualMedico(val);
+                      setOpenLocal(true);
+                    }}
                   >
-                    {medicosData?.map((item) => (
-                      <Option key={item.id} value={item.id}>
+                    {searchMedicos?.map((item) => (
+                      <Option key={item.id} value={item.nome}>
                         {item.nome}
                       </Option>
                     ))}
                   </Select>
                 )}
               </div>
+
+{/* verificar de buscar só os locais assim que for selecionado o medico */}
+              {qualMedico && openLocal
+                ? searchMedicos?.map((item, index) => (
+                    <div key={index + 1}>
+                      {item?.local?.map((lc, i) => (
+                        <Checkbox key={i + 1} label={lc.local} />
+                      ))}
+                    </div>
+                  ))
+                : "UÉ"}
             </FormWizard.TabContent>
             {/*  */}
             <FormWizard.TabContent title="Mais detalhes" icon="ti-user">

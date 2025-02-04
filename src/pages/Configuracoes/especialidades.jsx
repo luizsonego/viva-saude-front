@@ -20,7 +20,7 @@ function Especialidades({ title }) {
 
   const { data, isLoading } = useGetResources("especialidade", "especialidade");
   const { mutate: mutateDelete, isPending: isDeleting } = useDeleteMutation(
-    "especialidade",
+    "especialidades",
     "especialidade"
   );
 
@@ -59,18 +59,24 @@ function Especialidades({ title }) {
       <CustomCard title={title} handleAction={handleCreate}>
         <GenericTable
           columns={[
-            { Header: "Prioridade", accessor: "nome" },
+            { Header: "Nome", accessor: "nome" },
             {
               Header: "Cor",
               accessor: "color",
             },
           ]}
-          data={data?.map((item) => ({
-            id: item.id,
-            nome: <p>{item.nome}</p>,
-            color: <Chip style={{ backgroundColor: item.cor, height: 25 }} />,
-            resource: "prioridade",
-          }))}
+          data={
+            Array.isArray(data)
+              ? data?.map((item) => ({
+                  id: item.id,
+                  nome: <p>{item.nome}</p>,
+                  color: (
+                    <Chip style={{ backgroundColor: item.cor, height: 25 }} />
+                  ),
+                  resource: "especialidade",
+                }))
+              : []
+          }
           actionDelete={handleDelete}
           actionEdit={handleEdit}
           isDeleting={isDeleting}

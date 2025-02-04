@@ -80,6 +80,9 @@ const Create = () => {
   const [addProcedimentoValor, setAddProcedimentoValor] = useState("");
   const [especialidade, setEspecialidade] = useState("");
 
+  const [listaLocalAtendimento, setListaLocalAtendimento] = useState([]);
+  const [addLocalAtendimento, setAddLocalAtendimento] = useState("");
+
   const [schedule, setSchedule] = useState([]);
 
   const { data: unidadesData, isLoading: loadingUnidades } = useUnidadesFetch();
@@ -100,6 +103,7 @@ const Create = () => {
       procedimento_valor: listaProcedimentos,
       horarios: schedule,
       especialidade,
+      local: listaLocalAtendimento,
       ...data,
     };
     mutateAsync(sendForm);
@@ -183,6 +187,27 @@ const Create = () => {
     );
   };
 
+  function handleChangeLocalAtendimento(e) {
+    setAddLocalAtendimento(e.target.value);
+  }
+  function handleRemoveLocalAtendimento(id) {
+    const novaLista = listaLocalAtendimento.filter((item) => {
+      return item.id !== id;
+    });
+
+    setListaLocalAtendimento(novaLista);
+  }
+  function handleAddLocalAtendimento() {
+    let min = Math.ceil(1);
+    let max = Math.ceil(100);
+    let mt = Math.floor(Math.random() * (10 - 2) + 1);
+    const novaLista = listaLocalAtendimento.concat({
+      id: Math.floor(Math.random() * (max - min) + min) * mt,
+      local: addLocalAtendimento,
+    });
+    setListaLocalAtendimento(novaLista);
+  }
+
   return (
     <>
       <Card shadow={false} className="w-full justify-center">
@@ -193,11 +218,62 @@ const Create = () => {
           >
             <div className="mb-1 flex flex-col gap-6">
               <InputForm label="Nome" name="nome" register={register} />
-              <InputForm
+              {/* <InputForm
                 label="Local de atendimento"
                 name="local"
                 register={register}
-              />
+              /> */}
+              <div className="flex gap-4">
+                <div>
+                  <Typography
+                    variant="h6"
+                    color="blue-gray"
+                    className=""
+                    style={{ textTransform: "capitalize" }}
+                  >
+                    Local de Atendimento
+                  </Typography>
+                  <Input
+                    type="text"
+                    onChange={handleChangeLocalAtendimento}
+                    value={addLocalAtendimento}
+                  />
+                </div>
+                <div>
+                  <Button
+                    type="button"
+                    onClick={handleAddLocalAtendimento}
+                    className="mt-6"
+                    variant="text"
+                  >
+                    Adicionar
+                  </Button>
+                </div>
+              </div>
+              {listaLocalAtendimento.length < 1 ? (
+                ""
+              ) : (
+                <Card className="w-full md:w-1/2 overflow-hidden rounded-md">
+                  <List>
+                    {listaLocalAtendimento.map((item) => (
+                      <ListItem key={item.id}>
+                        {item.local}
+                        <ListItemPrefix>
+                          <Button
+                            variant="gradient"
+                            className="h-5 p-4 pt-1 pb-3 ml-5"
+                            onClick={() =>
+                              handleRemoveLocalAtendimento(item.id)
+                            }
+                          >
+                            (x)
+                          </Button>
+                        </ListItemPrefix>
+                      </ListItem>
+                    ))}
+                  </List>
+                </Card>
+              )}
 
               {loadingEspecialidade ? (
                 "carregando..."

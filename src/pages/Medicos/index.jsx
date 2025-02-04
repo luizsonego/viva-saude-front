@@ -1,6 +1,6 @@
 import React from "react";
 import Table from "./Table";
-import { avatar, Button } from "@material-tailwind/react";
+import { avatar, Button, Spinner } from "@material-tailwind/react";
 import { Link, useNavigate } from "react-router-dom";
 import { useGetResources } from "../../hooks/get/useGet.query";
 import { useDeleteMutation } from "../../hooks/delete/useDelete.query";
@@ -40,15 +40,19 @@ const Medicos = () => {
         <Button>Criar novo</Button>
       </Link>
 
-      <Table
-        columns={columns}
-        data={data}
-        loading={isLoading}
-        title="Lista de médicos"
-        edit={handleEdit}
-        del={handleDelete}
-        loadingDel={isPending}
-      />
+      {isLoading ? (
+        <Spinner />
+      ) : (
+        <Table
+          columns={columns}
+          data={data}
+          loading={isLoading}
+          title="Lista de médicos"
+          edit={handleEdit}
+          del={handleDelete}
+          loadingDel={isPending}
+        />
+      )}
     </div>
   );
 };

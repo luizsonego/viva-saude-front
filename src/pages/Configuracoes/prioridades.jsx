@@ -58,7 +58,7 @@ const Prioridades = () => {
       <CustomCard title="Prioridades" handleAction={handleOpenCreatePrioridade}>
         <GenericTable
           columns={[
-            { Header: "Prioridade", accessor: "nome" },
+            { Header: "Nome", accessor: "nome" },
             {
               Header: "Cor",
               accessor: "color",

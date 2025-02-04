@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  Navigate,
-  useNavigate,
-  useRoutes,
-  useLocation,
-} from "react-router-dom";
+import { Navigate, useRoutes, useLocation } from "react-router-dom";
 import Main from "../components/layouts/Main";
 import Login from "../pages/Login";
 import { isAuthenticated } from "../services/auth";
@@ -24,8 +19,12 @@ import Especialidades from "../pages/Configuracoes/especialidades";
 import Procedimentos from "../pages/Configuracoes/procedimentos";
 import Unidades from "../pages/Configuracoes/unidades";
 import Origem from "../pages/Configuracoes/origem";
+import Modal from "../components/Modal";
+import CreateAtendimento from "../pages/Atendimentos/create";
 
 export default function MainRouter() {
+  const location = useLocation();
+  const background = location.state && location.state.background;
   return useRoutes([
     {
       path: "/dashboard",
@@ -40,8 +39,17 @@ export default function MainRouter() {
           element: <Home />,
         },
         {
-          path: "/dashboard/atendimentos",
-          element: <Atendimentos />,
+          path: "atendimentos",
+          children: [
+            {
+              path: "",
+              element: <Atendimentos />,
+            },
+            {
+              path: "create",
+              element: <CreateAtendimento />,
+            },
+          ],
         },
         // {
         //   path: "/dashboard/cadastros",
@@ -78,10 +86,11 @@ export default function MainRouter() {
               path: "origem",
               element: <Origem />,
             },
-            {
-              path: ":path/editar/:resource/:id",
-              element: <EditConfigs />,
-            },
+            // {
+            //   path: ":path/editar/:resource/:id",
+            //   element: <EditConfigs />,
+            // },
+            { path: ":path/editar/:resource/:id", element: <Modal /> },
           ],
         },
         {

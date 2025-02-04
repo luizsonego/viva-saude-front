@@ -80,10 +80,7 @@ function Unidades({
         isLoading={isLoading}
       >
         <GenericTable
-          columns={[
-            { Header: "Nome", accessor: "nome" },
-            { Header: "Descrição", accessor: "descricao" },
-          ]}
+          columns={[{ Header: "Nome", accessor: "nome" }]}
           data={data?.map((item) => ({
             id: item.id,
             nome: item.nome,

@@ -5,7 +5,7 @@ import { useGetResources } from "../../hooks/get/useGet.query";
 import { Chip } from "@material-tailwind/react";
 import { useDeleteMutation } from "../../hooks/delete/useDelete.query";
 import { useResourcePost } from "../../hooks/post/usePost.query";
-import { useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import InputForm from "../../components/Forms/Input";
 import MainAlert from "../../components/Alert/MainAlert";
@@ -28,6 +28,7 @@ function Origem({
   resourcePut,
 }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { register, handleSubmit, reset } = useForm();
 
   const [openModalError, setOpenModalError] = React.useState(false);
@@ -65,6 +66,9 @@ function Origem({
   const handleEdit = (id, resource) => {
     navigate(`editar/${resource}/${id}`);
   };
+  if (isLoading) {
+    return "carregando";
+  }
   return (
     <>
       <MainAlert
@@ -73,18 +77,20 @@ function Origem({
         message={dataError}
         color={"red"}
       />
+
       <CustomCard title={title} handleAction={handleCreate}>
         <GenericTable
-          columns={[
-            { Header: "Nome", accessor: "nome" },
-            { Header: "Descrição", accessor: "descricao" },
-          ]}
-          data={data?.map((item) => ({
-            id: item.id,
-            nome: item.nome,
-            descricao: item.descricao,
-            resource: resourcePut,
-          }))}
+          columns={[{ Header: "Nome", accessor: "nome" }]}
+          data={
+            Array.isArray(data)
+              ? data?.map((item) => ({
+                  id: item.id,
+                  nome: item.nome,
+                  descricao: item.descricao,
+                  resource: resourcePut,
+                }))
+              : []
+          }
           actionDelete={handleDelete}
           actionEdit={handleEdit}
           isDeleting={isDeleting}
@@ -94,7 +100,7 @@ function Origem({
         <form className="mt-0 mb-2 w-full " onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-1 flex flex-col gap-6">
             <InputForm label="nome" register={register} required />
-            <InputForm label="descricao" register={register} />
+            {/* <InputForm label="descricao" register={register} /> */}
           </div>
           <input
             value={pendingPost ? "Enviando..." : "Enviar"}

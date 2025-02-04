@@ -29,6 +29,7 @@ import { getPrioridade } from "../../helpers";
 import { useMutation } from "@tanstack/react-query";
 import { useUpdateAgendamento } from "../../hooks/update/useUpdate.query";
 import GenericTable from "../../components/Table/genericTable";
+import { Link } from "react-router-dom";
 
 const Atendimentos = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -62,7 +63,16 @@ const Atendimentos = () => {
   };
 
   return (
-    <div className="mt-12 mb-8 flex flex-col gap-12">
+    <div className="mt-2 mb-2 flex flex-col gap-12">
+      <div className="flex justify-between md:items-center">
+        <div className="mt-1 mb-5 grid lg:grid-cols-5 md:grid-cols-2 grid-cols-1 items-center md:gap-2.5 gap-4 w-full ">
+          <Link to={"create"}>
+            <Button fullWidth variant="outlined" color="indigo">
+              Novos
+            </Button>
+          </Link>
+        </div>
+      </div>
       <div className="flex justify-between md:items-center">
         <div className="mt-6 grid lg:grid-cols-5 md:grid-cols-2 grid-cols-1 items-center md:gap-2.5 gap-4 w-full ">
           <Button fullWidth variant="outlined" color="indigo">
