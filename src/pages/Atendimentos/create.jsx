@@ -10,7 +10,7 @@ import {
 } from "@material-tailwind/react";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useAcoesFetch } from "../../hooks/get/useGet.query";
+import { useAcoesFetch, useGetResources } from "../../hooks/get/useGet.query";
 import { useSearchResource } from "../../hooks/search/useSearch.query";
 import { useMutation } from "@tanstack/react-query";
 import { useAtendimentoPost } from "../../hooks/post/usePost.query";
@@ -57,6 +57,9 @@ const CreateAtendimento = () => {
   const [emEspera, setEmEspera] = useState(0);
   const [aguardandoVaga, setAguardandoVaga] = useState(0);
 
+  const { data: procedimentosData, isLoading: loadingProcedimentos } =
+    useGetResources("medicos", "procedimentos");
+
   const { data: acaoData = [], isLoading: loadingAcao } = useAcoesFetch();
   const { data: searchMedicos = [], isLoading: loadingMedicos } =
     useSearchResource(
@@ -65,6 +68,15 @@ const CreateAtendimento = () => {
       queDeseja,
       queDeseja
     );
+
+  const { data: searchLocalMedico = [], isLoading: loadingLocalMedico } =
+    useSearchResource(
+      "localMedicosSearch",
+      "medicos-local",
+      qualMedico,
+      qualMedico
+    );
+  console.log("searchLocalMedico", searchLocalMedico);
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: useAtendimentoPost,
@@ -151,7 +163,7 @@ const CreateAtendimento = () => {
           </fieldset>
 
           <fieldset className="mb-1 flex flex-col gap-6 border p-5">
-            {loadingAcao ? (
+            {loadingProcedimentos ? (
               "carregando..."
             ) : (
               <Select
@@ -160,11 +172,12 @@ const CreateAtendimento = () => {
                 value={queDeseja}
                 onChange={(val) => {
                   setQueDeseja(val);
+                  setOpenLocal(false);
                 }}
               >
-                {acaoData?.map((item) => (
-                  <Option key={item.id} value={item.id}>
-                    {item.nome}
+                {procedimentosData?.map((item, index) => (
+                  <Option key={index + 1} value={item}>
+                    {item}
                   </Option>
                 ))}
               </Select>
@@ -190,7 +203,7 @@ const CreateAtendimento = () => {
               </Select>
             )}
             {qualMedico && openLocal
-              ? searchMedicos?.map((item, index) => (
+              ? searchLocalMedico?.map((item, index) => (
                   <div key={index + 1}>
                     {item?.local?.map((lc, i) => (
                       <Radio

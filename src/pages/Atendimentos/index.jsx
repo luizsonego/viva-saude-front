@@ -151,7 +151,7 @@ const Atendimentos = () => {
             {filtrarPorStatus().map((item) => (
               <tr key={item.id} className="">
                 <td className={classTdTable}>{item.titular_plano}</td>
-                <td className={classTdTable}>{item.acoes.nome}</td>
+                <td className={classTdTable}>{item.o_que_deseja}</td>
                 <td className={classTdTable}>{item.medico_atendimento}</td>
                 <td className={classTdTable}>
                   {item.onde_deseja_ser_atendido}
