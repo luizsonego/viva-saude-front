@@ -226,11 +226,11 @@ const CreateAtendimento = () => {
             />
           </fieldset>
           <fieldset className="mb-1 flex flex-col gap-6 border p-5">
-            {/* <InputForm
+            <InputForm
               label="Forma de pagamento "
               name="telefone"
               register={register}
-            /> */}
+            />
           </fieldset>
           <fieldset className="mb-1 flex flex-col gap-6 border p-5">
             <InputForm

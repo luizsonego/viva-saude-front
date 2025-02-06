@@ -22,6 +22,7 @@ import {
 import {
   useAcoesFetch,
   useAtendimentosFetch,
+  useGetResources,
   useMedicosFetch,
   useUnidadesFetch,
 } from "../../hooks/get/useGet.query";
@@ -37,6 +38,7 @@ import { CustomModal } from "../Configuracoes/Components";
 import EditAtendimentoDadosPessoais from "./edits/dadosPessoais";
 import EditAtendimentoDadosMedicos from "./edits/dadosMedicos";
 import CustomTimeline from "./timeline";
+import AddComentario from "./edits/comentario";
 
 const classThTable =
   "border-b border-blue-gray-50 py-3 px-5 text-left text-[11px] font-bold uppercase text-blue-gray-400";
@@ -47,19 +49,23 @@ const Atendimentos = () => {
   const [openModalAtendimento, setOpenModalAtendimento] = useState(false);
   const [openModalMedicos, setOpenModalMedicos] = useState(false);
   const [openModalTimeLine, setOpenModalTimeLine] = useState(false);
+  const [openModalComentario, setOpenModalComentario] = useState(false);
   const [dataModal, setDataModal] = useState({});
   const [statusSelecionado, setStatusSelecionado] = useState("ABERTO");
 
   const { data, isLoading } = useAtendimentosFetch();
+  const { data: prioridadeData } = useGetResources("prioridades", "prioridade");
 
   const { mutateAsync, isPending } = useResourcePut(
     "atendimentos",
     "troca-status",
     () => {}
   );
+  const { mutateAsync: mutatePrioridade, isPending: pendingPrioridade } =
+    useResourcePut("atendimentos", "troca-prioridade", () => {});
 
   const filtrarPorStatus = () => {
-    if (statusSelecionado === "NOVOS") return data;
+    if (statusSelecionado === "ABERTOS") return data;
     return data.filter((item) => item.status === statusSelecionado);
   };
 
@@ -78,6 +84,17 @@ const Atendimentos = () => {
     setOpenModalTimeLine(!openModalTimeLine);
   };
 
+  const handleOpenModalComentario = () => {
+    setOpenModalComentario(!openModalComentario);
+  };
+
+  const handleChangePrioridadeCartao = ({ id, prioridade }) => {
+    let dataStatus = {
+      id,
+      prioridade,
+    };
+    mutatePrioridade(dataStatus);
+  };
   const handleChangeStatusCartao = ({ id, status }) => {
     let dataStatus = {
       id,
@@ -91,6 +108,12 @@ const Atendimentos = () => {
   }
   return (
     <>
+      {/* <MainAlert
+        handleOpen={openModalError}
+        handleClose={() => setOpenModalError(!openModalError)}
+        message={dataError}
+        color={"red"}
+      /> */}
       <div className="flex flex-col gap-12">
         <div className="flex justify-between md:items-center">
           <div className="mt-1 mb-5 grid lg:grid-cols-5 md:grid-cols-2 grid-cols-1 items-center md:gap-2.5 gap-4 w-full ">
@@ -192,137 +215,6 @@ const Atendimentos = () => {
           </Link> */}
           </div>
         </div>
-        {/* <div className="flex justify-between md:items-center">
-          <div className="mt-1 grid lg:grid-cols-6 md:grid-cols-2 grid-cols-1 items-center md:gap-2.5 gap-4 w-full ">
-            <Button fullWidth variant="outlined" color="indigo">
-              Novos
-            </Button>
-            <Button fullWidth variant="outlined" color="cyan">
-              Abertos
-            </Button>
-            <Button fullWidth variant="outlined" color="orange">
-              Em análise
-            </Button>
-            <Button fullWidth variant="outlined" color="deep-orange">
-              Pagamento
-            </Button>
-            <Button
-              fullWidth
-              variant="outlined"
-              color="green"
-              className="py-3 px-0"
-            >
-              Aguardando autorização
-            </Button>
-            <Button fullWidth variant="outlined" color="indigo">
-              Concluidos
-            </Button>
-          </div>
-        </div> */}
-
-        {/* <Card>
-          <CardHeader variant="gradient" color="gray" className="mb-8 p-6">
-            <Typography variant="h6" color="white">
-              Atendimentos
-            </Typography>
-          </CardHeader>
-          <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
-            <table className="w-full  table-auto">
-              <thead>
-                <tr>
-                  <th className="border-b border-blue-gray-50 py-3 px-5 text-left">
-                    <Typography
-                      variant="small"
-                      className="text-[11px] font-bold uppercase text-blue-gray-400"
-                    >
-                      Titular
-                    </Typography>
-                  </th>
-                  <th className="border-b border-blue-gray-50 py-3 px-5 text-left">
-                    <Typography
-                      variant="small"
-                      className="text-[11px] font-bold uppercase text-blue-gray-400"
-                    >
-                      Ação
-                    </Typography>
-                  </th>
-                  <th className="border-b border-blue-gray-50 py-3 px-5 text-left">
-                    <Typography
-                      variant="small"
-                      className="text-[11px] font-bold uppercase text-blue-gray-400"
-                    >
-                      Onde
-                    </Typography>
-                  </th>
-                  <th className="border-b border-blue-gray-50 py-3 px-5 text-left">
-                    <Typography
-                      variant="small"
-                      className="text-[11px] font-bold uppercase text-blue-gray-400"
-                    >
-                      Médico
-                    </Typography>
-                  </th>
-                  <th className="border-b border-blue-gray-50 py-3 px-5 text-left">
-                    <Typography
-                      variant="small"
-                      className="text-[11px] font-bold uppercase text-blue-gray-400"
-                    >
-                      Status
-                    </Typography>
-                  </th>
-                  <th className="border-b border-blue-gray-50 py-3 px-5 text-left">
-                    <Typography
-                      variant="small"
-                      className="text-[11px] font-bold uppercase text-blue-gray-400"
-                    >
-                      Hora solicitação
-                    </Typography>
-                  </th>
-                  <th className="border-b border-blue-gray-50 py-3 px-5 text-left">
-                    <Typography
-                      variant="small"
-                      className="text-[11px] font-bold uppercase text-blue-gray-400"
-                    ></Typography>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {data?.map((item, index) => {
-                  return (
-                    <tr key={index + 1}>
-                      <td className={`py-3 px-5 border-b border-blue-gray-50`}>
-                        {item?.titular_plano}
-                      </td>
-                      <td className={`py-3 px-5 border-b border-blue-gray-50`}>
-                        {item.titular_plano}
-                      </td>
-                      <td className={`py-3 px-5 border-b border-blue-gray-50`}>
-                        {item.onde_deseja_ser_atendido}
-                      </td>
-                      <td className={`py-3 px-5 border-b border-blue-gray-50`}>
-                        {item.medico_atendimento}
-                      </td>
-                      <td className={`py-3 px-5 border-b border-blue-gray-50`}>
-                        {item.status}
-                      </td>
-                      <td className={`py-3 px-5 border-b border-blue-gray-50`}>
-                        {item.atendimento_iniciado}
-                      </td>
-                      <td className={`py-3 px-5 border-b border-blue-gray-50`}>
-                        <Button
-                          onClick={() => handleOpenModalConsulta(item)}
-                          variant="outlined"
-                        >
-                          Detalhes
-                        </Button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </CardBody>
-        </Card> */}
 
         <Dialog open={openModal} handler={handleOpenModalConsulta} size="lg">
           <DialogHeader>
@@ -412,7 +304,8 @@ const Atendimentos = () => {
                         className="text-xs !font-bold"
                         color="blue-gray"
                       >
-                        {getPrioridade(dataModal.prioridade)}
+                        {console.log(dataModal)}
+                        {dataModal?.prioridadeAtendimento?.nome}
                       </Typography>
                     </div>
 
@@ -456,7 +349,7 @@ const Atendimentos = () => {
                     {"O que deseja"}:
                   </Typography>
                   <Typography className="text-xs !font-bold" color="blue-gray">
-                    {dataModal.acoes?.nome}
+                    {dataModal.o_que_deseja}
                   </Typography>
                 </div>
                 <div className="flex gap-1">
@@ -465,6 +358,13 @@ const Atendimentos = () => {
                   </Typography>
                   <Typography className="text-xs !font-bold" color="blue-gray">
                     {dataModal.onde_deseja_ser_atendido}
+                  </Typography>
+                </div>
+                <hr className="mt-5 mb-5" />
+                <h3>Comentários</h3>
+                <div className="flex gap-1">
+                  <Typography className="text-xs !font-bold" color="blue-gray">
+                    {dataModal.comentario}
                   </Typography>
                 </div>
               </Card>
@@ -508,6 +408,21 @@ const Atendimentos = () => {
                 </Card>
 
                 <Select
+                  label="Prioridade"
+                  onChange={(prioridade) =>
+                    handleChangePrioridadeCartao({
+                      prioridade,
+                      id: dataModal.id,
+                    })
+                  }
+                >
+                  {prioridadeData?.map((item, index) => (
+                    <Option key={index + 1} value={item.id}>
+                      {item.nome}
+                    </Option>
+                  ))}
+                </Select>
+                <Select
                   label="Status"
                   onChange={(status) =>
                     handleChangeStatusCartao({ status, id: dataModal.id })
@@ -537,6 +452,13 @@ const Atendimentos = () => {
                     onClick={() => handleOpenModalAjustesMedico(dataModal)}
                   >
                     Ajustar dados atendimento
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    onClick={() => handleOpenModalComentario(dataModal)}
+                    color="light-blue"
+                  >
+                    Comentário
                   </Button>
                   <Button
                     variant="outlined"
@@ -573,6 +495,13 @@ const Atendimentos = () => {
             handler={handleOpenModalTimeLine}
           >
             <CustomTimeline data={dataModal} />
+          </CustomModal>
+          <CustomModal
+            title={"Comentário"}
+            open={openModalComentario}
+            handler={handleOpenModalComentario}
+          >
+            <AddComentario data={dataModal} />
           </CustomModal>
         </Dialog>
       </div>

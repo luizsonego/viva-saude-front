@@ -2,18 +2,7 @@ import { Input } from "@material-tailwind/react";
 import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useMedicosFetch } from "../../../hooks/get/useGet.query";
-
-const Select = ({ register, options, name, ...rest }) => {
-  return (
-    <select {...register(name)} {...rest}>
-      {options.map((value) => (
-        <option key={value} value={value}>
-          {value}
-        </option>
-      ))}
-    </select>
-  );
-};
+import { useResourcePut } from "../../../hooks/update/useUpdate.query";
 
 const EditAtendimentoDadosMedicos = ({ data }) => {
   const { register, handleSubmit, setValue, control } = useForm();
@@ -21,6 +10,12 @@ const EditAtendimentoDadosMedicos = ({ data }) => {
   const [qualMedico, setQualMedico] = useState();
 
   const { data: medicosData, isLoading: loadingMedicos } = useMedicosFetch();
+
+  const { mutateAsync, isPending } = useResourcePut(
+    "atendimentos",
+    "atendimento",
+    () => {}
+  );
 
   useEffect(() => {
     setValue("medico_atendimento", data.medico_atendimento);
@@ -31,8 +26,7 @@ const EditAtendimentoDadosMedicos = ({ data }) => {
       qualMedico,
       ...dataform,
     };
-    console.log(">>>", form);
-    // mutateAsync(data);
+    mutateAsync(form);
   };
 
   return (
@@ -58,33 +52,6 @@ const EditAtendimentoDadosMedicos = ({ data }) => {
         defaultValue={data?.onde_deseja_ser_atendido}
         {...register("onde_deseja_ser_atendido")}
       />
-
-      {/* <Input
-        label="cpf titular"
-        {...register("cpf_titular")}
-        defaultValue={data?.cpf_titular}
-      /> */}
-      {/* <Input
-        label="whatsapp titular"
-        {...register("whatsapp_titular")}
-        defaultValue={data?.whatsapp_titular}
-      /> */}
-      {/* {data.para_quem === "outro" ? (
-        <>
-          <Input
-            label="nome outro"
-            {...register("nome_outro")}
-            defaultValue={data?.nome_outro}
-          />
-          <Input
-            label="cpf outro"
-            {...register("cpf_outro")}
-            defaultValue={data?.cpf_outro}
-          />
-        </>
-      ) : (
-        ""
-      )} */}
 
       <Input
         // className="hidden"
