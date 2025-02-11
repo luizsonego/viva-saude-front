@@ -17,17 +17,21 @@ const postResource = async (resource, data) => {
   }
 };
 
-export const useResourcePost = (queries, resource, onSuccessCallback, onErrorCallback) => {
+export const useResourcePost = (
+  queries,
+  resource,
+  onSuccessCallback,
+  onErrorCallback
+) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data) => postResource(resource, data),
-    onSuccess: ({data}) => {
-      
+    onSuccess: ({ data }) => {
       if (data.status === 400) {
-        if(onErrorCallback) {
+        if (onErrorCallback) {
           onErrorCallback(data.message);
         }
-        console.log('err', data.message)
+        console.log("err", data.message);
         return;
       }
 
@@ -90,6 +94,29 @@ const postAtendimento = async (values) => {
   } catch (error) {
     console.log(error.message);
   }
+};
+
+const postUpload = async (dataImage) => {
+  try {
+    const data = await api.patch(
+      `${process.env.REACT_APP_API}/v1/update/anexo`,
+      dataImage,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem(
+            process.env.REACT_APP_ACCESS_TOKEN
+          )}`,
+        },
+      }
+    );
+    return data;
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+export const useUploadAnexo = async (data) => {
+  return postUpload(data);
 };
 
 export function useMedicoPost(data) {

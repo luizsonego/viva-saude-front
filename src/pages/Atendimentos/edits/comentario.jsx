@@ -1,7 +1,7 @@
 import React from "react";
 import { useResourcePut } from "../../../hooks/update/useUpdate.query";
 import { useForm } from "react-hook-form";
-import { Input } from "@material-tailwind/react";
+import { Input, Textarea } from "@material-tailwind/react";
 
 const AddComentario = ({ data }) => {
   const { register, handleSubmit, setValue, control } = useForm();
@@ -22,8 +22,8 @@ const AddComentario = ({ data }) => {
       className="mt-8 mb-2 w-full flex flex-col gap-5"
       onSubmit={handleSubmit(onSubmit)}
     >
-      <Input
-        label="Comentario"
+      <Textarea
+        label="Resumo do atendimento"
         name="comentario"
         defaultValue={data?.comentario}
         {...register("comentario")}
@@ -37,7 +37,7 @@ const AddComentario = ({ data }) => {
       />
 
       <input
-        // value={isPending ? "Enviando..." : "Enviar"}
+        value={isPending ? "Enviando..." : "Enviar"}
         type="submit"
         className="bg-green-500 text-white p-2 rounded-md w-full mt-10"
       />
