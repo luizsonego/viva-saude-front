@@ -3,13 +3,15 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { useResourcePut } from "../../../hooks/update/useUpdate.query";
 
-const EditAtendimentoDadosPessoais = ({ data }) => {
+const EditAtendimentoDadosPessoais = ({ data, modal }) => {
   const { register, handleSubmit, setValue } = useForm();
 
   const { mutateAsync, isPending } = useResourcePut(
     "atendimentos",
     "atendimento",
-    () => {}
+    () => {
+      modal(false);
+    }
   );
 
   const onSubmit = (dataform) => {
@@ -57,7 +59,7 @@ const EditAtendimentoDadosPessoais = ({ data }) => {
       )}
 
       <Input
-        // className="hidden"
+        className="hidden"
         disabled
         value={data.id}
         defaultValue={data.id}
@@ -65,7 +67,7 @@ const EditAtendimentoDadosPessoais = ({ data }) => {
       />
 
       <input
-        // value={isPending ? "Enviando..." : "Enviar"}
+        value={isPending ? "Enviando..." : "Enviar"}
         type="submit"
         className="bg-green-500 text-white p-2 rounded-md w-full mt-10"
       />

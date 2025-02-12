@@ -13,6 +13,7 @@
     "imagekitio-react": "^4.2.0",
     "react": "^18.2.0",
     "react-apexcharts": "1.4.1",
+    "react-datetime-picker": "^6.0.1",
     "react-dom": "^18.2.0",
     "react-form-wizard-component": "^0.2.7",
     "react-hook-form": "^7.54.2",

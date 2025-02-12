@@ -3,13 +3,15 @@ import { useResourcePut } from "../../../hooks/update/useUpdate.query";
 import { useForm } from "react-hook-form";
 import { Input, Textarea } from "@material-tailwind/react";
 
-const AddComentario = ({ data }) => {
+const AddComentario = ({ data, modal }) => {
   const { register, handleSubmit, setValue, control } = useForm();
 
   const { mutateAsync, isPending } = useResourcePut(
     "atendimentos",
     "atendimento",
-    () => {}
+    () => {
+      modal(false);
+    }
   );
   const onSubmit = (dataform) => {
     let form = {
@@ -29,7 +31,7 @@ const AddComentario = ({ data }) => {
         {...register("comentario")}
       />
       <Input
-        // className="hidden"
+        className="hidden"
         disabled
         value={data.id}
         defaultValue={data.id}

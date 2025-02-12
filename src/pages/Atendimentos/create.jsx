@@ -14,6 +14,11 @@ import { useAcoesFetch, useGetResources } from "../../hooks/get/useGet.query";
 import { useSearchResource } from "../../hooks/search/useSearch.query";
 import { useMutation } from "@tanstack/react-query";
 import { useAtendimentoPost } from "../../hooks/post/usePost.query";
+import DateTimePicker from "react-datetime-picker";
+import "react-datetime-picker/dist/DateTimePicker.css";
+import "react-calendar/dist/Calendar.css";
+import "react-clock/dist/Clock.css";
+import { useNavigate } from "react-router-dom";
 
 const InputForm = ({
   label = "",
@@ -21,6 +26,7 @@ const InputForm = ({
   placeholder = "",
   register,
   required,
+  type = "text",
 }) => {
   return (
     <>
@@ -39,6 +45,7 @@ const InputForm = ({
         labelProps={{
           className: "before:content-none after:content-none",
         }}
+        type={type}
         {...register(name, { required })}
       />
     </>
@@ -46,6 +53,7 @@ const InputForm = ({
 };
 
 const CreateAtendimento = () => {
+  const navigate = useNavigate();
   const { register, handleSubmit, setValue } = useForm();
 
   const [queDeseja, setQueDeseja] = useState("");
@@ -56,6 +64,7 @@ const CreateAtendimento = () => {
   const [localEscolhido, setLocalEscolhido] = useState(false);
   const [emEspera, setEmEspera] = useState(0);
   const [aguardandoVaga, setAguardandoVaga] = useState(0);
+  const [valueDateAgendamento, setValueDateAgendamento] = useState(new Date());
 
   const { data: procedimentosData, isLoading: loadingProcedimentos } =
     useGetResources("medicos", "procedimentos");
@@ -76,10 +85,12 @@ const CreateAtendimento = () => {
       qualMedico,
       qualMedico
     );
-  console.log("searchLocalMedico", searchLocalMedico);
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: useAtendimentoPost,
+    onSuccess: () => {
+      navigate(-1);
+    },
   });
 
   useEffect(() => {
@@ -95,7 +106,7 @@ const CreateAtendimento = () => {
       medico_atendimento: qualMedico,
       medico: qualMedico,
       onde_deseja_ser_atendido: localEscolhido,
-      // medico_atendimento_data: localEscolhido,
+      medico_atendimento_data: valueDateAgendamento,
       o_que_deseja: queDeseja,
       em_espera: emEspera,
       aguardando_vaga: aguardandoVaga,
@@ -219,11 +230,16 @@ const CreateAtendimento = () => {
               : ""}
           </fieldset>
           <fieldset className="mb-1 flex flex-col gap-6 border p-5">
-            <InputForm
+            <DateTimePicker
+              onChange={setValueDateAgendamento}
+              value={valueDateAgendamento}
+            />
+            {/* <InputForm
               label="Data de agendamento"
               name="medico_atendimento_data"
               register={register}
-            />
+              type=""
+            /> */}
           </fieldset>
           <fieldset className="mb-1 flex flex-col gap-6 border p-5">
             <InputForm

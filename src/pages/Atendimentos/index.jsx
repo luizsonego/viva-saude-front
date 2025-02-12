@@ -385,6 +385,14 @@ const Atendimentos = () => {
                     {dataModal.onde_deseja_ser_atendido}
                   </Typography>
                 </div>
+                <div className="flex gap-1">
+                  <Typography className="mb-1 text-xs !font-medium !text-gray-600">
+                    {"Data"}:
+                  </Typography>
+                  <Typography className="text-xs !font-bold" color="blue-gray">
+                    {dataModal.medico_atendimento_data}
+                  </Typography>
+                </div>
                 <hr className="mt-5 mb-5" />
                 <h3>Resumo do atendimento</h3>
                 <div className="flex gap-1">
@@ -396,7 +404,7 @@ const Atendimentos = () => {
                 <h3>Anexo</h3>
                 <div className="flex gap-1">
                   <Typography className="text-xs !font-bold" color="blue-gray">
-                    {dataModal.anexo}
+                    <img src={dataModal.anexos} alt="imagem" />
                   </Typography>
                 </div>
               </Card>
@@ -536,12 +544,16 @@ const Atendimentos = () => {
             open={openModalAtendimento}
             handler={handleOpenModalAjustesAtendimento}
           >
-            <EditAtendimentoDadosPessoais data={dataModal} />
+            <EditAtendimentoDadosPessoais
+              data={dataModal}
+              modal={() => setOpenModalAtendimento(false)}
+            />
           </CustomModal>
           <CustomModal
             title={"Ajustar dados do atendimento"}
             open={openModalMedicos}
             handler={handleOpenModalAjustesMedico}
+            modal={() => setOpenModalMedicos(false)}
           >
             <EditAtendimentoDadosMedicos data={dataModal} />
           </CustomModal>
@@ -550,6 +562,7 @@ const Atendimentos = () => {
             title={"Linha do tempo"}
             open={openModalTimeLine}
             handler={handleOpenModalTimeLine}
+            modal={() => setOpenModalTimeLine(false)}
           >
             <CustomTimeline data={dataModal} />
           </CustomModal>
@@ -557,6 +570,7 @@ const Atendimentos = () => {
             title={"Resumo do atendimento"}
             open={openModalComentario}
             handler={handleOpenModalComentario}
+            modal={() => setOpenModalComentario(false)}
           >
             <AddComentario data={dataModal} />
           </CustomModal>
