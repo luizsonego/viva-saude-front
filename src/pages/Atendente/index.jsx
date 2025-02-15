@@ -1,6 +1,6 @@
 import React from "react";
 import { useAtendenteFetch } from "../../hooks/get/useGet.query";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Button,
   Card,
@@ -28,9 +28,12 @@ const columns = [
 ];
 
 const Atendentes = () => {
+  const navigate = useNavigate();
   const { data, isLoading } = useAtendenteFetch();
 
-  console.log(data);
+  const handleEdit = (id, resource) => {
+    navigate(`editar/${id}`);
+  };
   return (
     <div>
       <Link to="criar">
@@ -69,7 +72,7 @@ const Atendentes = () => {
                 resource: "prioridade",
               }))}
               // actionDelete={handleDelete}
-              // actionEdit={handleEdit}
+              actionEdit={handleEdit}
               // isDeleting={isDeleting}
             />
           </CardBody>

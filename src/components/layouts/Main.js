@@ -3,9 +3,12 @@ import { Outlet } from "react-router-dom";
 import DashboardNavbar from "./dashboard-navbar";
 import { Sidenav } from "./sidenav";
 import { HomeIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
+import { useGetResources } from "../../hooks/get/useGet.query";
+
 const icon = {
   className: "w-5 h-5 text-inherit",
 };
+
 export const routes = [
   {
     layout: "dashboard",
@@ -14,24 +17,25 @@ export const routes = [
         icon: <HomeIcon {...icon} />,
         name: "inicio",
         path: "/",
-        // element: <Home />,
+        role: "atendente",
       },
       {
         icon: <InformationCircleIcon {...icon} />,
         name: "atendimentos",
         path: "/atendimentos",
-        // element: <Notifications />,
+        role: "atendente",
       },
       {
         icon: <InformationCircleIcon {...icon} />,
         name: "médicos",
         path: "/medicos",
-        // element: <Notifications />,
+        role: "gerente",
       },
       {
         icon: <InformationCircleIcon {...icon} />,
         name: "cadastros",
         path: "/cadastros",
+        role: "gerente",
         children: [
           {
             name: "grupos",
@@ -58,21 +62,22 @@ export const routes = [
             path: "/cadastros/origem",
           },
         ],
-        // element: <Notifications />,
       },
       {
         icon: <InformationCircleIcon {...icon} />,
         name: "atendentes",
         path: "/atendente",
-        // element: <Notifications />,
+        role: "gerente",
       },
     ],
   },
 ];
 function Main() {
+  const { data } = useGetResources("authenticatided", "user-authenticaded");
+
   return (
     <div className="min-h-screen bg-blue-gray-50/50">
-      <Sidenav routes={routes} brandImg={"/img/logo.png"} />
+      <Sidenav routes={routes} brandImg={"/img/logo.png"} userrole={data} />
       <div className="p-4 xl:ml-80">
         <DashboardNavbar />
         <div className="p-0 pt-20">

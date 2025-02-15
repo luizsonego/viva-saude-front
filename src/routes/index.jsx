@@ -1,5 +1,5 @@
 import React from "react";
-import { Navigate, useRoutes, useLocation } from "react-router-dom";
+import { Navigate, useRoutes } from "react-router-dom";
 import Main from "../components/layouts/Main";
 import Login from "../pages/Login";
 import { isAuthenticated } from "../services/auth";
@@ -12,7 +12,6 @@ import Atendentes from "../pages/Atendente";
 import CreateAtendente from "../pages/Atendente/create";
 import Autoatendimento from "../pages/Auto";
 import EditMedico from "../pages/Medicos/edit";
-import EditConfigs from "../pages/Configuracoes/edit";
 import Grupos from "../pages/Configuracoes/grupos";
 import Prioridades from "../pages/Configuracoes/prioridades";
 import Especialidades from "../pages/Configuracoes/especialidades";
@@ -21,10 +20,10 @@ import Unidades from "../pages/Configuracoes/unidades";
 import Origem from "../pages/Configuracoes/origem";
 import Modal from "../components/Modal";
 import CreateAtendimento from "../pages/Atendimentos/create";
+import EditarAtendente from "../pages/Atendente/editar";
+import EditConfigs from "../pages/Configuracoes/edit";
 
 export default function MainRouter() {
-  const location = useLocation();
-  const background = location.state && location.state.background;
   return useRoutes([
     {
       path: "/dashboard",
@@ -120,6 +119,10 @@ export default function MainRouter() {
             {
               path: "criar",
               element: <CreateAtendente />,
+            },
+            {
+              path: "editar/:id",
+              element: <EditConfigs />,
             },
           ],
         },

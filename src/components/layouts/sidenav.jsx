@@ -1,14 +1,12 @@
 import {
   ChevronDownIcon,
   ChevronRightIcon,
-  PresentationChartBarIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import {
   Accordion,
   AccordionBody,
   AccordionHeader,
-  Button,
   IconButton,
   List,
   ListItem,
@@ -18,8 +16,9 @@ import {
 import React from "react";
 import { Link, NavLink } from "react-router-dom";
 
-export function Sidenav({ brandImg, brandName, routes }) {
+export function Sidenav({ brandImg, brandName, routes, userrole }) {
   const [openSubMenu, setOpenSubMenu] = React.useState(0);
+
   const handleOpenSubMenu = (value) => {
     setOpenSubMenu(openSubMenu === value ? 0 : value);
   };
@@ -67,15 +66,17 @@ export function Sidenav({ brandImg, brandName, routes }) {
                     color={"blue-gray"}
                     className="font-black uppercase opacity-75"
                   >
-                    {title}
+                    {title} *
                   </Typography>
                 </ListItem>
               )}
-              {pages.map(({ icon, name, path, children }) =>
+              {pages.map(({ icon, name, path, children, role }) =>
                 children ? (
                   <>
-                    {console.log("childres", children)}
-                    <ListItem key={name} className="pb-3">
+                    <ListItem
+                      key={name}
+                      className={`${userrole !== role ? "hidden" : ""} pb-3`}
+                    >
                       <AccordionHeader
                         className="border-b-0 p-0 pl-0"
                         onClick={() => handleOpenSubMenu(1)}
@@ -85,7 +86,7 @@ export function Sidenav({ brandImg, brandName, routes }) {
                           color="blue-gray"
                           className="gradient w-full h-auto rounded-lg font-medium capitalize "
                         >
-                          {name}
+                          {name} --
                         </Typography>
                       </AccordionHeader>
                     </ListItem>
@@ -117,11 +118,12 @@ export function Sidenav({ brandImg, brandName, routes }) {
                 ) : (
                   <NavLink
                     to={`/${layout}${path}`}
-                    className={({ isActive }) =>
+                    className={`${userrole !== role ? "hidden" : ""} ${({
+                      isActive,
+                    }) =>
                       isActive
                         ? "gradient w-full h-auto bg-gray-300 rounded-lg font-medium capitalize "
-                        : "text capitalize"
-                    }
+                        : "text capitalize"}`}
                   >
                     <ListItem key={name} className="pb-3">
                       <ListItemPrefix>{icon}</ListItemPrefix>

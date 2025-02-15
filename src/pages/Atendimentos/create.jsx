@@ -61,6 +61,7 @@ const CreateAtendimento = () => {
   const [outro, setOutro] = useState(false);
   const [qualMedico, setQualMedico] = useState("");
   const [openLocal, setOpenLocal] = useState(false);
+
   const [localEscolhido, setLocalEscolhido] = useState(false);
   const [emEspera, setEmEspera] = useState(0);
   const [aguardandoVaga, setAguardandoVaga] = useState(0);

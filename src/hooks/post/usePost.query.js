@@ -8,6 +8,9 @@ const postResource = async (resource, data) => {
       data,
       {
         headers: { "Content-Type": "application/json" },
+        validateStatus: function (status) {
+          return true;
+        },
       }
     );
     return response;
@@ -44,6 +47,29 @@ export const useResourcePost = (
     },
   });
 };
+
+const postLogin = async (user) => {
+  try {
+    const { data } = await api.post(
+      `${process.env.REACT_APP_API}/site/login`,
+      user,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        validateStatus: function (status) {
+          return true;
+        },
+      }
+    );
+    return data;
+  } catch (error) {
+    console.log("error: ", error);
+  }
+};
+export function useLoginPost(data) {
+  return postLogin(data);
+}
 
 const postMedico = async (values) => {
   try {

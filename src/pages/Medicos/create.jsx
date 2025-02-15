@@ -30,6 +30,8 @@ import {
 import { format } from "date-fns";
 // import { DayPicker } from "react-day-picker";
 import { ChevronRightIcon, ChevronLeftIcon } from "@heroicons/react/24/outline";
+import { useSearchResource } from "../../hooks/search/useSearch.query";
+import MultiSelectDropdown from "../../components/Forms/MultiSelectDropdown";
 
 const InputForm = ({
   label = "",
@@ -76,9 +78,13 @@ const Create = () => {
   const [modalSchedules, setModalSchedules] = useState();
   const [date, setDate] = useState();
   const [listaProcedimentos, setListaProcedimentos] = useState(lista);
+  const [listaEtiquetas, setListaEtiquetas] = useState(lista);
   const [addProcedimento, setAddProcedimento] = useState("");
   const [addProcedimentoValor, setAddProcedimentoValor] = useState("");
   const [especialidade, setEspecialidade] = useState("");
+
+  const [queGrupo, setQueGrupo] = useState("");
+  const [queEtiqueta, setQueEtiqueta] = useState("");
 
   const [listaLocalAtendimento, setListaLocalAtendimento] = useState([]);
   const [addLocalAtendimento, setAddLocalAtendimento] = useState("");
@@ -86,11 +92,17 @@ const Create = () => {
   const [schedule, setSchedule] = useState([]);
 
   const { data: unidadesData, isLoading: loadingUnidades } = useUnidadesFetch();
-  const { data: grupoData, isLoading: loadingGrupo } = useGruposFetch();
   const { data: procedimentoData, isLoading: loadingProcedimento } =
     useAcoesFetch();
   const { data: especialidadeData, isLoading: loadingEspecialidade } =
     useGetResources("especialidade", "especialidade");
+
+  const { data: grupoData, isLoading: loadingGrupo } = useGetResources(
+    "grupos",
+    "grupos"
+  );
+  const { data: searchEtiquetas = [], isLoading: loadingEtiquetas } =
+    useSearchResource("medicosSearch", "etiquetas-grupo", queGrupo, queGrupo);
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: useMedicoPost,
@@ -124,6 +136,17 @@ const Create = () => {
   }
 
   function handleAdd() {
+    let min = Math.ceil(1);
+    let max = Math.ceil(100);
+    let mt = Math.floor(Math.random() * (10 - 2) + 1);
+    const novaLista = listaProcedimentos.concat({
+      id: Math.floor(Math.random() * (max - min) + min) * mt,
+      procedimento: addProcedimento,
+      valor: addProcedimentoValor,
+    });
+    setListaProcedimentos(novaLista);
+  }
+  function handleAddEtiqueta() {
     let min = Math.ceil(1);
     let max = Math.ceil(100);
     let mt = Math.floor(Math.random() * (10 - 2) + 1);
@@ -274,7 +297,6 @@ const Create = () => {
                   </List>
                 </Card>
               )}
-
               {loadingEspecialidade ? (
                 "carregando..."
               ) : (
@@ -300,104 +322,7 @@ const Create = () => {
                   </Select>
                 </>
               )}
-
-              {/* <InputForm
-                label="Horarios Atendimento"
-                name="atendimento_horarios"
-                register={register}
-              /> */}
               <hr />
-              {/* <Button onClick={handleOpenModalSchedule}>
-                Adicionar Horario
-              </Button> */}
-              {/* <Typography
-                variant="h6"
-                color="blue-gray"
-                className="-mb-3"
-                style={{ textTransform: "capitalize" }}
-              >
-                Horarios
-              </Typography>
-              {daysOfWeek.map((day) => (
-                <div key={day} style={{ marginBottom: "-20px" }}>
-                  <Checkbox
-                    label={day}
-                    className=""
-                    checked={!!schedule.find((item) => item.day === day)}
-                    onChange={() => handleDayToggle(day)}
-                  />
-
-                  {schedule.find((item) => item.day === day) && (
-                    <div style={{ marginLeft: "20px" }}>
-                      {schedule
-                        .find((item) => item.day === day)
-                        .times.map((time, index) => (
-                          <div
-                            key={index}
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "10px",
-                            }}
-                          >
-                            <input
-                              style={{
-                                border: "1px solid #cecece",
-                                padding: "5px 10px",
-                                borderRadius: 5,
-                              }}
-                              type="time"
-                              value={time.start}
-                              onChange={(e) =>
-                                handleTimeChange(
-                                  day,
-                                  index,
-                                  "start",
-                                  e.target.value
-                                )
-                              }
-                            />
-                            <span>até</span>
-                            <input
-                              style={{
-                                border: "1px solid #cecece",
-                                padding: "5px 10px",
-                                borderRadius: 5,
-                              }}
-                              type="time"
-                              value={time.end}
-                              onChange={(e) =>
-                                handleTimeChange(
-                                  day,
-                                  index,
-                                  "end",
-                                  e.target.value
-                                )
-                              }
-                            />
-                            <Button
-                              variant="text"
-                              onClick={() => handleRemoveTimeBlock(day, index)}
-                              style={{ color: "red" }}
-                            >
-                              Remover
-                            </Button>
-                          </div>
-                        ))}
-                      <Button
-                        variant="gradient"
-                        type="button"
-                        onClick={() => handleAddTimeBlock(day)}
-                        style={{ marginTop: "10px" }}
-                      >
-                        Adicionar Horário
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              ))} */}
-              <hr />
-
               <div className="flex gap-4">
                 <div>
                   {loadingProcedimento ? (
@@ -475,7 +400,6 @@ const Create = () => {
                   </List>
                 </Card>
               )}
-
               <hr />
               {/* <input
                 label="Avatar"
@@ -483,6 +407,41 @@ const Create = () => {
                 type="file"
                 register={register}
               /> */}
+              {/* <div className="flex gap-4">
+                {loadingGrupo ? (
+                  "carregando..."
+                ) : (
+                  <Select
+                    label="Grupo"
+                    name="grupo"
+                    value={queGrupo}
+                    onChange={(val) => {
+                      setQueGrupo(val);
+                    }}
+                  >
+                    {grupoData?.map((item, index) => (
+                      <Option key={index + 1} value={item.id}>
+                        {item.servico}
+                      </Option>
+                    ))}
+                  </Select>
+                )}
+                <div></div>
+              </div>
+              {loadingEtiquetas ? (
+                "carregando..."
+              ) : (
+                <MultiSelectDropdown
+                  disabled={!queGrupo || loadingEtiquetas}
+                  formFieldName={"countries"}
+                  options={searchEtiquetas}
+                  onChange={(selectedCountries) => {
+                    setQueEtiqueta(selectedCountries);
+                    console.debug("selectedCountries", selectedCountries);
+                  }}
+                  prompt="Selecione uma ou mais etiquetas"
+                />
+              )} */}
             </div>
             <input
               value={isPending ? "Enviando..." : "Enviar"}

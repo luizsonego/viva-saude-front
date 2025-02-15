@@ -51,7 +51,7 @@ const Atendimentos = () => {
 
   const filtrarPorStatus = () => {
     if (statusSelecionado === "ABERTOS") return data;
-    return data.filter((item) => item.status === statusSelecionado);
+    return data?.filter((item) => item.status === statusSelecionado);
   };
 
   const handleOpenModalConsulta = (item) => {
@@ -164,7 +164,7 @@ const Atendimentos = () => {
             </tr>
           </thead>
           <tbody>
-            {filtrarPorStatus().map((item) => (
+            {filtrarPorStatus()?.map((item) => (
               <tr key={item.id} className="">
                 <td className={classTdTable}>{item.titular_plano}</td>
                 <td className={classTdTable}>{item.acoes?.nome}</td>
@@ -404,7 +404,15 @@ const Atendimentos = () => {
                 <h3>Anexo</h3>
                 <div className="flex gap-1">
                   <Typography className="text-xs !font-bold" color="blue-gray">
-                    <img src={dataModal.anexos} alt="imagem" />
+                    {dataModal?.anexos?.map((item) =>
+                      item.fileType === "image" ? (
+                        <img src={item.url} alt="imagem" width={200} />
+                      ) : (
+                        <a href={item.url} target="_blank" rel="noreferrer">
+                          {item.nome}
+                        </a>
+                      )
+                    )}
                   </Typography>
                 </div>
               </Card>
@@ -524,7 +532,10 @@ const Atendimentos = () => {
                     Visualizar linha do tempo
                   </Button>
                   <Upload
-                    title={`Anexo-${dataModal.id}`}
+                    title={`Anexo-${dataModal.id}-${getRandomIntInclusive(
+                      1,
+                      100000
+                    )}`}
                     id={dataModal.id}
                     label={"Enviar Anexo"}
                     folder={"anexos"}
@@ -581,3 +592,9 @@ const Atendimentos = () => {
 };
 
 export default Atendimentos;
+
+function getRandomIntInclusive(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}

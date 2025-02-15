@@ -6,7 +6,12 @@ const getResources = async (resource) => {
     const response = await api.post(
       `${process.env.REACT_APP_API}/v1/get/${resource}`,
       {
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem(
+            process.env.REACT_APP_ACCESS_TOKEN
+          )}`,
+        },
       }
     );
 
@@ -22,7 +27,12 @@ const getResource = async (resource, id) => {
     const response = await api.post(
       `${process.env.REACT_APP_API}/v1/view/${resource}?id=${id}`,
       {
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem(
+            process.env.REACT_APP_ACCESS_TOKEN
+          )}`,
+        },
       }
     );
 

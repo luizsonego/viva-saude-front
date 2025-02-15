@@ -20,7 +20,7 @@ const Upload = ({
   // const authenticationEndpoint = `${process.env.REACT_APP_API}/v1/site/auth`;
 
   const { mutateAsync, isPending } = useResourcePut(
-    "update",
+    "atendimentos",
     "anexo",
     () => {}
   );
@@ -32,10 +32,16 @@ const Upload = ({
   };
 
   const onSuccess = (res) => {
-    const anexos = res.url;
+    const url = res.url;
+    const fileId = res.fileId;
+    const fileType = res.fileType;
+    const nome = res.name;
     const dataDocument = {
-      anexos,
+      url,
       id,
+      fileId,
+      fileType,
+      nome,
     };
     mutateAsync(dataDocument);
   };
@@ -81,21 +87,25 @@ const Upload = ({
   };
   return (
     <>
-      <IKContext
-        publicKey={publicKey}
-        urlEndpoint={urlEndpoint}
-        authenticator={authenticator}
-      >
-        <IKUpload
-          fileName={`${btoa(title)}-${id}`}
-          onError={onError}
-          onSuccess={onSuccess}
-          useUniqueFileName={false}
-          folder={"/anexo"}
-          onUploadStart={onUploadStart}
-          onUploadProgress={onUploadProgress}
-        />
-      </IKContext>
+      {isPending ? (
+        "enviando..."
+      ) : (
+        <IKContext
+          publicKey={publicKey}
+          urlEndpoint={urlEndpoint}
+          authenticator={authenticator}
+        >
+          <IKUpload
+            fileName={`${btoa(title)}-${id}`}
+            onError={onError}
+            onSuccess={onSuccess}
+            useUniqueFileName={false}
+            folder={`/anexo/${id}`}
+            onUploadStart={onUploadStart}
+            onUploadProgress={onUploadProgress}
+          />
+        </IKContext>
+      )}
     </>
   );
 };
