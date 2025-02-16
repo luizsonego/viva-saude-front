@@ -116,6 +116,7 @@ const Create = () => {
       horarios: schedule,
       especialidade,
       local: listaLocalAtendimento,
+      etiquetas: queEtiqueta,
       ...data,
     };
     mutateAsync(sendForm);
@@ -241,11 +242,7 @@ const Create = () => {
           >
             <div className="mb-1 flex flex-col gap-6">
               <InputForm label="Nome" name="nome" register={register} />
-              {/* <InputForm
-                label="Local de atendimento"
-                name="local"
-                register={register}
-              /> */}
+
               <div className="flex gap-4">
                 <div>
                   <Typography
@@ -407,7 +404,7 @@ const Create = () => {
                 type="file"
                 register={register}
               /> */}
-              {/* <div className="flex gap-4">
+              <div className="flex gap-4">
                 {loadingGrupo ? (
                   "carregando..."
                 ) : (
@@ -432,17 +429,26 @@ const Create = () => {
                 "carregando..."
               ) : (
                 <MultiSelectDropdown
+                  style={{ width: "100%", zIndex: 999 }}
                   disabled={!queGrupo || loadingEtiquetas}
                   formFieldName={"countries"}
                   options={searchEtiquetas}
                   onChange={(selectedCountries) => {
                     setQueEtiqueta(selectedCountries);
-                    console.debug("selectedCountries", selectedCountries);
                   }}
                   prompt="Selecione uma ou mais etiquetas"
                 />
-              )} */}
+              )}
+
+              <InputForm
+                label="vagas disponiveis"
+                name="nome"
+                register={register}
+              />
+              <InputForm label="consulta" name="nome" register={register} />
+              <InputForm label="retorno" name="nome" register={register} />
             </div>
+
             <input
               value={isPending ? "Enviando..." : "Enviar"}
               type="submit"

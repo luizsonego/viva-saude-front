@@ -22,6 +22,8 @@ import {
 } from "../../hooks/get/useGet.query";
 import { useEffect } from "react";
 import { useResourcePut } from "../../hooks/update/useUpdate.query";
+import MultiSelectDropdown from "../../components/Forms/MultiSelectDropdown";
+import { useSearchResource } from "../../hooks/search/useSearch.query";
 // import InputForm from "../../components/Forms/Input";
 
 const InputForm = ({
@@ -65,6 +67,9 @@ const EditMedico = () => {
   const [addProcedimentoValor, setAddProcedimentoValor] = useState("");
   const [listaLocalAtendimento, setListaLocalAtendimento] = useState([]);
   const [addLocalAtendimento, setAddLocalAtendimento] = useState("");
+  const [queGrupo, setQueGrupo] = useState("");
+  const [queEtiqueta, setQueEtiqueta] = useState("");
+  const [etiquetas, setEtiquetas] = useState([]);
 
   const { data, isLoading } = useGetResource("medicos", "medico", id);
   const { data: procedimentoData, isLoading: loadingProcedimento } =
@@ -73,6 +78,21 @@ const EditMedico = () => {
   const { data: especialidadeData, isLoading: loadingEspecialidade } =
     useGetResources("especialidade", "especialidade");
 
+  const { data: searchEtiquetas = [], isLoading: loadingEtiquetas } =
+    useSearchResource("medicosSearch", "etiquetas-grupo", queGrupo, queGrupo);
+  const { data: grupoData, isLoading: loadingGrupo } = useGetResources(
+    "grupos",
+    "grupos"
+  );
+
+  const { data: dataEtiquetas = [], isLoading: isloadingEtiquetas } =
+    useSearchResource(
+      "etiquetas",
+      "busca-etiquetas",
+      data?.etiquetas,
+      data?.etiquetas
+    );
+  console.log(dataEtiquetas);
   const { mutate, isPending } = useResourcePut("medico", "medico", () => {
     history(-1);
   });
@@ -84,6 +104,8 @@ const EditMedico = () => {
 
       setListaLocalAtendimento(data?.local);
       setListaProcedimentos(data?.procedimento_valor);
+      setQueEtiqueta(data?.etiquetas);
+      setEtiquetas(data?.etiquetas);
     }
   }, [data, setValue]);
 
@@ -91,6 +113,7 @@ const EditMedico = () => {
     const sendForm = {
       especialidade,
       localizacao: listaLocalAtendimento,
+      etiquetas: queEtiqueta,
       ...formData,
     };
     mutate(sendForm);
@@ -218,7 +241,6 @@ const EditMedico = () => {
                   </List>
                 </Card>
               )}
-
               {loadingEspecialidade ? (
                 "carregando..."
               ) : (
@@ -245,9 +267,7 @@ const EditMedico = () => {
                 </>
               )}
               <hr />
-
               {/*  */}
-
               <div className="flex gap-4">
                 <div>
                   {loadingProcedimento ? (
@@ -325,7 +345,50 @@ const EditMedico = () => {
                   </List>
                 </Card>
               )}
+              Etiquetas adicionadas
+              <div className="flex gap-4 flex-col">
+                {dataEtiquetas?.map((item, index) => (
+                  <div key={index} className="flex gap-4">
+                    <div> * {item.servico}</div>
+                  </div>
+                ))}
+              </div>
               {/*  */}
+              <div className="flex gap-4">
+                {loadingGrupo ? (
+                  "carregando..."
+                ) : (
+                  <Select
+                    label="Grupo"
+                    name="grupo"
+                    value={queGrupo}
+                    onChange={(val) => {
+                      setQueGrupo(val);
+                    }}
+                  >
+                    {grupoData?.map((item, index) => (
+                      <Option key={index + 1} value={item.id}>
+                        {item.servico}
+                      </Option>
+                    ))}
+                  </Select>
+                )}
+                <div></div>
+              </div>
+              {loadingEtiquetas ? (
+                "carregando..."
+              ) : (
+                <MultiSelectDropdown
+                  style={{ width: "100%", zIndex: 999 }}
+                  disabled={!queGrupo || loadingEtiquetas}
+                  formFieldName={"countries"}
+                  options={searchEtiquetas}
+                  onChange={(selectedCountries) => {
+                    setQueEtiqueta(selectedCountries);
+                  }}
+                  prompt="Selecione uma ou mais etiquetas"
+                />
+              )}
             </div>
 
             <div style={{ display: "none" }}>

@@ -122,7 +122,7 @@ export default function MainRouter() {
             },
             {
               path: "editar/:id",
-              element: <EditConfigs />,
+              element: <EditarAtendente />,
             },
           ],
         },
