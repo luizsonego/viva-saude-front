@@ -101,18 +101,33 @@ const CreateAtendimento = () => {
     if (paraQuem !== "outra") setOutro(false);
   }, [paraQuem, setValue]);
 
-  const onSubmit = (data) => {
+  const onSubmit = (sendData) => {
+    const opcoes = {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    };
+    const dataFormatada = new Intl.DateTimeFormat("pt-BR", opcoes)
+      .format(valueDateAgendamento)
+      .replace(/\//g, "-")
+      .replace(",", "");
+
     let dataForm = {
       para_quem: paraQuem,
       medico_atendimento: qualMedico,
       medico: qualMedico,
       onde_deseja_ser_atendido: localEscolhido,
-      medico_atendimento_data: valueDateAgendamento,
+      medico_atendimento_data: dataFormatada,
       o_que_deseja: queDeseja,
       em_espera: emEspera,
       aguardando_vaga: aguardandoVaga,
-      ...data,
+      ...sendData,
     };
+
     mutateAsync(dataForm);
   };
 
@@ -234,6 +249,8 @@ const CreateAtendimento = () => {
             <DateTimePicker
               onChange={setValueDateAgendamento}
               value={valueDateAgendamento}
+              minDate={new Date()}
+              format="dd/MM/y H:mm"
             />
             {/* <InputForm
               label="Data de agendamento"

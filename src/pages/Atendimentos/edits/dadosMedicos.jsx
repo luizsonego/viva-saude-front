@@ -47,7 +47,8 @@ const EditAtendimentoDadosMedicos = ({ data, modal }) => {
 
   useEffect(() => {
     setValue("medico_atendimento", data.medico_atendimento);
-  }, [data.medico_atendimento, setValue]);
+    setValueDateAgendamento(data.medico_atendimento_data);
+  }, [data.medico_atendimento, data.medico_atendimento_data, setValue]);
 
   const onSubmit = (data) => {
     let dataForm = {

@@ -17,29 +17,30 @@ export const routes = [
         icon: <HomeIcon {...icon} />,
         name: "inicio",
         path: "/",
-        role: "atendente",
+        roles: ["atendente", "gerente"],
       },
       {
         icon: <InformationCircleIcon {...icon} />,
         name: "atendimentos",
         path: "/atendimentos",
-        role: "atendente",
+        roles: ["atendente", "gerente"],
       },
       {
         icon: <InformationCircleIcon {...icon} />,
         name: "médicos",
         path: "/medicos",
-        role: "gerente",
+        roles: ["gerente"],
       },
       {
         icon: <InformationCircleIcon {...icon} />,
         name: "cadastros",
         path: "/cadastros",
-        role: "gerente",
+        roles: ["gerente"],
         children: [
           {
             name: "grupos",
             path: "/cadastros/grupos",
+            roles: ["gerente"],
           },
           {
             name: "prioridades",
@@ -67,7 +68,7 @@ export const routes = [
         icon: <InformationCircleIcon {...icon} />,
         name: "atendentes",
         path: "/atendente",
-        role: "gerente",
+        roles: ["gerente"],
       },
     ],
   },
@@ -77,7 +78,7 @@ function Main() {
 
   return (
     <div className="min-h-screen bg-blue-gray-50/50">
-      <Sidenav routes={routes} brandImg={"/img/logo.png"} userrole={data} />
+      <Sidenav routes={routes} brandImg={"/img/logo.png"} userRole={data} />
       <div className="p-4 xl:ml-80">
         <DashboardNavbar />
         <div className="p-0 pt-20">

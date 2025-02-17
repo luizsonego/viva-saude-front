@@ -269,7 +269,7 @@ const Atendimentos = () => {
                         {dataModal.whatsapp_titular}
                       </span>
                     </Typography>
-                    {dataModal.para_quem === "outro" ? (
+                    {dataModal.para_quem === "outra" ? (
                       <>
                         <hr />
                         <h3>Dados de quem vai ser atendido</h3>
@@ -375,6 +375,7 @@ const Atendimentos = () => {
                   </Typography>
                   <Typography className="text-xs !font-bold" color="blue-gray">
                     {dataModal.acoes?.nome}
+                    {dataModal.o_que_deseja}
                   </Typography>
                 </div>
                 <div className="flex gap-1">

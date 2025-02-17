@@ -1,4 +1,4 @@
-import { Input } from "@material-tailwind/react";
+import { Input, Typography } from "@material-tailwind/react";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useResourcePut } from "../../../hooks/update/useUpdate.query";
@@ -41,8 +41,16 @@ const EditAtendimentoDadosPessoais = ({ data, modal }) => {
         {...register("whatsapp_titular")}
         defaultValue={data?.whatsapp_titular}
       />
-      {data.para_quem === "outro" ? (
+      <Input
+        label="perfil atendimento"
+        {...register("perfil_cliente")}
+        defaultValue={data?.perfil_cliente}
+      />
+      {data.para_quem === "outra" ? (
         <>
+          <Typography className="text-xs !font-bold" color="blue-gray">
+            Dados do de outra pessoa para ser atendida
+          </Typography>
           <Input
             label="nome outro"
             {...register("nome_outro")}

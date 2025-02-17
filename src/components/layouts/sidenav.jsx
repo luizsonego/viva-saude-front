@@ -16,12 +16,18 @@ import {
 import React from "react";
 import { Link, NavLink } from "react-router-dom";
 
-export function Sidenav({ brandImg, brandName, routes, userrole }) {
+export function Sidenav({ brandImg, brandName, routes, userRole }) {
   const [openSubMenu, setOpenSubMenu] = React.useState(0);
 
   const handleOpenSubMenu = (value) => {
     setOpenSubMenu(openSubMenu === value ? 0 : value);
   };
+
+  const filteredRoutes = routes.map((route) => ({
+    ...route,
+    pages: route.pages.filter((page) => page.roles.includes(userRole)),
+  }));
+
   return (
     <aside
       className={`translate-x-0 fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 xl:translate-x-0 border border-blue-gray-100`}
@@ -46,7 +52,7 @@ export function Sidenav({ brandImg, brandName, routes, userrole }) {
         </IconButton>
       </div>
       <div className="m-4">
-        {routes.map(({ layout, title, pages }, key) => (
+        {filteredRoutes.map(({ layout, title, pages }, key) => (
           <List key={key}>
             <Accordion
               open={openSubMenu}
@@ -66,17 +72,14 @@ export function Sidenav({ brandImg, brandName, routes, userrole }) {
                     color={"blue-gray"}
                     className="font-black uppercase opacity-75"
                   >
-                    {title} *
+                    {title}
                   </Typography>
                 </ListItem>
               )}
               {pages.map(({ icon, name, path, children, role }) =>
                 children ? (
                   <>
-                    <ListItem
-                      key={name}
-                      className={`${userrole !== role ? "hidden" : ""} pb-3`}
-                    >
+                    <ListItem key={name}>
                       <AccordionHeader
                         className="border-b-0 p-0 pl-0"
                         onClick={() => handleOpenSubMenu(1)}
@@ -86,7 +89,7 @@ export function Sidenav({ brandImg, brandName, routes, userrole }) {
                           color="blue-gray"
                           className="gradient w-full h-auto rounded-lg font-medium capitalize "
                         >
-                          {name} --
+                          {name}
                         </Typography>
                       </AccordionHeader>
                     </ListItem>
@@ -118,9 +121,7 @@ export function Sidenav({ brandImg, brandName, routes, userrole }) {
                 ) : (
                   <NavLink
                     to={`/${layout}${path}`}
-                    className={`${userrole !== role ? "hidden" : ""} ${({
-                      isActive,
-                    }) =>
+                    className={`${({ isActive }) =>
                       isActive
                         ? "gradient w-full h-auto bg-gray-300 rounded-lg font-medium capitalize "
                         : "text capitalize"}`}
