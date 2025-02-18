@@ -46,6 +46,11 @@ const EditAtendimentoDadosPessoais = ({ data, modal }) => {
         {...register("perfil_cliente")}
         defaultValue={data?.perfil_cliente}
       />
+      <Input
+        label="observação"
+        {...register("observacoes")}
+        defaultValue={data?.observacoes}
+      />
       {data.para_quem === "outra" ? (
         <>
           <Typography className="text-xs !font-bold" color="blue-gray">

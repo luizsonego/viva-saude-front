@@ -22,6 +22,7 @@ import Modal from "../components/Modal";
 import CreateAtendimento from "../pages/Atendimentos/create";
 import EditarAtendente from "../pages/Atendente/editar";
 import EditConfigs from "../pages/Configuracoes/edit";
+import ModalAtendimento from "../pages/Atendimentos/modal";
 
 export default function MainRouter() {
   return useRoutes([
@@ -48,6 +49,7 @@ export default function MainRouter() {
               path: "create",
               element: <CreateAtendimento />,
             },
+            { path: "ver/:resource/:id", element: <ModalAtendimento /> },
           ],
         },
         // {
@@ -85,10 +87,6 @@ export default function MainRouter() {
               path: "origem",
               element: <Origem />,
             },
-            // {
-            //   path: ":path/editar/:resource/:id",
-            //   element: <EditConfigs />,
-            // },
             { path: ":path/editar/:resource/:id", element: <Modal /> },
           ],
         },

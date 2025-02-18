@@ -14,7 +14,7 @@ import {
   useGetResources,
 } from "../../hooks/get/useGet.query";
 import { useResourcePut } from "../../hooks/update/useUpdate.query";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { CustomModal } from "../Configuracoes/Components";
 import EditAtendimentoDadosPessoais from "./edits/dadosPessoais";
 import EditAtendimentoDadosMedicos from "./edits/dadosMedicos";
@@ -23,10 +23,13 @@ import AddComentario from "./edits/comentario";
 import Upload from "../../components/uploads";
 
 const classThTable =
+  "py-3 px-5 text-left text-[11px] font-bold uppercase text-blue-gray-400";
+const class2ThTable =
   "border-b border-blue-gray-50 py-3 px-5 text-left text-[11px] font-bold uppercase text-blue-gray-400";
 const classTdTable = "py-3 px-5 border-b border-blue-gray-50 ";
 
 const Atendimentos = () => {
+  const navigate = useNavigate();
   const [openModal, setOpenModal] = useState(false);
   const [openModalAtendimento, setOpenModalAtendimento] = useState(false);
   const [openModalMedicos, setOpenModalMedicos] = useState(false);
@@ -48,7 +51,7 @@ const Atendimentos = () => {
     useResourcePut("atendimentos", "troca-prioridade", () => {});
   const { mutateAsync: mutateAtendente, isPending: pendingAtendente } =
     useResourcePut("atendimentos", "troca-atendente", () => {});
-
+  console.log("><><><><", data);
   const filtrarPorStatus = () => {
     if (statusSelecionado === "ABERTOS") return data;
     return data?.filter((item) => item.status === statusSelecionado);
@@ -93,6 +96,10 @@ const Atendimentos = () => {
       status,
     };
     mutateAsync(dataStatus);
+  };
+
+  const handleViewCartao = (resource, id) => {
+    navigate(`ver/${resource}/${id}`);
   };
 
   if (isLoading) {
@@ -155,7 +162,9 @@ const Atendimentos = () => {
             <tr className="">
               <th className={classThTable}>Titular</th>
               <th className={classThTable}>Procedimento</th>
-              <th className={classThTable}>Prioridade</th>
+              <th className={classThTable} width="auto">
+                Prioridade
+              </th>
               <th className={classThTable}>Medico</th>
               <th className={classThTable}>Local</th>
               <th className={classThTable}>Status</th>
@@ -165,39 +174,56 @@ const Atendimentos = () => {
           </thead>
           <tbody>
             {filtrarPorStatus()?.map((item) => (
-              <tr key={item.id} className="">
-                <td className={classTdTable}>{item.titular_plano}</td>
-                <td className={classTdTable}>{item.acoes?.nome}</td>
-                <td
-                  className={classTdTable}
-                  style={{
-                    background:
-                      item?.prioridadeAtendimento?.cor || "transparent",
-                  }}
-                >
-                  <Chip
-                    value={item?.prioridadeAtendimento?.nome}
+              <div
+                key={item.id}
+                style={{ display: "contents", backgroundColor: "tomato" }}
+              >
+                <tr className="">
+                  <td className={classTdTable}>{item.titular_plano}</td>
+                  <td className={classTdTable}>{item.o_que_deseja}</td>
+                  <td
+                    className={classTdTable}
                     style={{
                       background:
                         item?.prioridadeAtendimento?.cor || "transparent",
                     }}
-                  />
-                </td>
-                <td className={classTdTable}>{item.medico_atendimento}</td>
-                <td className={classTdTable}>
-                  {item.onde_deseja_ser_atendido}
-                </td>
-                <td className={classTdTable}>{item.status}</td>
-                <td className={classTdTable}>{item.atendimento_iniciado}</td>
-                <td className={classTdTable}>
-                  <Button
-                    onClick={() => handleOpenModalConsulta(item)}
-                    variant="outlined"
                   >
-                    Detalhes
-                  </Button>
-                </td>
-              </tr>
+                    <Chip
+                      value={item?.prioridadeAtendimento?.nome}
+                      style={{
+                        background:
+                          item?.prioridadeAtendimento?.cor || "transparent",
+                      }}
+                    />
+                  </td>
+                  <td className={classTdTable}>{item.medico_atendimento}</td>
+                  <td className={classTdTable}>
+                    {item.onde_deseja_ser_atendido}
+                  </td>
+                  <td className={classTdTable}>{item.status}</td>
+                  <td className={classTdTable}>
+                    {item.medico_atendimento_data}
+                  </td>
+                  <td className={classTdTable}>
+                    {/* <Button
+                      onClick={() => handleOpenModalConsulta(item)}
+                      variant="outlined"
+                    >
+                      Detalhes
+                    </Button> */}
+                    <Button
+                      onClick={() => handleViewCartao("atendimento", item.id)}
+                    >
+                      ver
+                    </Button>
+                  </td>
+                  {/* <tr span={8} aria-rowspan={5}>
+                    <td colspan={8} className={class2ThTable}>
+                      Procedimento: {item.acoes?.nome}
+                    </td>
+                  </tr> */}
+                </tr>
+              </div>
             ))}
           </tbody>
         </table>
@@ -598,4 +624,8 @@ function getRandomIntInclusive(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function RenderHtml(props) {
+  return <div dangerouslySetInnerHTML={{ __html: props.html }} />;
 }
