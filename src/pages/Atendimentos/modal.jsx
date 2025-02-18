@@ -35,7 +35,7 @@ const ModalAtendimento = () => {
   const { data: prioridadeData } = useGetResources("prioridades", "prioridade");
   const { data: atendenteData } = useGetResources("atendentes", "atendente");
 
-  const { mutateAsync, isPending } = useResourcePut(
+  const { mutateAsync, isPending: pendingStatus } = useResourcePut(
     "atendimento",
     "troca-status",
     () => {}
@@ -126,7 +126,7 @@ const ModalAtendimento = () => {
             />
           </svg>
         </span>
-        <div className="w-4/5">
+        <div className="w-4/5 h-[90%] overflow-y-auto">
           <Card shadow={true} className="w-full justify-center">
             <DialogHeader>
               Detalhes do agendamento{" "}
@@ -373,51 +373,65 @@ const ModalAtendimento = () => {
                       </Typography>
                     </div>
                   </Card>
-                  <Select
-                    label="Prioridade"
-                    onChange={(prioridade) =>
-                      handleChangePrioridadeCartao({
-                        prioridade,
-                        id: data.id,
-                      })
-                    }
-                  >
-                    {prioridadeData?.map((item, index) => (
-                      <Option key={index + 1} value={item.id}>
-                        {item.nome}
-                      </Option>
-                    ))}
-                  </Select>
-                  <Select
-                    label="Status"
-                    onChange={(status) =>
-                      handleChangeStatusCartao({ status, id: data.id })
-                    }
-                  >
-                    <Option value="ABERTO">Aberto</Option>
-                    <Option value="EM ANALISE">Em Analise</Option>
-                    <Option value="PAGAMENTO">Para pagamento</Option>
-                    <Option value="AGUARDANDO AUTORIZACAO">
-                      Aguardando Autorização
-                    </Option>
-                    <Option value="CONCLUIDO">Concluído</Option>
-                  </Select>
+                  <div className={"flex flex-col gap-2"}>
+                    {pendingPrioridade ? (
+                      "Enviando..."
+                    ) : (
+                      <Select
+                        label="Prioridade"
+                        onChange={(prioridade) =>
+                          handleChangePrioridadeCartao({
+                            prioridade,
+                            id: data.id,
+                          })
+                        }
+                      >
+                        {prioridadeData?.map((item, index) => (
+                          <Option key={index + 1} value={item.id}>
+                            {item.nome}
+                          </Option>
+                        ))}
+                      </Select>
+                    )}
 
-                  <Select
-                    label="Atendente"
-                    onChange={(atendente) =>
-                      handleChangeAtendenteCartao({
-                        atendente,
-                        id: data.id,
-                      })
-                    }
-                  >
-                    {atendenteData?.map((item, index) => (
-                      <Option key={index + 1} value={item.id}>
-                        {item?.profile?.name}
-                      </Option>
-                    ))}
-                  </Select>
+                    {pendingStatus ? (
+                      "Enviando..."
+                    ) : (
+                      <Select
+                        label="Status"
+                        onChange={(status) =>
+                          handleChangeStatusCartao({ status, id: data.id })
+                        }
+                      >
+                        <Option value="ABERTO">Aberto</Option>
+                        <Option value="EM ANALISE">Em Analise</Option>
+                        <Option value="PAGAMENTO">Para pagamento</Option>
+                        <Option value="AGUARDANDO AUTORIZACAO">
+                          Aguardando Autorização
+                        </Option>
+                        <Option value="CONCLUIDO">Concluído</Option>
+                      </Select>
+                    )}
+                    {pendingAtendente ? (
+                      "Enviando..."
+                    ) : (
+                      <Select
+                        label="Atendente"
+                        onChange={(atendente) =>
+                          handleChangeAtendenteCartao({
+                            atendente,
+                            id: data.id,
+                          })
+                        }
+                      >
+                        {atendenteData?.map((item, index) => (
+                          <Option key={index + 1} value={item.id}>
+                            {item?.profile?.name}
+                          </Option>
+                        ))}
+                      </Select>
+                    )}
+                  </div>
 
                   <Card
                     shadow={true}
@@ -483,7 +497,10 @@ const ModalAtendimento = () => {
           handler={handleOpenModalAjustesMedico}
           modal={() => setOpenModalMedicos(false)}
         >
-          <EditAtendimentoDadosMedicos data={data} />
+          <EditAtendimentoDadosMedicos
+            data={data}
+            modal={() => setOpenModalMedicos(false)}
+          />
         </CustomModal>
 
         <CustomModal
@@ -500,7 +517,10 @@ const ModalAtendimento = () => {
           handler={handleOpenModalComentario}
           modal={() => setOpenModalComentario(false)}
         >
-          <AddComentario data={data} />
+          <AddComentario
+            data={data}
+            modal={() => setOpenModalComentario(false)}
+          />
         </CustomModal>
       </div>
     </>

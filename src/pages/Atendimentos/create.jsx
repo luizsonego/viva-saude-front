@@ -60,6 +60,7 @@ const CreateAtendimento = () => {
   const [paraQuem, setParaQuem] = useState("");
   const [outro, setOutro] = useState(false);
   const [qualMedico, setQualMedico] = useState("");
+  const [valuePerfilAtendimento, setValuePerfilAtendimento] = useState("");
   const [openLocal, setOpenLocal] = useState(false);
 
   const [localEscolhido, setLocalEscolhido] = useState(false);
@@ -125,6 +126,7 @@ const CreateAtendimento = () => {
       o_que_deseja: queDeseja,
       em_espera: emEspera,
       aguardando_vaga: aguardandoVaga,
+      perfil_cliente: valuePerfilAtendimento,
       ...sendData,
     };
 
@@ -154,11 +156,17 @@ const CreateAtendimento = () => {
               name="cpf_titular"
               register={register}
             />
-            <InputForm
+            <Select
               label="Perfil do cliente"
               name="perfil_cliente"
-              register={register}
-            />
+              value={acaoData}
+              onChange={(val) => setValuePerfilAtendimento(val)}
+            >
+              <Option value="Áudio">Áudio</Option>
+              <Option value="Mensagem">Mensagem</Option>
+              <Option value="Ligação">Ligação</Option>
+              <Option value="Site">Site</Option>
+            </Select>
           </fieldset>
 
           <fieldset className="mb-1 flex flex-col gap-6 border p-5">

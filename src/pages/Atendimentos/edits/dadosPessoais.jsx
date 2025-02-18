@@ -7,7 +7,7 @@ const EditAtendimentoDadosPessoais = ({ data, modal }) => {
   const { register, handleSubmit, setValue } = useForm();
 
   const { mutateAsync, isPending } = useResourcePut(
-    "atendimentos",
+    "atendimento",
     "atendimento",
     () => {
       modal(false);

@@ -131,7 +131,7 @@ const EditarAtendente = () => {
 
             <form onSubmit={handleSubmit(onSubmit)}>
               {renderFields(data)}
-              <Input label="Senha" name="password" register={register} />
+              {/* <Input label="Senha" name="password" register={register} /> */}
               <input
                 value={isPending ? "Enviando..." : "Enviar"}
                 type="submit"

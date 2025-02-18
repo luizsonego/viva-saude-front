@@ -40,9 +40,11 @@ const EditAtendimentoDadosMedicos = ({ data, modal }) => {
     );
 
   const { mutateAsync, isPending } = useResourcePut(
-    "atendimentos",
     "atendimento",
-    () => {}
+    "atendimento",
+    () => {
+      modal(false);
+    }
   );
 
   useEffect(() => {
@@ -51,12 +53,26 @@ const EditAtendimentoDadosMedicos = ({ data, modal }) => {
   }, [data.medico_atendimento, data.medico_atendimento_data, setValue]);
 
   const onSubmit = (data) => {
+    const opcoes = {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    };
+    const dataFormatada = new Intl.DateTimeFormat("pt-BR", opcoes)
+      .format(valueDateAgendamento)
+      .replace(/\//g, "-")
+      .replace(",", "");
+
     let dataForm = {
-      medico_atendimento: qualMedico,
-      medico: qualMedico,
-      onde_deseja_ser_atendido: localEscolhido,
-      o_que_deseja: queDeseja,
-      medico_atendimento_data: valueDateAgendamento,
+      medico_atendimento: qualMedico || data.medico_atendimento,
+      medico: qualMedico || data.medico,
+      onde_deseja_ser_atendido: localEscolhido || data.onde_deseja_ser_atendido,
+      o_que_deseja: queDeseja || data.o_que_deseja,
+      medico_atendimento_data: dataFormatada,
       ...data,
     };
     mutateAsync(dataForm);
