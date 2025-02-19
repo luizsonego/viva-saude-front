@@ -97,6 +97,7 @@ export function Sidenav({ brandImg, brandName, routes, userRole }) {
                       <List className="p-0 pl-3">
                         {children.map(({ name, path }) => (
                           <NavLink
+                            key={name}
                             to={`/${layout}${path}`}
                             className={({ isActive }) =>
                               isActive

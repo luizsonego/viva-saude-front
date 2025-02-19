@@ -31,9 +31,19 @@ const ModalAtendimento = () => {
   const [openModalComentario, setOpenModalComentario] = useState(false);
   const [dataModal, setDataModal] = useState({});
 
-  const { data, isLoading } = useGetResource("atendimento", "atendimento", id);
-  const { data: prioridadeData } = useGetResources("prioridades", "prioridade");
-  const { data: atendenteData } = useGetResources("atendentes", "atendente");
+  const { data = {}, isLoading } = useGetResource(
+    "atendimento",
+    "atendimento",
+    id
+  );
+  const { data: prioridadeData = [] } = useGetResources(
+    "prioridades",
+    "prioridade"
+  );
+  const { data: atendenteData = [] } = useGetResources(
+    "atendentes",
+    "atendente"
+  );
 
   const { mutateAsync, isPending: pendingStatus } = useResourcePut(
     "atendimento",
@@ -99,7 +109,7 @@ const ModalAtendimento = () => {
     setOpenModalComentario(!openModalComentario);
   };
 
-  if (isLoading) return "carregando";
+  if (isLoading) return "carregando...";
 
   return (
     <>
@@ -130,7 +140,7 @@ const ModalAtendimento = () => {
           <Card shadow={true} className="w-full justify-center">
             <DialogHeader>
               Detalhes do agendamento{" "}
-              {data.em_espera ? (
+              {data?.em_espera ? (
                 <Chip className="ml-8" value="Item Em fila de espera" />
               ) : (
                 ""
@@ -347,7 +357,7 @@ const ModalAtendimento = () => {
                         className="text-xs !font-bold"
                         color="blue-gray"
                       >
-                        <Chip value={data.acoes?.nome} />
+                        <Chip value={data?.o_que_deseja} />
                       </Typography>
                     </div>
                     <div className="flex flex-col gap-1">
@@ -464,11 +474,11 @@ const ModalAtendimento = () => {
                       Visualizar linha do tempo
                     </Button>
                     <Upload
-                      title={`Anexo-${data.id}-${getRandomIntInclusive(
+                      title={`Anexo-${data?.id}-${getRandomIntInclusive(
                         1,
                         100000
                       )}`}
-                      id={data.id}
+                      id={data?.id}
                       label={"Enviar Anexo"}
                       folder={"anexos"}
                       controller={"atendimentos"}
@@ -486,10 +496,10 @@ const ModalAtendimento = () => {
           open={openModalAtendimento}
           handler={handleOpenModalAjustesAtendimento}
         >
-          <EditAtendimentoDadosPessoais
+          {/* <EditAtendimentoDadosPessoais
             data={data}
             modal={() => setOpenModalAtendimento(false)}
-          />
+          /> */}
         </CustomModal>
         <CustomModal
           title={"Ajustar dados do atendimento"}
@@ -497,10 +507,10 @@ const ModalAtendimento = () => {
           handler={handleOpenModalAjustesMedico}
           modal={() => setOpenModalMedicos(false)}
         >
-          <EditAtendimentoDadosMedicos
+          {/* <EditAtendimentoDadosMedicos
             data={data}
             modal={() => setOpenModalMedicos(false)}
-          />
+          /> */}
         </CustomModal>
 
         <CustomModal
@@ -509,7 +519,7 @@ const ModalAtendimento = () => {
           handler={handleOpenModalTimeLine}
           modal={() => setOpenModalTimeLine(false)}
         >
-          <CustomTimeline data={data} />
+          {/* <CustomTimeline data={data} /> */}
         </CustomModal>
         <CustomModal
           title={"Resumo do atendimento"}
@@ -517,10 +527,10 @@ const ModalAtendimento = () => {
           handler={handleOpenModalComentario}
           modal={() => setOpenModalComentario(false)}
         >
-          <AddComentario
+          {/* <AddComentario
             data={data}
             modal={() => setOpenModalComentario(false)}
-          />
+          /> */}
         </CustomModal>
       </div>
     </>
