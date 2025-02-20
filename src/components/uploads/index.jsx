@@ -17,13 +17,6 @@ const Upload = ({
 }) => {
   const publicKey = "public_+CkIRGN5XL12KtmQCOzaDedsveU=";
   const urlEndpoint = "https://ik.imagekit.io/krf4f8xfq";
-  // const authenticationEndpoint = `${process.env.REACT_APP_API}/v1/site/auth`;
-
-  const [progress, setProgress] = useState(0);
-  const [uploadError, setUploadError] = useState(false);
-  const [uploadSuccess, setUploadSuccess] = useState(false);
-  const [startUpload, setStartUpload] = useState(false);
-
   const authenticator = async () => {
     try {
       const response = await fetch(`${process.env.REACT_APP_API}/v1/site/auth`);
@@ -42,6 +35,11 @@ const Upload = ({
       throw new Error(`Authentication request failed: ${error.message}`);
     }
   };
+
+  const [progress, setProgress] = useState(0);
+  const [uploadError, setUploadError] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [startUpload, setStartUpload] = useState(false);
 
   const { mutateAsync, isPending } = useResourcePut(
     "atendimento",
@@ -96,7 +94,7 @@ const Upload = ({
         <IKContext
           publicKey={publicKey}
           urlEndpoint={urlEndpoint}
-          authenticator={authenticator}
+          authenticationEndpoint={authenticator}
         >
           <IKUpload
             fileName={`${btoa(title)}-${id}`}
