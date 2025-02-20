@@ -496,10 +496,10 @@ const ModalAtendimento = () => {
           open={openModalAtendimento}
           handler={handleOpenModalAjustesAtendimento}
         >
-          {/* <EditAtendimentoDadosPessoais
+          <EditAtendimentoDadosPessoais
             data={data}
             modal={() => setOpenModalAtendimento(false)}
-          /> */}
+          />
         </CustomModal>
         <CustomModal
           title={"Ajustar dados do atendimento"}
@@ -507,10 +507,10 @@ const ModalAtendimento = () => {
           handler={handleOpenModalAjustesMedico}
           modal={() => setOpenModalMedicos(false)}
         >
-          {/* <EditAtendimentoDadosMedicos
+          <EditAtendimentoDadosMedicos
             data={data}
             modal={() => setOpenModalMedicos(false)}
-          /> */}
+          />
         </CustomModal>
 
         <CustomModal
@@ -519,7 +519,7 @@ const ModalAtendimento = () => {
           handler={handleOpenModalTimeLine}
           modal={() => setOpenModalTimeLine(false)}
         >
-          {/* <CustomTimeline data={data} /> */}
+          <CustomTimeline data={data} />
         </CustomModal>
         <CustomModal
           title={"Resumo do atendimento"}
@@ -527,10 +527,10 @@ const ModalAtendimento = () => {
           handler={handleOpenModalComentario}
           modal={() => setOpenModalComentario(false)}
         >
-          {/* <AddComentario
+          <AddComentario
             data={data}
             modal={() => setOpenModalComentario(false)}
-          /> */}
+          />
         </CustomModal>
       </div>
     </>

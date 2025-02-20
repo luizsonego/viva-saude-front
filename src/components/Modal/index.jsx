@@ -1,4 +1,3 @@
-import { Card, Dialog, DialogBody, Typography } from "@material-tailwind/react";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import EditConfigs from "../../pages/Configuracoes/edit";
