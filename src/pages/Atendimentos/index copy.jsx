@@ -38,17 +38,9 @@ const Atendimentos = () => {
   const [dataModal, setDataModal] = useState({});
   const [statusSelecionado, setStatusSelecionado] = useState("ABERTO");
 
-  const [prioridadeSelecionada, setPrioridadeSelecionada] = useState("");
-  const [medicoSelecionado, setMedicoSelecionado] = useState("");
-  const [localSelecionado, setLocalSelecionado] = useState("");
-  const [clienteSelecionado, setClienteSelecionado] = useState("");
-  const [atendenteSelecionado, setAtendenteSelecionado] = useState("");
-
   const { data, isLoading } = useAtendimentosFetch();
   const { data: prioridadeData } = useGetResources("prioridades", "prioridade");
   const { data: atendenteData } = useGetResources("atendentes", "atendente");
-  const { data: medicoData } = useGetResources("medico", "medicos");
-  const { data: locaisData } = useGetResources("locais", "onde-ser-atendido");
 
   const { mutateAsync, isPending } = useResourcePut(
     "atendimentos",
@@ -63,40 +55,6 @@ const Atendimentos = () => {
   const filtrarPorStatus = () => {
     if (statusSelecionado === "ABERTOS") return data;
     return data?.filter((item) => item.status === statusSelecionado);
-  };
-
-  const filtrarAtendimentos = () => {
-    return data?.filter((item) => {
-      const statusFiltro =
-        statusSelecionado === "TODOS" ||
-        statusSelecionado === "ABERTOS" ||
-        item.status === statusSelecionado;
-      const prioridadeFiltro = prioridadeSelecionada
-        ? item.prioridadeAtendimento?.nome === prioridadeSelecionada
-        : true;
-      const medicoFiltro = medicoSelecionado
-        ? item.medico_atendimento === medicoSelecionado
-        : true;
-      const localFiltro = localSelecionado
-        ? item.onde_deseja_ser_atendido === localSelecionado
-        : true;
-      const atendenteFiltro = atendenteSelecionado
-        ? item?.profile?.name === atendenteSelecionado
-        : true;
-      const clienteFiltro = clienteSelecionado
-        ? item.titular_plano.includes(clienteSelecionado) ||
-          item.cpf_titular.includes(clienteSelecionado)
-        : true;
-
-      return (
-        statusFiltro &&
-        prioridadeFiltro &&
-        medicoFiltro &&
-        localFiltro &&
-        atendenteFiltro &&
-        clienteFiltro
-      );
-    });
   };
 
   const handleOpenModalConsulta = (item) => {
@@ -169,7 +127,6 @@ const Atendimentos = () => {
 
       <div className="mb-10 flex gap-2">
         {[
-          "TODOS",
           "AGUARDANDO VAGA",
           "FILA DE ESPERA",
           "NOVOS",
@@ -200,66 +157,6 @@ const Atendimentos = () => {
             Atendimentos
           </Typography>
         </CardHeader>
-        <div className="flex flex-wrap gap-2 mt-4 w-full grid lg:grid-cols-5 md:grid-cols-2 grid-cols-1">
-          <select
-            onChange={(e) => setPrioridadeSelecionada(e.target.value)}
-            className="border p-2 rounded"
-          >
-            <option value="">Todas Prioridades</option>
-            {prioridadeData?.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.nome}
-              </option>
-            ))}
-          </select>
-
-          <select
-            onChange={(e) => setMedicoSelecionado(e.target.value)}
-            className="border p-2 rounded"
-          >
-            <option value="">Todos Médicos</option>
-            {medicoData?.map((item) => (
-              <option key={item.id} value={item.nome}>
-                {item.nome}
-              </option>
-            ))}
-          </select>
-
-          <select
-            onChange={(e) => setLocalSelecionado(e.target.value)}
-            className="border p-2 rounded"
-          >
-            <option value="">Todos Locais</option>
-            {locaisData.map((item) => (
-              <option
-                key={item.onde_deseja_ser_atendido}
-                value={item.onde_deseja_ser_atendido}
-              >
-                {item.onde_deseja_ser_atendido}
-              </option>
-            ))}
-          </select>
-
-          <select
-            onChange={(e) => setAtendenteSelecionado(e.target.value)}
-            className="border p-2 rounded"
-          >
-            <option value="">Todos Atendentes</option>
-            {atendenteData?.map((item) => (
-              <option key={item.id} value={item?.profile?.name}>
-                {item?.profile?.name}
-              </option>
-            ))}
-          </select>
-
-          <input
-            type="text"
-            placeholder="Filtrar Cliente (Nome ou CPF)"
-            onChange={(e) => setClienteSelecionado(e.target.value)}
-            className="border p-2 rounded"
-          />
-        </div>
-
         <table className="w-full border-collapse border border-gray-300">
           <thead>
             <tr className="">
@@ -276,7 +173,7 @@ const Atendimentos = () => {
             </tr>
           </thead>
           <tbody>
-            {filtrarAtendimentos()?.map((item) => (
+            {filtrarPorStatus()?.map((item) => (
               <div
                 key={item.id}
                 style={{ display: "contents", backgroundColor: "tomato" }}

@@ -1,9 +1,10 @@
 import React, { Children } from "react";
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import DashboardNavbar from "./dashboard-navbar";
 import { Sidenav } from "./sidenav";
 import { HomeIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
 import { useGetResources } from "../../hooks/get/useGet.query";
+import { logout } from "../../services/auth";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -17,30 +18,30 @@ export const routes = [
         icon: <HomeIcon {...icon} />,
         name: "inicio",
         path: "/",
-        roles: ["atendente", "gerente"],
+        roles: ["atendente", "gerente", "supervisor"],
       },
       {
         icon: <InformationCircleIcon {...icon} />,
         name: "atendimentos",
         path: "/atendimentos",
-        roles: ["atendente", "gerente"],
+        roles: ["atendente", "gerente", "supervisor"],
       },
       {
         icon: <InformationCircleIcon {...icon} />,
         name: "médicos",
         path: "/medicos",
-        roles: ["gerente"],
+        roles: ["gerente", "supervisor"],
       },
       {
         icon: <InformationCircleIcon {...icon} />,
         name: "cadastros",
         path: "/cadastros",
-        roles: ["gerente"],
+        roles: ["gerente", "supervisor"],
         children: [
           {
             name: "grupos",
             path: "/cadastros/grupos",
-            roles: ["gerente"],
+            roles: ["gerente", "supervisor"],
           },
           {
             name: "prioridades",
@@ -68,7 +69,21 @@ export const routes = [
         icon: <InformationCircleIcon {...icon} />,
         name: "atendentes",
         path: "/atendente",
-        roles: ["gerente"],
+        roles: ["gerente", "supervisor"],
+      },
+      {
+        icon: <InformationCircleIcon {...icon} />,
+        name: (
+          <Link
+            onClick={() => {
+              logout();
+            }}
+          >
+            Sair
+          </Link>
+        ),
+        path: "",
+        roles: ["atendente", "gerente", "supervisor"],
       },
     ],
   },
