@@ -94,7 +94,7 @@ const Upload = ({
         <IKContext
           publicKey={publicKey}
           urlEndpoint={urlEndpoint}
-          authenticationEndpoint={authenticator}
+          authenticator={authenticator}
         >
           <IKUpload
             fileName={`${btoa(title)}-${id}`}
