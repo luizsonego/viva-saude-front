@@ -230,7 +230,7 @@ const Atendimentos = () => {
             className="border p-2 rounded"
           >
             <option value="">Todos Locais</option>
-            {locaisData.map((item) => (
+            {locaisData?.map((item) => (
               <option
                 key={item.onde_deseja_ser_atendido}
                 value={item.onde_deseja_ser_atendido}

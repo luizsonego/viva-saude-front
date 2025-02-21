@@ -8,6 +8,7 @@ import {
   DialogBody,
   DialogFooter,
   DialogHeader,
+  IconButton,
   Input,
   List,
   ListItem,
@@ -29,7 +30,11 @@ import {
 } from "../../hooks/get/useGet.query";
 import { format } from "date-fns";
 // import { DayPicker } from "react-day-picker";
-import { ChevronRightIcon, ChevronLeftIcon } from "@heroicons/react/24/outline";
+import {
+  ChevronRightIcon,
+  ChevronLeftIcon,
+  TrashIcon,
+} from "@heroicons/react/24/outline";
 import { useSearchResource } from "../../hooks/search/useSearch.query";
 import MultiSelectDropdown from "../../components/Forms/MultiSelectDropdown";
 
@@ -88,6 +93,16 @@ const Create = () => {
 
   const [listaLocalAtendimento, setListaLocalAtendimento] = useState([]);
   const [addLocalAtendimento, setAddLocalAtendimento] = useState("");
+  const [
+    addLocalAtendimentoVagasConsulta,
+    setAddLocalAtendimentoVagasConsulta,
+  ] = useState(0);
+  const [addLocalAtendimentoVagasRetorno, setAddLocalAtendimentoVagasRetorno] =
+    useState(0);
+  const [
+    addLocalAtendimentoVagasProcedimento,
+    setAddLocalAtendimentoVagasProcedimento,
+  ] = useState(0);
 
   const [schedule, setSchedule] = useState([]);
 
@@ -214,6 +229,15 @@ const Create = () => {
   function handleChangeLocalAtendimento(e) {
     setAddLocalAtendimento(e.target.value);
   }
+  function handleChangeLocalAtendimentoVagasConsulta(e) {
+    setAddLocalAtendimentoVagasConsulta(e.target.value);
+  }
+  function handleChangeLocalAtendimentoVagasRetorno(e) {
+    setAddLocalAtendimentoVagasRetorno(e.target.value);
+  }
+  function handleChangeLocalAtendimentoVagasProcedimento(e) {
+    setAddLocalAtendimentoVagasProcedimento(e.target.value);
+  }
   function handleRemoveLocalAtendimento(id) {
     const novaLista = listaLocalAtendimento.filter((item) => {
       return item.id !== id;
@@ -228,6 +252,9 @@ const Create = () => {
     const novaLista = listaLocalAtendimento.concat({
       id: Math.floor(Math.random() * (max - min) + min) * mt,
       local: addLocalAtendimento,
+      consulta: addLocalAtendimentoVagasConsulta,
+      retorno: addLocalAtendimentoVagasRetorno,
+      procedimento: addLocalAtendimentoVagasProcedimento,
     });
     setListaLocalAtendimento(novaLista);
   }
@@ -245,40 +272,105 @@ const Create = () => {
 
               <div className="flex gap-4">
                 <div>
-                  <Typography
-                    variant="h6"
-                    color="blue-gray"
-                    className=""
-                    style={{ textTransform: "capitalize" }}
-                  >
-                    Local de Atendimento
-                  </Typography>
-                  <Input
-                    type="text"
-                    onChange={handleChangeLocalAtendimento}
-                    value={addLocalAtendimento}
-                  />
-                </div>
-                <div>
-                  <Button
-                    type="button"
-                    onClick={handleAddLocalAtendimento}
-                    className="mt-6"
-                    variant="text"
-                  >
-                    Adicionar
-                  </Button>
+                  <div className="mb-1 flex flex-row gap-6">
+                    <fieldset className="py-5 m-0 w-64 flex-1">
+                      <legend> Local</legend>
+                      <Input
+                        label="Local de Atendimento"
+                        type="text"
+                        onChange={handleChangeLocalAtendimento}
+                        value={addLocalAtendimento}
+                      />
+                    </fieldset>
+                    <fieldset className="flex flex-row gap-1 border p-5 grid grid-cols-3 w-2/4">
+                      <legend>Vagas</legend>
+                      <Input
+                        style={{ width: "140px" }}
+                        label="Consultas"
+                        type="text"
+                        onChange={handleChangeLocalAtendimentoVagasConsulta}
+                        value={addLocalAtendimentoVagasConsulta}
+                        placeholder="Consultas"
+                        labelProps={{
+                          className: "hidden",
+                        }}
+                        className="!border !border-gray-300 bg-white text-gray-900 shadow-lg shadow-gray-900/5 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:!border-gray-900 focus:!border-t-gray-900 focus:ring-gray-900/10"
+                      />
+                      <Input
+                        style={{ width: "140px" }}
+                        label="Returno"
+                        type="text"
+                        onChange={handleChangeLocalAtendimentoVagasRetorno}
+                        value={addLocalAtendimentoVagasRetorno}
+                        placeholder="Retorno"
+                        labelProps={{
+                          className: "hidden",
+                        }}
+                        className="!border !border-gray-300 bg-white text-gray-900 shadow-lg shadow-gray-900/5 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:!border-gray-900 focus:!border-t-gray-900 focus:ring-gray-900/10"
+                      />
+                      <Input
+                        style={{ width: "140px" }}
+                        label="Procedimentos"
+                        type="text"
+                        onChange={handleChangeLocalAtendimentoVagasProcedimento}
+                        value={addLocalAtendimentoVagasProcedimento}
+                        placeholder="Procedimentos"
+                        labelProps={{
+                          className: "hidden",
+                        }}
+                        className="!border !border-gray-300 bg-white text-gray-900 shadow-lg shadow-gray-900/5 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:!border-gray-900 focus:!border-t-gray-900 focus:ring-gray-900/10"
+                      />
+                    </fieldset>
+                    <Button
+                      type="button"
+                      onClick={handleAddLocalAtendimento}
+                      className="mt-6"
+                      variant="text"
+                    >
+                      Adicionar
+                    </Button>
+                  </div>
                 </div>
               </div>
               {listaLocalAtendimento.length < 1 ? (
                 ""
               ) : (
-                <Card className="w-full md:w-1/2 overflow-hidden rounded-md">
+                <Card className="w-full md:w-full overflow-hidden rounded-md">
                   <List>
                     {listaLocalAtendimento.map((item) => (
                       <ListItem key={item.id}>
-                        {item.local}
-                        <ListItemPrefix>
+                        <List>
+                          <div>
+                            <Typography variant="h6" color="blue-gray">
+                              Local: {item.local}
+                            </Typography>
+                            <Typography
+                              variant="small"
+                              color="gray"
+                              className="font-normal"
+                            >
+                              <div className="flex flex-row gap-4">
+                                <span>- Consultas: {item.consulta}</span>
+                                <span>- Retorno: {item.retorno}</span>
+                                <span>
+                                  - Procedimentos: {item.procedimento}
+                                </span>
+                              </div>
+                            </Typography>
+                          </div>
+                        </List>
+                        <ListItemSuffix>
+                          <Button
+                            variant="gradient"
+                            className="pb-5 ml-5 pt-5"
+                            onClick={() =>
+                              handleRemoveLocalAtendimento(item.id)
+                            }
+                          >
+                            x
+                          </Button>
+                        </ListItemSuffix>
+                        {/* <ListItemPrefix>
                           <Button
                             variant="gradient"
                             className="h-5 p-4 pt-1 pb-3 ml-5"
@@ -286,9 +378,9 @@ const Create = () => {
                               handleRemoveLocalAtendimento(item.id)
                             }
                           >
-                            (x)
+                            x
                           </Button>
-                        </ListItemPrefix>
+                        </ListItemPrefix> */}
                       </ListItem>
                     ))}
                   </List>
@@ -439,14 +531,6 @@ const Create = () => {
                   prompt="Selecione uma ou mais etiquetas"
                 />
               )}
-
-              <InputForm
-                label="vagas disponiveis"
-                name="nome"
-                register={register}
-              />
-              <InputForm label="consulta" name="nome" register={register} />
-              <InputForm label="retorno" name="nome" register={register} />
             </div>
 
             <input

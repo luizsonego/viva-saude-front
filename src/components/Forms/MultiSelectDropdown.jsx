@@ -113,7 +113,16 @@ export default function MultiSelectDropdown({
                     className="cursor-pointer"
                     onChange={handleChange}
                   />
-                  <span className="ml-1">{option.servico}</span>
+                  <span className="ml-1">
+                    {option.servico}{" "}
+                    <span
+                      style={{
+                        background: option.cor,
+                        width: "30px",
+                        height: "5px",
+                      }}
+                    ></span>
+                  </span>
                 </label>
               </li>
             );

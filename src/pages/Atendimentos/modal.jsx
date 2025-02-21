@@ -357,29 +357,23 @@ const ModalAtendimento = () => {
                         className="text-xs !font-bold"
                         color="blue-gray"
                       >
-                        <Chip value={data?.o_que_deseja} />
+                        {data?.o_que_deseja}
+                      </Typography>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <Typography className="mt-3 text-xs !font-medium !text-gray-600">
+                        {"Atendido por"}:{" "}
+                        <span className="text-xs !font-bold" color="blue-gray">
+                          {data.atendido_por}
+                        </span>
                       </Typography>
                     </div>
                     <div className="flex flex-col gap-1">
                       <Typography className="mt-1 text-xs !font-medium !text-gray-600">
-                        {"Atendido por"}:
-                      </Typography>
-                      <Typography
-                        className="text-xs !font-bold"
-                        color="blue-gray"
-                      >
-                        {data.atendido_por}
-                      </Typography>
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <Typography className="mt-1 text-xs !font-medium !text-gray-600">
-                        {"inicio do atendimento"}:
-                      </Typography>
-                      <Typography
-                        className="text-xs !font-bold"
-                        color="blue-gray"
-                      >
-                        {data.atendimento_iniciado}
+                        {"inicio do atendimento"}:{" "}
+                        <span className="text-xs !font-bold" color="blue-gray">
+                          {data.atendimento_iniciado}
+                        </span>
                       </Typography>
                     </div>
                   </Card>
@@ -420,6 +414,7 @@ const ModalAtendimento = () => {
                           Aguardando Autorização
                         </Option>
                         <Option value="CONCLUIDO">Concluído</Option>
+                        <Option value="INATIVIDADE">Inatividade</Option>
                       </Select>
                     )}
                     {pendingAtendente ? (
