@@ -2,6 +2,7 @@ import React from "react";
 import {
   Card,
   CardBody,
+  CardHeader,
   Input,
   Option,
   Select,
@@ -20,7 +21,7 @@ const Login = () => {
   const [openModalError, setOpenModalError] = React.useState(false);
   const [dataMessage, setDataMessage] = React.useState({});
 
-  const { mutate, isLoading, isFetching } = useMutation({
+  const { mutate, isLoading, isFetching, isPending } = useMutation({
     mutationFn: useLoginPost,
     onSuccess: (data) => {
       if (data.status === 400 || data.status === 401) {
@@ -46,8 +47,52 @@ const Login = () => {
     mutate(data);
   };
   return (
-    <>
-      <MainAlert
+    <section className="px-8">
+      <div className="container mx-auto h-screen grid place-items-center">
+        <Card
+          shadow={false}
+          className="md:px-10 md:py-14 py-8 border border-gray-300 w-1/2"
+        >
+          <CardHeader shadow={false} floated={false} className="text-center">
+            <img
+              src={"/img/logo.png"}
+              alt="Logo viva saude"
+              className="w-64 h-64 aspect-square text-center mx-auto"
+            />
+            {/* <Typography
+              variant="h1"
+              color="blue-gray"
+              className="mb-4 !text-3xl lg:text-4xl"
+            >
+              Web3 Login Simplified
+            </Typography> */}
+            {/* <Typography className="!text-gray-600 text-[18px] font-normal md:max-w-sm">
+              Enjoy quick and secure access to your accounts on various Web3
+              platforms.
+            </Typography> */}
+          </CardHeader>
+          <CardBody>
+            <form
+              className="mt-8 mb-2 max-w-screen-lg flex flex-col gap-5"
+              onSubmit={handleSubmit(onSubmit)}
+            >
+              <InputForm label="Email" name="username" register={register} />
+              <InputForm label="Senha" name="password" register={register} />
+
+              {isPending ? (
+                "entrando"
+              ) : (
+                <input
+                  value={isPending ? "Entrando..." : "Entrar"}
+                  type="submit"
+                  className="bg-green-500 text-white p-2 rounded-md w-full "
+                />
+              )}
+            </form>
+          </CardBody>
+        </Card>
+      </div>
+      {/* <MainAlert
         handleOpen={openModalError}
         handleClose={() => setOpenModalError(!openModalError)}
         message={dataMessage.message}
@@ -73,8 +118,8 @@ const Login = () => {
             )}
           </form>
         </CardBody>
-      </Card>
-    </>
+      </Card> */}
+    </section>
   );
 };
 
