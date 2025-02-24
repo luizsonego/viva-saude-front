@@ -62,11 +62,15 @@ const Login = () => {
             <InputForm label="Email" name="username" register={register} />
             <InputForm label="Senha" name="password" register={register} />
 
-            <input
-              value={isLoading || isFetching ? "Enviando..." : "Enviar"}
-              type="submit"
-              className="bg-green-500 text-white p-2 rounded-md w-full mt-10"
-            />
+            {isLoading || isFetching ? (
+              "entrando"
+            ) : (
+              <input
+                value={isLoading || isFetching ? "Entrando..." : "Entrar"}
+                type="submit"
+                className="bg-green-500 text-white p-2 rounded-md w-full mt-10"
+              />
+            )}
           </form>
         </CardBody>
       </Card>

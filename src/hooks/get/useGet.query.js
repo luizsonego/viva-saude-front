@@ -3,7 +3,7 @@ import api from "../../services/api";
 
 const getResources = async (resource) => {
   try {
-    const response = await api.post(
+    const response = await api.get(
       `${process.env.REACT_APP_API}/v1/get/${resource}`,
       {
         headers: {
@@ -24,7 +24,7 @@ const getResources = async (resource) => {
 };
 const getResource = async (resource, id) => {
   try {
-    const response = await api.post(
+    const response = await api.get(
       `${process.env.REACT_APP_API}/v1/view/${resource}?id=${id}`,
       {
         headers: {
@@ -74,17 +74,36 @@ export function useGetResource(queries, resource, id) {
     queryFn: () => getResource(resource, id),
   });
 }
-// export const useDeleteMutation = (queries, resource) => {
-//   const queryClient = useQueryClient();
+const getAccess = async () => {
+  console.log("testes");
+  try {
+    const { data } = await api.get(
+      `${process.env.REACT_APP_API}/site/get-access`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem(
+            process.env.REACT_APP_ACCESS_TOKEN
+          )}`,
+        },
+      }
+    );
+    console.log(">>", data);
+    //  const { data } = response.data;
+    return data;
+  } catch (error) {
+    localStorage.removeItem(process.env.REACT_APP_ACCESS_TOKEN);
+    console.error(`Erro ao acessar:`, error.message);
+    throw error;
+  }
+};
 
-//   return useMutation({
-//     mutationFn: (id) => getResources(resource, id),
-//     onSuccess: () => {
-//       console.log(resource);
-//       queryClient.invalidateQueries({ queryKey: [queries] });
-//     },
-//   });
-// };
+export function useAccessFetchRequest() {
+  return useQuery({
+    queryKey: ["manager-access"],
+    queryFn: () => getAccess(),
+  });
+}
 
 const getAtendimentos = async (values) => {
   try {

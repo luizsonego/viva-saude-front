@@ -1,5 +1,5 @@
 import React from "react";
-import { Navigate, useRoutes } from "react-router-dom";
+import { Navigate, useNavigate, useRoutes } from "react-router-dom";
 import Main from "../components/layouts/Main";
 import Login from "../pages/Login";
 import { isAuthenticated } from "../services/auth";
@@ -21,14 +21,25 @@ import Origem from "../pages/Configuracoes/origem";
 import Modal from "../components/Modal";
 import CreateAtendimento from "../pages/Atendimentos/create";
 import EditarAtendente from "../pages/Atendente/editar";
-import EditConfigs from "../pages/Configuracoes/edit";
+
 import ModalAtendimento from "../pages/Atendimentos/modal";
+import { useAccessFetchRequest } from "../hooks/get/useGet.query";
 
 export default function MainRouter() {
+  const navigate = useNavigate();
+  const { data, isLoading: loading, status } = useAccessFetchRequest();
+  const access = data?.data?.access;
+  console.log(data);
   return useRoutes([
     {
       path: "/dashboard",
-      element: isAuthenticated() ? <Main /> : <Navigate to="/login" />,
+      element: loading ? (
+        "loading..."
+      ) : isAuthenticated() ? (
+        <Main />
+      ) : (
+        <Navigate to="/login" />
+      ),
       children: [
         {
           path: "/dashboard",
