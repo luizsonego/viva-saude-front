@@ -29,17 +29,11 @@ export default function MainRouter() {
   const navigate = useNavigate();
   const { data, isLoading: loading, status } = useAccessFetchRequest();
   const access = data?.data?.access;
-  console.log(data);
+
   return useRoutes([
     {
       path: "/dashboard",
-      element: loading ? (
-        "loading..."
-      ) : isAuthenticated() ? (
-        <Main />
-      ) : (
-        <Navigate to="/login" />
-      ),
+      element: isAuthenticated() ? <Main /> : <Navigate to="/login" />,
       children: [
         {
           path: "/dashboard",
