@@ -27,8 +27,8 @@ import { useAccessFetchRequest } from "../hooks/get/useGet.query";
 
 export default function MainRouter() {
   const navigate = useNavigate();
-  const { data, isLoading: loading, status } = useAccessFetchRequest();
-  const access = data?.data?.access;
+  // const { data, isLoading: loading, status } = useAccessFetchRequest();
+  // const access = data?.data?.access;
 
   return useRoutes([
     {

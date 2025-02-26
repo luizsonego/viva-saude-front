@@ -75,7 +75,6 @@ export function useGetResource(queries, resource, id) {
   });
 }
 const getAccess = async () => {
-  console.log("testes");
   try {
     const { data } = await api.get(
       `${process.env.REACT_APP_API}/site/get-access`,
@@ -92,7 +91,7 @@ const getAccess = async () => {
     //  const { data } = response.data;
     return data;
   } catch (error) {
-    localStorage.removeItem(process.env.REACT_APP_ACCESS_TOKEN);
+    // localStorage.removeItem(process.env.REACT_APP_ACCESS_TOKEN);
     console.error(`Erro ao acessar:`, error.message);
     throw error;
   }
