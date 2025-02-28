@@ -24,7 +24,6 @@ import { useEffect } from "react";
 import { useResourcePut } from "../../hooks/update/useUpdate.query";
 import MultiSelectDropdown from "../../components/Forms/MultiSelectDropdown";
 import { useSearchResource } from "../../hooks/search/useSearch.query";
-// import InputForm from "../../components/Forms/Input";
 
 const InputForm = ({
   label = "",
@@ -117,20 +116,19 @@ const EditMedico = () => {
       setListaProcedimentos(data?.procedimento_valor);
       setQueEtiqueta(data?.etiquetas);
       setEtiquetas(data?.etiquetas);
+      setEspecialidade(data?.especialidade);
     }
   }, [data, setValue]);
 
   const onSubmit = (formData) => {
     const sendForm = {
-      especialidade,
+      especialidade: especialidade,
       localizacao: listaLocalAtendimento,
       etiquetas: queEtiqueta,
       ...formData,
     };
     mutate(sendForm);
   };
-
-  console.log(listaLocalAtendimento);
 
   function handleChangeLocalAtendimento(e) {
     setAddLocalAtendimento(e.target.value);
