@@ -96,13 +96,13 @@ const Create = () => {
   const [
     addLocalAtendimentoVagasConsulta,
     setAddLocalAtendimentoVagasConsulta,
-  ] = useState(0);
+  ] = useState();
   const [addLocalAtendimentoVagasRetorno, setAddLocalAtendimentoVagasRetorno] =
-    useState(0);
+    useState();
   const [
     addLocalAtendimentoVagasProcedimento,
     setAddLocalAtendimentoVagasProcedimento,
-  ] = useState(0);
+  ] = useState();
 
   const [schedule, setSchedule] = useState([]);
 

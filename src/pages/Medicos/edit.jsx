@@ -73,13 +73,13 @@ const EditMedico = () => {
   const [
     addLocalAtendimentoVagasConsulta,
     setAddLocalAtendimentoVagasConsulta,
-  ] = useState(0);
+  ] = useState();
   const [addLocalAtendimentoVagasRetorno, setAddLocalAtendimentoVagasRetorno] =
-    useState(0);
+    useState();
   const [
     addLocalAtendimentoVagasProcedimento,
     setAddLocalAtendimentoVagasProcedimento,
-  ] = useState(0);
+  ] = useState();
 
   const { data, isLoading } = useGetResource("medicos", "medico", id);
   const { data: procedimentoData, isLoading: loadingProcedimento } =
@@ -123,8 +123,9 @@ const EditMedico = () => {
   const onSubmit = (formData) => {
     const sendForm = {
       especialidade: especialidade,
-      localizacao: listaLocalAtendimento,
+      local: listaLocalAtendimento,
       etiquetas: queEtiqueta,
+      procedimento_valor: listaProcedimentos,
       ...formData,
     };
     mutate(sendForm);

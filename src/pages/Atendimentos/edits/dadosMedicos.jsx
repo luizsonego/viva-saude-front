@@ -62,17 +62,42 @@ const EditAtendimentoDadosMedicos = ({ data, modal }) => {
       second: "2-digit",
       hour12: false,
     };
-    const dataFormatada = new Intl.DateTimeFormat("pt-BR", opcoes)
-      .format(valueDateAgendamento)
-      .replace(/\//g, "-")
-      .replace(",", "");
+
+    let formattedDate;
+
+    // Verifica se a entrada é uma string no formato DD-MM-YYYY HH:mm:ss
+    if (
+      typeof valueDateAgendamento === "string" &&
+      /^\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2}$/.test(valueDateAgendamento)
+    ) {
+      formattedDate = valueDateAgendamento.replace(
+        /(\d{2})-(\d{2})-(\d{4})/,
+        "$3-$2-$1"
+      );
+      console.log("so no ifizinho");
+    } else {
+      console.log("assume aqui");
+      // Assume que é um objeto Date ou string compatível com new Date()
+      const data = new Date(valueDateAgendamento);
+      formattedDate = new Intl.DateTimeFormat("pt-BR", opcoes)
+        .format(data)
+        .replace(/\//g, "-")
+        .replace(",", "");
+
+      formattedDate = formattedDate.replace(
+        /(\d{2})-(\d{2})-(\d{4})/,
+        "$3-$2-$1"
+      );
+    }
+
+    console.log(formattedDate);
 
     let dataForm = {
       medico_atendimento: qualMedico || data.medico_atendimento,
       medico: qualMedico || data.medico,
       onde_deseja_ser_atendido: localEscolhido || data.onde_deseja_ser_atendido,
       o_que_deseja: queDeseja || data.o_que_deseja,
-      medico_atendimento_data: dataFormatada,
+      medico_atendimento_data: formattedDate,
       ...data,
     };
     mutateAsync(dataForm);

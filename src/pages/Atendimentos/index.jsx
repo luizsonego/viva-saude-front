@@ -172,12 +172,13 @@ const Atendimentos = () => {
           "TODOS",
           "AGUARDANDO VAGA",
           "FILA DE ESPERA",
-          "NOVOS",
+          // "NOVOS",
           "ABERTO",
           "EM ANALISE",
           "PAGAMENTO",
           "AGUARDANDO AUTORIZACAO",
           "CONCLUIDO",
+          "INATIVIDADE",
         ].map((status) => (
           <Button
             key={status}
@@ -606,6 +607,7 @@ const Atendimentos = () => {
                     handleChangeStatusCartao({ status, id: dataModal.id })
                   }
                 >
+                  {/* {isPending && <Option value="">ENVIANDO</Option>} */}
                   <Option value="ABERTO">Aberto</Option>
                   <Option value="EM ANALISE">Em Analise</Option>
                   <Option value="PAGAMENTO">Para pagamento</Option>

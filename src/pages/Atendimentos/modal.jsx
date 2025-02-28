@@ -114,13 +114,17 @@ const ModalAtendimento = () => {
   return (
     <>
       <div
-        className="absolute inset-0 w-screen h-screen bg-black bg-opacity-60 flex items-center justify-center backdrop-blur-sm "
+        className="
+          absolute inset-0 w-screen h-screen bg-black bg-opacity-60 
+          flex items-center justify-center backdrop-blur-sm 
+        "
         style={{
           zIndex: 999,
         }}
       >
         <span
-          className="inline-block absolute top-0 right-0 mr-4 mt-4 cursor-pointer"
+          className="
+          inline-block absolute top-0 right-0 mr-4 mt-4 cursor-pointer"
           onClick={closeModal}
         >
           <svg
