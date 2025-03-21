@@ -614,9 +614,10 @@ const Atendimentos = () => {
                   <Option value="AGUARDANDO AUTORIZACAO">
                     Aguardando Autorização
                   </Option>
-                  <Option value="CONCLUIDO">Concluído</Option>
+
                   <Option value="AGUARDANDO VAGA">Aguardando Vaga</Option>
                   <Option value="FILA DE ESPERA">Fila de espera</Option>
+                  <Option value="CONCLUIDO">Concluído</Option>
                 </Select>
 
                 <Select
