@@ -1,70 +1,128 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Format: HTML
+max tokens
+50000
 
-## Available Scripts
+All Extensions
 
-In the project directory, you can run:
+Base path: root
+±50480 tokens
 
-### `npm start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Copy
+API
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Other Tools
+The response has been limited to 50k tokens of the smallest files in the repo. You can remove this limitation by removing the max tokens filter.
+├── .env
+├── .gitignore
+├── README.md
+├── debug.log
+├── package.json
+├── public
+    ├── favicon.ico
+    ├── img
+    │   └── logo.png
+    ├── index.html
+    ├── logo192.png
+    ├── logo512.png
+    ├── manifest.json
+    └── robots.txt
+├── src
+    ├── App.css
+    ├── App.js
+    ├── App.test.js
+    ├── clientProvider
+    │   ├── clientProvider.js
+    │   └── index.js
+    ├── components
+    │   ├── Alert
+    │   │   └── MainAlert.jsx
+    │   ├── Forms
+    │   │   ├── Input.jsx
+    │   │   └── MultiSelectDropdown.jsx
+    │   ├── Modal
+    │   │   └── index.jsx
+    │   ├── Table
+    │   │   └── genericTable.jsx
+    │   ├── layouts
+    │   │   ├── Main.js
+    │   │   ├── dashboard-navbar.jsx
+    │   │   └── sidenav.jsx
+    │   └── uploads
+    │   │   └── index.jsx
+    ├── helpers
+    │   ├── index.js
+    │   ├── prioridade.js
+    │   ├── status.js
+    │   └── unserialize.js
+    ├── hooks
+    │   ├── auth
+    │   │   └── useAuth.query.js
+    │   ├── delete
+    │   │   └── useDelete.query.js
+    │   ├── get
+    │   │   └── useGet.query.js
+    │   ├── post
+    │   │   └── usePost.query.js
+    │   ├── search
+    │   │   └── useSearch.query.js
+    │   └── update
+    │   │   └── useUpdate.query.js
+    ├── index.css
+    ├── index.js
+    ├── logo.svg
+    ├── pages
+    │   ├── Atendente
+    │   │   ├── create.jsx
+    │   │   ├── editar.jsx
+    │   │   └── index.jsx
+    │   ├── Atendimentos
+    │   │   ├── create.jsx
+    │   │   ├── edits
+    │   │   │   ├── comentario.jsx
+    │   │   │   ├── dadosMedicos.jsx
+    │   │   │   └── dadosPessoais.jsx
+    │   │   ├── index copy.jsx
+    │   │   ├── index.jsx
+    │   │   ├── modal.jsx
+    │   │   └── timeline.jsx
+    │   ├── Auto
+    │   │   └── index.jsx
+    │   ├── Configuracoes
+    │   │   ├── Components
+    │   │   │   ├── card.jsx
+    │   │   │   ├── index.js
+    │   │   │   └── modal.jsx
+    │   │   ├── edit.jsx
+    │   │   ├── especialidades.jsx
+    │   │   ├── etiquetas.jsx
+    │   │   ├── grupos.jsx
+    │   │   ├── index.jsx
+    │   │   ├── origem.jsx
+    │   │   ├── prioridades.jsx
+    │   │   ├── procedimentos.jsx
+    │   │   └── unidades.jsx
+    │   ├── Home
+    │   │   └── index.jsx
+    │   ├── Login
+    │   │   └── index.jsx
+    │   └── Medicos
+    │   │   ├── Table.jsx
+    │   │   ├── create.jsx
+    │   │   ├── edit.jsx
+    │   │   ├── index.jsx
+    │   │   └── view.jsx
+    ├── reportWebVitals.js
+    ├── routes
+    │   └── index.jsx
+    ├── services
+    │   ├── api.js
+    │   └── auth.js
+    ├── setupTests.js
+    ├── tailwind.css
+    └── theme
+    │   └── color.js
+├── tailwind.config.js
+└── yarn.lock
 
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
