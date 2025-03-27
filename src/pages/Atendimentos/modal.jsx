@@ -419,6 +419,8 @@ const ModalAtendimento = () => {
                         </Option>
                         <Option value="CONCLUIDO">Concluído</Option>
                         <Option value="INATIVIDADE">Inatividade</Option>
+                          <Option value="AGUARDANDO VAGA">Aguardando Vaga</Option>
+                          <Option value="FILA DE ESPERA">Fila de espera</Option>
                       </Select>
                     )}
                     {pendingAtendente ? (
