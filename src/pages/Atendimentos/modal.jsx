@@ -19,6 +19,7 @@ import EditAtendimentoDadosPessoais from "./edits/dadosPessoais";
 import EditAtendimentoDadosMedicos from "./edits/dadosMedicos";
 import CustomTimeline from "./timeline";
 import AddComentario from "./edits/comentario";
+import { formatarDataBr } from "../../helpers";
 
 const ModalAtendimento = () => {
   const { id, resource } = useParams();
@@ -36,6 +37,7 @@ const ModalAtendimento = () => {
     "atendimento",
     id
   );
+  const atendimentoData = data?.atendimento;
   const { data: prioridadeData = [] } = useGetResources(
     "prioridades",
     "prioridade"
@@ -80,6 +82,7 @@ const ModalAtendimento = () => {
       id,
       status,
     };
+    console.log(dataStatus);
     mutateAsync(dataStatus);
   };
   const handleChangeAtendenteCartao = ({ id, atendente }) => {
@@ -141,14 +144,30 @@ const ModalAtendimento = () => {
           </svg>
         </span>
         <div className="w-4/5 h-[90%] overflow-y-auto">
-          <Card shadow={true} className="w-full justify-center">
+          <Card
+            shadow={true}
+            className="w-full justify-center"
+            style={{
+              border: data.expirado?.tempo_restante <= 0 ? "2px solid red" : "",
+            }}
+          >
             <DialogHeader>
               Detalhes do agendamento{" "}
-              {data?.em_espera ? (
+              {atendimentoData?.em_espera ? (
                 <Chip className="ml-8" value="Item Em fila de espera" />
               ) : (
                 ""
               )}
+            </DialogHeader>
+            <DialogHeader>
+              <small>
+                Expira em:{" "}
+                {data.expirado?.tempo_restante > 0 ? (
+                  formatarDataBr(data.expirado?.expira_em)
+                ) : (
+                  <Chip className="ml-8" value="Atendimento expirado" />
+                )}
+              </small>
             </DialogHeader>
             <CardBody>
               <div className="flex flex-row gap-4">
@@ -161,7 +180,7 @@ const ModalAtendimento = () => {
                     color="blue-gray"
                     className="mb-3 font-bold"
                   >
-                    {data.titulo}
+                    {atendimentoData.titulo}
                   </Typography>
                   <div className="mb-4 flex items-start justify-between">
                     <div>
@@ -169,35 +188,35 @@ const ModalAtendimento = () => {
                       <Typography color="blue-gray" className="mb-1 ">
                         Nome:{" "}
                         <span className="mb-1 font-bold font-lg">
-                          {data.titular_plano}
+                          {atendimentoData.titular_plano}
                         </span>
                       </Typography>
                       <Typography color="blue-gray" className="mb-1 ">
                         CPF:{" "}
                         <span className="mb-1 font-bold font-lg">
-                          {data.cpf_titular}
+                          {atendimentoData.cpf_titular}
                         </span>
                       </Typography>
                       <Typography color="blue-gray" className="mb-1 ">
                         Whatsapp:{" "}
                         <span className="mb-1 font-bold font-lg">
-                          {data.whatsapp_titular}
+                          {atendimentoData.whatsapp_titular}
                         </span>
                       </Typography>
-                      {data.para_quem === "outra" ? (
+                      {atendimentoData.para_quem === "outra" ? (
                         <>
                           <hr />
                           <h3>Dados de quem vai ser atendido</h3>
                           <Typography color="blue-gray" className="mb-1 ">
                             Nome:{" "}
                             <span className="mb-1 font-bold font-lg">
-                              {data.nome_outro}
+                              {atendimentoData.nome_outro}
                             </span>
                           </Typography>
                           <Typography color="blue-gray" className="mb-1 ">
                             CPF:{" "}
                             <span className="mb-1 font-bold font-lg">
-                              {data.cpf_outro}
+                              {atendimentoData.cpf_outro}
                             </span>
                           </Typography>
                         </>
@@ -216,7 +235,7 @@ const ModalAtendimento = () => {
                           className="text-xs !font-bold"
                           color="blue-gray"
                         >
-                          {data.status}
+                          {atendimentoData.status}
                         </Typography>
                       </div>
                       <div className="flex gap-1">
@@ -228,10 +247,10 @@ const ModalAtendimento = () => {
                           color="blue-gray"
                         >
                           <Chip
-                            value={data?.prioridadeAtendimento?.nome}
+                            value={atendimentoData?.prioridadeAtendimento?.nome}
                             style={{
                               background:
-                                data?.prioridadeAtendimento?.cor ||
+                                atendimentoData?.prioridadeAtendimento?.cor ||
                                 "transparent",
                             }}
                           />
@@ -246,7 +265,8 @@ const ModalAtendimento = () => {
                           className="text-xs !font-bold"
                           color="blue-gray"
                         >
-                          {data.perfil_cliente} {/*perfil do cliente*/}
+                          {atendimentoData.perfil_cliente}{" "}
+                          {/*perfil do cliente*/}
                         </Typography>
                       </div>
                       <div className="flex gap-1">
@@ -257,7 +277,7 @@ const ModalAtendimento = () => {
                           className="text-xs !font-bold"
                           color="blue-gray"
                         >
-                          {data.observacoes} {/*perfil do cliente*/}
+                          {atendimentoData.observacoes} {/*perfil do cliente*/}
                         </Typography>
                       </div>
                     </div>
@@ -272,7 +292,7 @@ const ModalAtendimento = () => {
                       className="text-xs !font-bold"
                       color="blue-gray"
                     >
-                      {data?.profile?.name}
+                      {atendimentoData?.profile?.name}
                     </Typography>
                   </div>
                   <hr className="mt-5 mb-5" />
@@ -285,7 +305,7 @@ const ModalAtendimento = () => {
                       className="text-xs !font-bold"
                       color="blue-gray"
                     >
-                      {data.medico_atendimento}
+                      {atendimentoData.medico_atendimento}
                     </Typography>
                   </div>
                   <div className="flex gap-1">
@@ -296,8 +316,8 @@ const ModalAtendimento = () => {
                       className="text-xs !font-bold"
                       color="blue-gray"
                     >
-                      {data.acoes?.nome}
-                      {data.o_que_deseja}
+                      {atendimentoData.acoes?.nome}
+                      {atendimentoData.o_que_deseja}
                     </Typography>
                   </div>
                   <div className="flex gap-1">
@@ -308,7 +328,7 @@ const ModalAtendimento = () => {
                       className="text-xs !font-bold"
                       color="blue-gray"
                     >
-                      {data.onde_deseja_ser_atendido}
+                      {atendimentoData.onde_deseja_ser_atendido}
                     </Typography>
                   </div>
                   <div className="flex gap-1">
@@ -319,7 +339,7 @@ const ModalAtendimento = () => {
                       className="text-xs !font-bold"
                       color="blue-gray"
                     >
-                      {data.medico_atendimento_data}
+                      {atendimentoData.medico_atendimento_data}
                     </Typography>
                   </div>
                   <hr className="mt-5 mb-5" />
@@ -329,7 +349,7 @@ const ModalAtendimento = () => {
                       className="text-xs !font-bold"
                       color="blue-gray"
                     >
-                      {data.comentario}
+                      {atendimentoData.comentario}
                     </Typography>
                   </div>
                   <hr className="mt-5 mb-5" />
@@ -339,7 +359,7 @@ const ModalAtendimento = () => {
                       className="text-xs !font-bold"
                       color="blue-gray"
                     >
-                      {data?.anexos?.map((item) =>
+                      {atendimentoData?.anexos?.map((item) =>
                         item.fileType === "image" ? (
                           <img src={item.url} alt="imagem" width={200} />
                         ) : (
@@ -361,14 +381,14 @@ const ModalAtendimento = () => {
                         className="text-xs !font-bold"
                         color="blue-gray"
                       >
-                        {data?.o_que_deseja}
+                        {atendimentoData?.o_que_deseja}
                       </Typography>
                     </div>
                     <div className="flex flex-col gap-1">
                       <Typography className="mt-3 text-xs !font-medium !text-gray-600">
                         {"Atendido por"}:{" "}
                         <span className="text-xs !font-bold" color="blue-gray">
-                          {data.atendido_por}
+                          {atendimentoData.atendido_por}
                         </span>
                       </Typography>
                     </div>
@@ -376,7 +396,7 @@ const ModalAtendimento = () => {
                       <Typography className="mt-1 text-xs !font-medium !text-gray-600">
                         {"inicio do atendimento"}:{" "}
                         <span className="text-xs !font-bold" color="blue-gray">
-                          {data.atendimento_iniciado}
+                          {atendimentoData.atendimento_iniciado}
                         </span>
                       </Typography>
                     </div>
@@ -390,7 +410,7 @@ const ModalAtendimento = () => {
                         onChange={(prioridade) =>
                           handleChangePrioridadeCartao({
                             prioridade,
-                            id: data.id,
+                            id: atendimentoData.id,
                           })
                         }
                       >
@@ -408,19 +428,28 @@ const ModalAtendimento = () => {
                       <Select
                         label="Status"
                         onChange={(status) =>
-                          handleChangeStatusCartao({ status, id: data.id })
+                          handleChangeStatusCartao({
+                            status,
+                            id: atendimentoData.id,
+                          })
                         }
                       >
                         <Option value="ABERTO">Aberto</Option>
-                        <Option value="EM ANALISE">Em Analise</Option>
-                        <Option value="PAGAMENTO">Para pagamento</Option>
                         <Option value="AGUARDANDO AUTORIZACAO">
                           Aguardando Autorização
                         </Option>
+                        <Option value="AGUARDANDO PAGAMENTO">
+                          Aguardando pagamento
+                        </Option>
+                        <Option value="AGUARDANDO VAGA">Aguardando Vaga</Option>
                         <Option value="CONCLUIDO">Concluído</Option>
+                        <Option value="EM ANALISE">Em Analise</Option>
+                        <Option value="FILA DE ESPERA">Fila de espera</Option>
                         <Option value="INATIVIDADE">Inatividade</Option>
-                          <Option value="AGUARDANDO VAGA">Aguardando Vaga</Option>
-                          <Option value="FILA DE ESPERA">Fila de espera</Option>
+                        <Option value="PAGAMENTO">Para pagamento</Option>
+                        <Option value="PAGAMENTO EFETUADO">
+                          Pagamento efetuado
+                        </Option>
                       </Select>
                     )}
                     {pendingAtendente ? (
@@ -431,7 +460,7 @@ const ModalAtendimento = () => {
                         onChange={(atendente) =>
                           handleChangeAtendenteCartao({
                             atendente,
-                            id: data.id,
+                            id: atendimentoData.id,
                           })
                         }
                       >
@@ -450,36 +479,39 @@ const ModalAtendimento = () => {
                   >
                     <Button
                       variant="outlined"
-                      onClick={() => handleOpenModalAjustesAtendimento(data)}
+                      onClick={() =>
+                        handleOpenModalAjustesAtendimento(atendimentoData)
+                      }
                     >
                       Ajustar dados paciente
                     </Button>
                     <Button
                       variant="outlined"
-                      onClick={() => handleOpenModalAjustesMedico(data)}
+                      onClick={() =>
+                        handleOpenModalAjustesMedico(atendimentoData)
+                      }
                     >
                       Ajustar dados atendimento
                     </Button>
                     <Button
                       variant="outlined"
-                      onClick={() => handleOpenModalComentario(data)}
+                      onClick={() => handleOpenModalComentario(atendimentoData)}
                       color="light-blue"
                     >
                       Resumo do atendimento
                     </Button>
                     <Button
                       variant="outlined"
-                      onClick={() => handleOpenModalTimeLine(data)}
+                      onClick={() => handleOpenModalTimeLine(atendimentoData)}
                       color="blue-gray"
                     >
                       Visualizar linha do tempo
                     </Button>
                     <Upload
-                      title={`Anexo-${data?.id}-${getRandomIntInclusive(
-                        1,
-                        100000
-                      )}`}
-                      id={data?.id}
+                      title={`Anexo-${
+                        atendimentoData?.id
+                      }-${getRandomIntInclusive(1, 100000)}`}
+                      id={atendimentoData?.id}
                       label={"Enviar Anexo"}
                       folder={"anexos"}
                       controller={"atendimentos"}
@@ -498,7 +530,7 @@ const ModalAtendimento = () => {
           handler={handleOpenModalAjustesAtendimento}
         >
           <EditAtendimentoDadosPessoais
-            data={data}
+            data={atendimentoData}
             modal={() => setOpenModalAtendimento(false)}
           />
         </CustomModal>
@@ -509,7 +541,7 @@ const ModalAtendimento = () => {
           modal={() => setOpenModalMedicos(false)}
         >
           <EditAtendimentoDadosMedicos
-            data={data}
+            data={atendimentoData}
             modal={() => setOpenModalMedicos(false)}
           />
         </CustomModal>
@@ -520,7 +552,7 @@ const ModalAtendimento = () => {
           handler={handleOpenModalTimeLine}
           modal={() => setOpenModalTimeLine(false)}
         >
-          <CustomTimeline data={data} />
+          <CustomTimeline data={atendimentoData} />
         </CustomModal>
         <CustomModal
           title={"Resumo do atendimento"}
@@ -529,7 +561,7 @@ const ModalAtendimento = () => {
           modal={() => setOpenModalComentario(false)}
         >
           <AddComentario
-            data={data}
+            data={atendimentoData}
             modal={() => setOpenModalComentario(false)}
           />
         </CustomModal>
