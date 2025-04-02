@@ -62,7 +62,7 @@ const Atendimentos = () => {
 
   const filtrarPorStatus = () => {
     if (statusSelecionado === "ABERTOS") return data;
-    return data?.filter((item) => item.status === statusSelecionado);
+    return data?.filter((item) => item?.status === statusSelecionado);
   };
 
   const filtrarAtendimentos = () => {
@@ -70,22 +70,22 @@ const Atendimentos = () => {
       const statusFiltro =
         statusSelecionado === "TODOS" ||
         statusSelecionado === "ABERTOS" ||
-        item.status === statusSelecionado;
+        item?.status === statusSelecionado;
       const prioridadeFiltro = prioridadeSelecionada
-        ? item.prioridadeAtendimento?.nome === prioridadeSelecionada
+        ? item?.prioridadeAtendimento?.nome === prioridadeSelecionada
         : true;
       const medicoFiltro = medicoSelecionado
-        ? item.medico_atendimento === medicoSelecionado
+        ? item?.medico_atendimento === medicoSelecionado
         : true;
       const localFiltro = localSelecionado
-        ? item.onde_deseja_ser_atendido === localSelecionado
+        ? item?.onde_deseja_ser_atendido === localSelecionado
         : true;
       const atendenteFiltro = atendenteSelecionado
         ? item?.profile?.name === atendenteSelecionado
         : true;
       const clienteFiltro = clienteSelecionado
-        ? item.titular_plano.includes(clienteSelecionado) ||
-          item.cpf_titular.includes(clienteSelecionado)
+        ? item?.titular_plano.includes(clienteSelecionado) ||
+          item?.cpf_titular.includes(clienteSelecionado)
         : true;
 
       return (
@@ -147,6 +147,7 @@ const Atendimentos = () => {
   if (isLoading) {
     return "carregando...";
   }
+
   return (
     <>
       {/* <MainAlert
@@ -172,11 +173,11 @@ const Atendimentos = () => {
           "TODOS",
           "AGUARDANDO VAGA",
           "FILA DE ESPERA",
-          // "NOVOS",
           "ABERTO",
           "EM ANALISE",
           "PAGAMENTO",
           "AGUARDANDO AUTORIZACAO",
+          "AGUARDANDO PAGAMENTO",
           "CONCLUIDO",
           "INATIVIDADE",
         ].map((status) => (
@@ -208,8 +209,8 @@ const Atendimentos = () => {
           >
             <option value="">Todas Prioridades</option>
             {prioridadeData?.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.nome}
+              <option key={item?.id} value={item?.id}>
+                {item?.nome}
               </option>
             ))}
           </select>
@@ -220,8 +221,8 @@ const Atendimentos = () => {
           >
             <option value="">Todos Médicos</option>
             {medicoData?.map((item) => (
-              <option key={item.id} value={item.nome}>
-                {item.nome}
+              <option key={item?.id} value={item?.nome}>
+                {item?.nome}
               </option>
             ))}
           </select>
@@ -233,10 +234,10 @@ const Atendimentos = () => {
             <option value="">Todos Locais</option>
             {locaisData?.map((item) => (
               <option
-                key={item.onde_deseja_ser_atendido}
-                value={item.onde_deseja_ser_atendido}
+                key={item?.onde_deseja_ser_atendido}
+                value={item?.onde_deseja_ser_atendido}
               >
-                {item.onde_deseja_ser_atendido}
+                {item?.onde_deseja_ser_atendido}
               </option>
             ))}
           </select>
@@ -247,7 +248,7 @@ const Atendimentos = () => {
           >
             <option value="">Todos Atendentes</option>
             {atendenteData?.map((item) => (
-              <option key={item.id} value={item?.profile?.name}>
+              <option key={item?.id} value={item?.profile?.name}>
                 {item?.profile?.name}
               </option>
             ))}
@@ -279,12 +280,12 @@ const Atendimentos = () => {
           <tbody>
             {filtrarAtendimentos()?.map((item) => (
               <div
-                key={item.id}
+                key={item?.id}
                 style={{ display: "contents", backgroundColor: "tomato" }}
               >
                 <tr className="">
-                  <td className={classTdTable}>{item.titular_plano}</td>
-                  <td className={classTdTable}>{item.o_que_deseja}</td>
+                  <td className={classTdTable}>{item?.titular_plano}</td>
+                  <td className={classTdTable}>{item?.o_que_deseja}</td>
                   <td
                     className={classTdTable}
                     style={{
@@ -300,13 +301,13 @@ const Atendimentos = () => {
                       }}
                     />
                   </td>
-                  <td className={classTdTable}>{item.medico_atendimento}</td>
+                  <td className={classTdTable}>{item?.medico_atendimento}</td>
                   <td className={classTdTable}>
-                    {item.onde_deseja_ser_atendido}
+                    {item?.onde_deseja_ser_atendido}
                   </td>
-                  <td className={classTdTable}>{item.status}</td>
+                  <td className={classTdTable}>{item?.status}</td>
                   <td className={classTdTable}>
-                    {item.medico_atendimento_data}
+                    {item?.medico_atendimento_data}
                   </td>
                   <td className={classTdTable}>
                     {/* <Button
@@ -316,7 +317,7 @@ const Atendimentos = () => {
                       Detalhes
                     </Button> */}
                     <Button
-                      onClick={() => handleViewCartao("atendimento", item.id)}
+                      onClick={() => handleViewCartao("atendimento", item?.id)}
                     >
                       ver
                     </Button>
@@ -536,11 +537,11 @@ const Atendimentos = () => {
                 <div className="flex gap-1">
                   <Typography className="text-xs !font-bold" color="blue-gray">
                     {dataModal?.anexos?.map((item) =>
-                      item.fileType === "image" ? (
-                        <img src={item.url} alt="imagem" width={200} />
+                      item?.fileType === "image" ? (
+                        <img src={item?.url} alt="imagem" width={200} />
                       ) : (
-                        <a href={item.url} target="_blank" rel="noreferrer">
-                          {item.nome}
+                        <a href={item?.url} target="_blank" rel="noreferrer">
+                          {item?.nome}
                         </a>
                       )
                     )}
@@ -596,8 +597,8 @@ const Atendimentos = () => {
                   }
                 >
                   {prioridadeData?.map((item, index) => (
-                    <Option key={index + 1} value={item.id}>
-                      {item.nome}
+                    <Option key={index + 1} value={item?.id}>
+                      {item?.nome}
                     </Option>
                   ))}
                 </Select>
@@ -630,7 +631,7 @@ const Atendimentos = () => {
                   }
                 >
                   {atendenteData?.map((item, index) => (
-                    <Option key={index + 1} value={item.id}>
+                    <Option key={index + 1} value={item?.id}>
                       {item?.profile?.name}
                     </Option>
                   ))}

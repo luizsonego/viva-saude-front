@@ -446,7 +446,6 @@ const ModalAtendimento = () => {
                         <Option value="EM ANALISE">Em Analise</Option>
                         <Option value="FILA DE ESPERA">Fila de espera</Option>
                         <Option value="INATIVIDADE">Inatividade</Option>
-                        <Option value="PAGAMENTO">Para pagamento</Option>
                         <Option value="PAGAMENTO EFETUADO">
                           Pagamento efetuado
                         </Option>
