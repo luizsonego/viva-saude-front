@@ -176,9 +176,9 @@ const Atendimentos = () => {
           "FILA DE ESPERA",
           "ABERTO",
           "EM ANALISE",
-          "PAGAMENTO EFETUADO",
           "AGUARDANDO AUTORIZACAO",
           "AGUARDANDO PAGAMENTO",
+          "PAGAMENTO EFETUADO",
           "CONCLUIDO",
           "INATIVIDADE",
         ].map((status) => (
