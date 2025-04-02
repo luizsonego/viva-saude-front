@@ -148,7 +148,10 @@ const ModalAtendimento = () => {
             shadow={true}
             className="w-full justify-center"
             style={{
-              border: data.expirado?.tempo_restante <= 0 ? "2px solid red" : "",
+              border:
+                data.expirado?.tempo_restante <= 0 || data.expirado
+                  ? "2px solid red"
+                  : "",
             }}
           >
             <DialogHeader>
@@ -165,7 +168,11 @@ const ModalAtendimento = () => {
                 {data.expirado?.tempo_restante > 0 ? (
                   formatarDataBr(data.expirado?.expira_em)
                 ) : (
-                  <Chip className="ml-8" value="Atendimento expirado" />
+                  <Chip
+                    className="ml-8"
+                    value="Atendimento em atraso"
+                    style={{ background: "red" }}
+                  />
                 )}
               </small>
             </DialogHeader>
