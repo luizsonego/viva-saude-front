@@ -167,12 +167,14 @@ const ModalAtendimento = () => {
                 Expira em:{" "}
                 {data.expirado?.tempo_restante > 0 ? (
                   formatarDataBr(data.expirado?.expira_em)
-                ) : (
+                ) : atendimentoData.status !== "CONCLUIDO" ? (
                   <Chip
                     className="ml-8"
                     value="Atendimento em atraso"
                     style={{ background: "red" }}
                   />
+                ) : (
+                  ""
                 )}
               </small>
             </DialogHeader>

@@ -21,6 +21,7 @@ import EditAtendimentoDadosMedicos from "./edits/dadosMedicos";
 import CustomTimeline from "./timeline";
 import AddComentario from "./edits/comentario";
 import Upload from "../../components/uploads";
+import { formatarDataBr } from "../../helpers";
 
 const classThTable =
   "py-3 px-5 text-left text-[11px] font-bold uppercase text-blue-gray-400";
@@ -175,7 +176,7 @@ const Atendimentos = () => {
           "FILA DE ESPERA",
           "ABERTO",
           "EM ANALISE",
-          "PAGAMENTO",
+          "PAGAMENTO EFETUADO",
           "AGUARDANDO AUTORIZACAO",
           "AGUARDANDO PAGAMENTO",
           "CONCLUIDO",
@@ -283,7 +284,16 @@ const Atendimentos = () => {
                 key={item?.id}
                 style={{ display: "contents", backgroundColor: "tomato" }}
               >
-                <tr className="">
+                <tr
+                  style={{
+                    background: `${
+                      item?.temporizador?.tempo_restante <= 0 ? "red" : ""
+                    }`,
+                    color: `${
+                      item?.temporizador?.tempo_restante <= 0 ? "white" : ""
+                    }`,
+                  }}
+                >
                   <td className={classTdTable}>{item?.titular_plano}</td>
                   <td className={classTdTable}>{item?.o_que_deseja}</td>
                   <td
