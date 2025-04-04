@@ -20,10 +20,11 @@ import EditAtendimentoDadosMedicos from "./edits/dadosMedicos";
 import CustomTimeline from "./timeline";
 import AddComentario from "./edits/comentario";
 import { formatarDataBr } from "../../helpers";
+import { converterSegundosMinutos } from "../../helpers/formatarDataBr";
 
 const ModalAtendimento = () => {
   const { id, resource } = useParams();
-  const history = useNavigate();
+  const navigate = useNavigate();
 
   const [openModal, setOpenModal] = useState(false);
   const [openModalAtendimento, setOpenModalAtendimento] = useState(false);
@@ -31,18 +32,19 @@ const ModalAtendimento = () => {
   const [openModalTimeLine, setOpenModalTimeLine] = useState(false);
   const [openModalComentario, setOpenModalComentario] = useState(false);
   const [dataModal, setDataModal] = useState({});
+  const [error, setError] = useState(null);
 
-  const { data = {}, isLoading } = useGetResource(
+  const { data = {}, isLoading, error: fetchError } = useGetResource(
     "atendimento",
     "atendimento",
     id
   );
   const atendimentoData = data?.atendimento;
-  const { data: prioridadeData = [] } = useGetResources(
+  const { data: prioridadeData = [], error: prioridadeError } = useGetResources(
     "prioridades",
     "prioridade"
   );
-  const { data: atendenteData = [] } = useGetResources(
+  const { data: atendenteData = [], error: atendenteError } = useGetResources(
     "atendentes",
     "atendente"
   );
@@ -59,7 +61,7 @@ const ModalAtendimento = () => {
 
   const closeModal = (e) => {
     e.stopPropagation();
-    history(-1);
+    navigate(-1);
   };
 
   React.useEffect(() => {
@@ -75,22 +77,33 @@ const ModalAtendimento = () => {
       id,
       prioridade,
     };
-    mutatePrioridade(dataStatus);
+    try {
+      mutatePrioridade(dataStatus);
+    } catch (error) {
+      setError("Erro ao alterar prioridade. Tente novamente.");
+    }
   };
   const handleChangeStatusCartao = ({ id, status }) => {
     let dataStatus = {
       id,
       status,
     };
-    console.log(dataStatus);
-    mutateAsync(dataStatus);
+    try {
+      mutateAsync(dataStatus);
+    } catch (error) {
+      setError("Erro ao alterar status. Tente novamente.");
+    }
   };
   const handleChangeAtendenteCartao = ({ id, atendente }) => {
     let dataStatus = {
       id,
       atendente,
     };
-    mutateAtendente(dataStatus);
+    try {
+      mutateAtendente(dataStatus);
+    } catch (error) {
+      setError("Erro ao alterar atendente. Tente novamente.");
+    }
   };
 
   const handleOpenModalConsulta = (item) => {
@@ -113,6 +126,17 @@ const ModalAtendimento = () => {
   };
 
   if (isLoading) return "carregando...";
+  
+  if (fetchError || prioridadeError || atendenteError) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-red-500 text-center">
+          <h2 className="text-xl font-bold mb-2">Erro ao carregar dados</h2>
+          <p>{fetchError?.message || prioridadeError?.message || atendenteError?.message || "Ocorreu um erro ao carregar os dados. Tente novamente."}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -120,21 +144,33 @@ const ModalAtendimento = () => {
         className="
           absolute inset-0 w-screen h-screen bg-black bg-opacity-60 
           flex items-center justify-center backdrop-blur-sm 
+          transition-opacity duration-300 ease-in-out
         "
         style={{
           zIndex: 999,
         }}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
       >
+        {error && (
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50">
+            <p>{error}</p>
+          </div>
+        )}
         <span
           className="
-          inline-block absolute top-0 right-0 mr-4 mt-4 cursor-pointer"
+          inline-block absolute top-0 right-0 mr-4 mt-4 cursor-pointer
+          transition-transform duration-200 ease-in-out hover:scale-110
+          "
           onClick={closeModal}
         >
           <svg
-            class="w-6 h-6 text-white"
+            className="w-6 h-6 text-white"
             fill="currentColor"
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg"
+            aria-label="Fechar modal"
           >
             <path
               fill-rule="evenodd"
@@ -143,10 +179,10 @@ const ModalAtendimento = () => {
             />
           </svg>
         </span>
-        <div className="w-4/5 h-[90%] overflow-y-auto">
+        <div className="w-4/5 h-[90%] flex items-center justify-center">
           <Card
             shadow={true}
-            className="w-full justify-center"
+            className="w-full h-full flex flex-col transform transition-all duration-300 ease-in-out hover:shadow-lg"
             style={{
               border:
                 data.expirado?.tempo_restante <= 0 || data.expirado
@@ -164,21 +200,49 @@ const ModalAtendimento = () => {
             </DialogHeader>
             <DialogHeader>
               <small>
-                Expira em:{" "}
-                {data.expirado?.tempo_restante > 0 ? (
-                  formatarDataBr(data.expirado?.expira_em)
-                ) : atendimentoData.status !== "CONCLUIDO" ? (
-                  <Chip
-                    className="ml-8"
-                    value="Atendimento em atraso"
-                    style={{ background: "red" }}
-                  />
-                ) : (
-                  ""
-                )}
+              
+                Expira em: {data?.temporizador?.em_atraso ? 
+                <span 
+                className="inline-flex items-center rounded-md bg-red-900 px-14 py-5 text-xs font-medium text-red-50 ring-1 ring-red-800 ring-inset">
+                  Em atraso
+                  </span> : formatarDataBr(data?.temporizador?.expira_em)} {" - "}
+                  {!data?.temporizador?.em_atraso ? `Resta: ${converterSegundosMinutos(data?.temporizador?.tempo_restante)}` : ''}
               </small>
             </DialogHeader>
-            <CardBody>
+            <CardBody className="flex-1 overflow-y-auto custom-scrollbar">
+              <style jsx>{`
+                .custom-scrollbar::-webkit-scrollbar {
+                  width: 6px;
+                }
+                
+                .custom-scrollbar::-webkit-scrollbar-track {
+                  background: rgba(241, 241, 241, 0.5);
+                  border-radius: 10px;
+                  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+                }
+                
+                .custom-scrollbar::-webkit-scrollbar-thumb {
+                  background: rgba(136, 136, 136, 0.7);
+                  border-radius: 10px;
+                  transition: all 0.3s ease;
+                  border: 1px solid rgba(255, 255, 255, 0.1);
+                }
+                
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                  background: rgba(85, 85, 85, 0.9);
+                  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+                }
+                
+                .custom-scrollbar {
+                  scrollbar-width: thin;
+                  scrollbar-color: rgba(136, 136, 136, 0.7) rgba(241, 241, 241, 0.5);
+                  scroll-behavior: smooth;
+                }
+                
+                .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+                  background: rgba(85, 85, 85, 0.9);
+                }
+              `}</style>
               <div className="flex flex-row gap-4">
                 <Card
                   shadow={false}
@@ -256,10 +320,10 @@ const ModalAtendimento = () => {
                           color="blue-gray"
                         >
                           <Chip
-                            value={atendimentoData?.prioridadeAtendimento?.nome}
+                            value={atendimentoData?.prioridadeAtendimentos?.nome}
                             style={{
                               background:
-                                atendimentoData?.prioridadeAtendimento?.cor ||
+                                atendimentoData?.prioridadeAtendimentos?.cor ||
                                 "transparent",
                             }}
                           />
@@ -490,6 +554,7 @@ const ModalAtendimento = () => {
                       onClick={() =>
                         handleOpenModalAjustesAtendimento(atendimentoData)
                       }
+                      aria-label="Ajustar dados do paciente"
                     >
                       Ajustar dados paciente
                     </Button>
@@ -498,6 +563,7 @@ const ModalAtendimento = () => {
                       onClick={() =>
                         handleOpenModalAjustesMedico(atendimentoData)
                       }
+                      aria-label="Ajustar dados do atendimento"
                     >
                       Ajustar dados atendimento
                     </Button>
@@ -505,6 +571,7 @@ const ModalAtendimento = () => {
                       variant="outlined"
                       onClick={() => handleOpenModalComentario(atendimentoData)}
                       color="light-blue"
+                      aria-label="Adicionar resumo do atendimento"
                     >
                       Resumo do atendimento
                     </Button>
@@ -512,6 +579,7 @@ const ModalAtendimento = () => {
                       variant="outlined"
                       onClick={() => handleOpenModalTimeLine(atendimentoData)}
                       color="blue-gray"
+                      aria-label="Visualizar linha do tempo"
                     >
                       Visualizar linha do tempo
                     </Button>
@@ -536,6 +604,7 @@ const ModalAtendimento = () => {
           title={"Ajustar dados do paciente"}
           open={openModalAtendimento}
           handler={handleOpenModalAjustesAtendimento}
+          aria-labelledby="modal-title-paciente"
         >
           <EditAtendimentoDadosPessoais
             data={atendimentoData}
@@ -547,6 +616,7 @@ const ModalAtendimento = () => {
           open={openModalMedicos}
           handler={handleOpenModalAjustesMedico}
           modal={() => setOpenModalMedicos(false)}
+          aria-labelledby="modal-title-atendimento"
         >
           <EditAtendimentoDadosMedicos
             data={atendimentoData}
@@ -559,6 +629,7 @@ const ModalAtendimento = () => {
           open={openModalTimeLine}
           handler={handleOpenModalTimeLine}
           modal={() => setOpenModalTimeLine(false)}
+          aria-labelledby="modal-title-timeline"
         >
           <CustomTimeline data={atendimentoData} />
         </CustomModal>
@@ -567,6 +638,7 @@ const ModalAtendimento = () => {
           open={openModalComentario}
           handler={handleOpenModalComentario}
           modal={() => setOpenModalComentario(false)}
+          aria-labelledby="modal-title-comentario"
         >
           <AddComentario
             data={atendimentoData}

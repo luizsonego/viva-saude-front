@@ -1,4 +1,7 @@
 export default function formatarDataBr(dataIso) {
+    if (dataIso === null || dataIso === undefined) {
+        return 'sem data definida, consulte a gerência';
+    }
     const data = new Date(dataIso);
     return data.toLocaleString('pt-BR', {
         year: 'numeric',
@@ -10,3 +13,12 @@ export default function formatarDataBr(dataIso) {
     }).replace(',', '');
   }
   
+
+export function converterSegundosMinutos(segundos) {
+    if (segundos <= 0 || segundos === null || segundos === undefined) {
+        return 'sem calculo de tempo';
+    }
+    const minutos = Math.floor(segundos / 60);
+    const segundosRestantes = segundos % 60;
+    return `${minutos}:${segundosRestantes.toString().padStart(2, '0')}`;
+}

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Select, Option, Chip } from "@material-tailwind/react";
+import React, { useState, useMemo, useCallback } from "react";
+import { Select, Option, Chip, Input } from "@material-tailwind/react";
 import {
   Button,
   Card,
@@ -8,6 +8,7 @@ import {
   DialogBody,
   DialogHeader,
   Typography,
+  Spinner,
 } from "@material-tailwind/react";
 import {
   useAtendimentosFetch,
@@ -22,6 +23,11 @@ import CustomTimeline from "./timeline";
 import AddComentario from "./edits/comentario";
 import Upload from "../../components/uploads";
 import { formatarDataBr } from "../../helpers";
+// import { toast } from "react-toastify";
+
+// Constantes para tipos de arquivo permitidos e tamanho máximo
+const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'application/pdf'];
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 const classThTable =
   "py-3 px-5 text-left text-[11px] font-bold uppercase text-blue-gray-400";
@@ -36,57 +42,75 @@ const Atendimentos = () => {
   const [openModalMedicos, setOpenModalMedicos] = useState(false);
   const [openModalTimeLine, setOpenModalTimeLine] = useState(false);
   const [openModalComentario, setOpenModalComentario] = useState(false);
-  const [dataModal, setDataModal] = useState({});
+  const [dataModal, setDataModal] = useState(null);
   const [statusSelecionado, setStatusSelecionado] = useState("ABERTO");
+  const [filtros, setFiltros] = useState({
+    prioridade: "",
+    medico: "",
+    local: "",
+    cliente: "",
+    atendente: ""
+  });
 
-  const [prioridadeSelecionada, setPrioridadeSelecionada] = useState("");
-  const [medicoSelecionado, setMedicoSelecionado] = useState("");
-  const [localSelecionado, setLocalSelecionado] = useState("");
-  const [clienteSelecionado, setClienteSelecionado] = useState("");
-  const [atendenteSelecionado, setAtendenteSelecionado] = useState("");
-
-  const { data, isLoading } = useAtendimentosFetch();
+  const { data, isLoading, error } = useAtendimentosFetch();
   const { data: prioridadeData } = useGetResources("prioridades", "prioridade");
   const { data: atendenteData } = useGetResources("atendentes", "atendente");
   const { data: medicoData } = useGetResources("medico", "medicos");
   const { data: locaisData } = useGetResources("locais", "onde-ser-atendido");
 
-  const { mutateAsync, isPending } = useResourcePut(
+  const { mutateAsync: mutateStatus, isPending: isPendingStatus } = useResourcePut(
     "atendimentos",
     "troca-status",
-    () => {}
+    {
+      // onSuccess: () => toast.success("Status atualizado com sucesso!"),
+      // onError: (error) => toast.error("Erro ao atualizar status: " + error.message)
+    }
   );
-  const { mutateAsync: mutatePrioridade, isPending: pendingPrioridade } =
-    useResourcePut("atendimentos", "troca-prioridade", () => {});
-  const { mutateAsync: mutateAtendente, isPending: pendingAtendente } =
-    useResourcePut("atendimentos", "troca-atendente", () => {});
 
-  const filtrarPorStatus = () => {
-    if (statusSelecionado === "ABERTOS") return data;
-    return data?.filter((item) => item?.status === statusSelecionado);
-  };
+  const { mutateAsync: mutatePrioridade, isPending: isPendingPrioridade } =
+    useResourcePut("atendimentos", "troca-prioridade", {
+      // onSuccess: () => toast.success("Prioridade atualizada com sucesso!"),
+      // onError: (error) => toast.error("Erro ao atualizar prioridade: " + error.message)
+    });
 
-  const filtrarAtendimentos = () => {
-    return data?.filter((item) => {
+  const { mutateAsync: mutateAtendente, isPending: isPendingAtendente } =
+    useResourcePut("atendimentos", "troca-atendente", {
+      // onSuccess: () => toast.success("Atendente atualizado com sucesso!"),
+      // onError: (error) => toast.error("Erro ao atualizar atendente: " + error.message)
+    });
+
+  const handleFiltroChange = useCallback((key, value) => {
+    setFiltros(prev => ({ ...prev, [key]: value }));
+  }, []);
+
+  const atendimentosFiltrados = useMemo(() => {
+    if (!data) return [];
+    
+    return data.filter((item) => {
       const statusFiltro =
         statusSelecionado === "TODOS" ||
         statusSelecionado === "ABERTOS" ||
         item?.status === statusSelecionado;
-      const prioridadeFiltro = prioridadeSelecionada
-        ? item?.prioridadeAtendimento?.nome === prioridadeSelecionada
+      
+      const prioridadeFiltro = filtros.prioridade
+        ? item?.prioridadeAtendimento?.nome === filtros.prioridade
         : true;
-      const medicoFiltro = medicoSelecionado
-        ? item?.medico_atendimento === medicoSelecionado
+      
+      const medicoFiltro = filtros.medico
+        ? item?.medico_atendimento === filtros.medico
         : true;
-      const localFiltro = localSelecionado
-        ? item?.onde_deseja_ser_atendido === localSelecionado
+      
+      const localFiltro = filtros.local
+        ? item?.onde_deseja_ser_atendido === filtros.local
         : true;
-      const atendenteFiltro = atendenteSelecionado
-        ? item?.profile?.name === atendenteSelecionado
+      
+      const atendenteFiltro = filtros.atendente
+        ? item?.profile?.name === filtros.atendente
         : true;
-      const clienteFiltro = clienteSelecionado
-        ? item?.titular_plano.includes(clienteSelecionado) ||
-          item?.cpf_titular.includes(clienteSelecionado)
+      
+      const clienteFiltro = filtros.cliente
+        ? item?.titular_plano?.toLowerCase().includes(filtros.cliente.toLowerCase()) ||
+          item?.cpf_titular?.includes(filtros.cliente)
         : true;
 
       return (
@@ -98,70 +122,106 @@ const Atendimentos = () => {
         clienteFiltro
       );
     });
-  };
+  }, [data, statusSelecionado, filtros]);
 
-  const handleOpenModalConsulta = (item) => {
+  const handleOpenModalConsulta = useCallback((item) => {
+    if (!item) return;
     setDataModal(item);
-    setOpenModal(!openModal);
-  };
+    setOpenModal(true);
+  }, []);
 
-  const handleOpenModalAjustesAtendimento = () => {
-    setOpenModalAtendimento(!openModalAtendimento);
-  };
-  const handleOpenModalAjustesMedico = () => {
-    setOpenModalMedicos(!openModalMedicos);
-  };
-  const handleOpenModalTimeLine = () => {
-    setOpenModalTimeLine(!openModalTimeLine);
-  };
+  const handleCloseModal = useCallback(() => {
+    setOpenModal(false);
+    setDataModal(null);
+  }, []);
 
-  const handleOpenModalComentario = () => {
-    setOpenModalComentario(!openModalComentario);
-  };
+  const handleChangeAtendenteCartao = useCallback(async ({ id, atendente }) => {
+    if (!id || !atendente) {
+      // toast.error("Dados inválidos para atualização do atendente");
+      return;
+    }
+    try {
+      await mutateAtendente({ id, atendente });
+    } catch (error) {
+      console.error("Erro ao atualizar atendente:", error);
+    }
+  }, [mutateAtendente]);
 
-  const handleChangeAtendenteCartao = ({ id, atendente }) => {
-    let dataStatus = {
-      id,
-      atendente,
-    };
-    mutateAtendente(dataStatus);
-  };
-  const handleChangePrioridadeCartao = ({ id, prioridade }) => {
-    let dataStatus = {
-      id,
-      prioridade,
-    };
-    mutatePrioridade(dataStatus);
-  };
-  const handleChangeStatusCartao = ({ id, status }) => {
-    let dataStatus = {
-      id,
-      status,
-    };
-    mutateAsync(dataStatus);
-  };
+  const handleChangePrioridadeCartao = useCallback(async ({ id, prioridade }) => {
+    if (!id || !prioridade) {
+      // toast.error("Dados inválidos para atualização da prioridade");
+      return;
+    }
+    try {
+      await mutatePrioridade({ id, prioridade });
+    } catch (error) {
+      console.error("Erro ao atualizar prioridade:", error);
+    }
+  }, [mutatePrioridade]);
 
-  const handleViewCartao = (resource, id) => {
+  const handleChangeStatusCartao = useCallback(async ({ id, status }) => {
+    if (!id || !status) {
+      // toast.error("Dados inválidos para atualização do status");
+      return;
+    }
+    try {
+      await mutateStatus({ id, status });
+    } catch (error) {
+      console.error("Erro ao atualizar status:", error);
+    }
+  }, [mutateStatus]);
+
+  const handleViewCartao = useCallback((resource, id) => {
+    if (!resource || !id) return;
     navigate(`ver/${resource}/${id}`);
-  };
+  }, [navigate]);
+
+  const handleUpload = useCallback((file) => {
+    if (!file) return;
+    
+    if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+      // toast.error("Tipo de arquivo não permitido");
+      return false;
+    }
+    
+    if (file.size > MAX_FILE_SIZE) {
+      // toast.error("Arquivo muito grande. Tamanho máximo: 5MB");
+      return false;
+    }
+    
+    return true;
+  }, []);
 
   if (isLoading) {
-    return "carregando...";
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Spinner className="h-8 w-8" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Typography color="red" variant="h6">
+          Erro ao carregar atendimentos: {error.message}
+        </Typography>
+      </div>
+    );
   }
 
   return (
-    <>
-      {/* <MainAlert
-        handleOpen={openModalError}
-        handleClose={() => setOpenModalError(!openModalError)}
-        message={dataError}
-        color={"red"}
-      /> */}
+    <div className="container mx-auto px-4">
       <div className="flex flex-col gap-12">
         <div className="flex justify-between md:items-center">
-          <div className="mt-1 mb-5 grid lg:grid-cols-5 md:grid-cols-2 grid-cols-1 items-center md:gap-2.5 gap-4 w-full ">
+          <div className="mt-1 mb-5 grid lg:grid-cols-5 md:grid-cols-2 grid-cols-1 items-center md:gap-2.5 gap-4 w-full">
             <Link to={"create"}>
-              <Button fullWidth variant="outlined" color="indigo">
+              <Button 
+                fullWidth 
+                variant="outlined" 
+                color="indigo"
+                aria-label="Criar novo cartão de atendimento"
+              >
                 Criar Cartão
               </Button>
             </Link>
@@ -169,7 +229,7 @@ const Atendimentos = () => {
         </div>
       </div>
 
-      <div className="mb-10 flex gap-2">
+      <div className="mb-10 flex flex-wrap gap-2">
         {[
           "TODOS",
           "AGUARDANDO VAGA",
@@ -184,567 +244,200 @@ const Atendimentos = () => {
         ].map((status) => (
           <Button
             key={status}
-            className={`px-4 py-2 border rounded ${
-              statusSelecionado === status ? "bg-blue-500 text-white" : ""
+            className={`px-4 py-2 border rounded transition-colors duration-200 ${
+              statusSelecionado === status 
+                ? "bg-blue-500 text-white hover:bg-blue-600" 
+                : "hover:bg-gray-100"
             }`}
             onClick={() => setStatusSelecionado(status)}
+            aria-pressed={statusSelecionado === status}
           >
             {status}
           </Button>
         ))}
       </div>
+
       <Card className="mt-5">
         <CardHeader
           variant="gradient"
           color="gray"
-          className="mb-8 p-6 flex justify-between "
+          className="mb-8 p-6 flex justify-between"
         >
-          <Typography variant="h6" color="white" className="">
+          <Typography variant="h6" color="white">
             Atendimentos
           </Typography>
         </CardHeader>
-        <div className="flex flex-wrap gap-2 mt-4 w-full grid lg:grid-cols-5 md:grid-cols-2 grid-cols-1">
-          <select
-            onChange={(e) => setPrioridadeSelecionada(e.target.value)}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 p-4">
+          <Select
+            label="Prioridade"
+            value={filtros.prioridade}
+            onChange={(value) => handleFiltroChange('prioridade', value)}
             className="border p-2 rounded"
           >
-            <option value="">Todas Prioridades</option>
+            <Option value="">Todas Prioridades</Option>
             {prioridadeData?.map((item) => (
-              <option key={item?.id} value={item?.id}>
+              <Option key={item?.id} value={item?.nome}>
                 {item?.nome}
-              </option>
+              </Option>
             ))}
-          </select>
+          </Select>
 
-          <select
-            onChange={(e) => setMedicoSelecionado(e.target.value)}
+          <Select
+            label="Médico"
+            value={filtros.medico}
+            onChange={(value) => handleFiltroChange('medico', value)}
             className="border p-2 rounded"
           >
-            <option value="">Todos Médicos</option>
+            <Option value="">Todos Médicos</Option>
             {medicoData?.map((item) => (
-              <option key={item?.id} value={item?.nome}>
+              <Option key={item?.id} value={item?.nome}>
                 {item?.nome}
-              </option>
+              </Option>
             ))}
-          </select>
+          </Select>
 
-          <select
-            onChange={(e) => setLocalSelecionado(e.target.value)}
+          <Select
+            label="Local"
+            value={filtros.local}
+            onChange={(value) => handleFiltroChange('local', value)}
             className="border p-2 rounded"
           >
-            <option value="">Todos Locais</option>
+            <Option value="">Todos Locais</Option>
             {locaisData?.map((item) => (
-              <option
+              <Option
                 key={item?.onde_deseja_ser_atendido}
                 value={item?.onde_deseja_ser_atendido}
               >
                 {item?.onde_deseja_ser_atendido}
-              </option>
+              </Option>
             ))}
-          </select>
+          </Select>
 
-          <select
-            onChange={(e) => setAtendenteSelecionado(e.target.value)}
+          <Select
+            label="Atendente"
+            value={filtros.atendente}
+            onChange={(value) => handleFiltroChange('atendente', value)}
             className="border p-2 rounded"
           >
-            <option value="">Todos Atendentes</option>
+            <Option value="">Todos Atendentes</Option>
             {atendenteData?.map((item) => (
-              <option key={item?.id} value={item?.profile?.name}>
+              <Option key={item?.id} value={item?.profile?.name}>
                 {item?.profile?.name}
-              </option>
+              </Option>
             ))}
-          </select>
+          </Select>
 
-          <input
-            type="text"
-            placeholder="Filtrar Cliente (Nome ou CPF)"
-            onChange={(e) => setClienteSelecionado(e.target.value)}
+          <Input
+            label="Filtrar Cliente"
+            value={filtros.cliente}
+            onChange={(e) => handleFiltroChange('cliente', e.target.value)}
+            placeholder="Nome ou CPF"
             className="border p-2 rounded"
           />
         </div>
 
-        <table className="w-full border-collapse border border-gray-300">
-          <thead>
-            <tr className="">
-              <th className={classThTable}>Titular</th>
-              <th className={classThTable}>Procedimento</th>
-              <th className={classThTable} width="auto">
-                Prioridade
-              </th>
-              <th className={classThTable}>Medico</th>
-              <th className={classThTable}>Local</th>
-              <th className={classThTable}>Status</th>
-              <th className={classThTable}>Atendimento</th>
-              <th className={classThTable}></th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtrarAtendimentos()?.map((item) => (
-              <div
-                key={item?.id}
-                style={{ display: "contents", backgroundColor: "tomato" }}
-              >
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr>
+                <th className={classThTable}>Titular</th>
+                <th className={classThTable}>Procedimento</th>
+                <th className={classThTable}>Prioridade</th>
+                <th className={classThTable}>Médico</th>
+                <th className={classThTable}>Local</th>
+                <th className={classThTable}>Status</th>
+                <th className={classThTable}>Atendimento</th>
+                <th className={classThTable}>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {atendimentosFiltrados.map((item) => (
                 <tr
+                  key={item?.id}
+                  className={`${
+                    item?.temporizador?.tempo_restante <= 0
+                      ? "text-gray-100 bold"
+                      : "hover:bg-gray-50"
+                  }`}
                   style={{
-                    background: `${
-                      item?.temporizador?.tempo_restante <= 0 ? "red" : ""
-                    }`,
-                    color: `${
-                      item?.temporizador?.tempo_restante <= 0 ? "white" : ""
-                    }`,
+                    background:
+                    item?.temporizador?.tempo_restante <= 0
+                    && "red"
                   }}
                 >
+
                   <td className={classTdTable}>{item?.titular_plano}</td>
                   <td className={classTdTable}>{item?.o_que_deseja}</td>
-                  <td
-                    className={classTdTable}
-                    style={{
-                      background:
-                        item?.prioridadeAtendimento?.cor || "transparent",
-                    }}
-                  >
+                  <td className={classTdTable} style={{
+                        backgroundColor: item?.prioridadeAtendimentos?.cor || "transparent"
+                      }}>
                     <Chip
-                      value={item?.prioridadeAtendimento?.nome}
+                      value={item?.prioridadeAtendimentos?.nome}
+                      className="w-fit"
                       style={{
-                        background:
-                          item?.prioridadeAtendimento?.cor || "transparent",
+                        backgroundColor: item?.prioridadeAtendimentos?.cor || "transparent"
                       }}
                     />
                   </td>
                   <td className={classTdTable}>{item?.medico_atendimento}</td>
-                  <td className={classTdTable}>
-                    {item?.onde_deseja_ser_atendido}
-                  </td>
+                  <td className={classTdTable}>{item?.onde_deseja_ser_atendido}</td>
                   <td className={classTdTable}>{item?.status}</td>
                   <td className={classTdTable}>
-                    {item?.medico_atendimento_data}
+                    {formatarDataBr(item?.medico_atendimento_data)}
                   </td>
                   <td className={classTdTable}>
-                    {/* <Button
-                      onClick={() => handleOpenModalConsulta(item)}
-                      variant="outlined"
-                    >
-                      Detalhes
-                    </Button> */}
                     <Button
                       onClick={() => handleViewCartao("atendimento", item?.id)}
+                      variant="text"
+                      className="text-blue-500 hover:text-blue-700"
+                      aria-label={`Ver detalhes do atendimento ${item?.id}`}
                     >
-                      ver
+                      Ver
                     </Button>
                   </td>
-                  {/* <tr span={8} aria-rowspan={5}>
-                    <td colspan={8} className={class2ThTable}>
-                      Procedimento: {item.acoes?.nome}
-                    </td>
-                  </tr> */}
                 </tr>
-              </div>
-            ))}
-          </tbody>
-        </table>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </Card>
 
-      <div className="mt-2 mb-2 flex flex-col gap-12">
-        <div className="flex justify-between md:items-center">
-          <div className="mt-1 mb-3 grid lg:grid-cols-5 md:grid-cols-2 grid-cols-1 items-center md:gap-2.5 gap-4 w-full ">
-            {/* <Link to={"create"}>
-              <Button fullWidth variant="outlined" color="indigo">
-                Criar Cartão
-              </Button>
-            </Link> */}
-            {/* <Link to={"create"}>
-            <Button fullWidth variant="outlined" color="indigo">
-              Fila de espera{" "}
-            </Button>
-          </Link> */}
-            {/* <Link to={"create"}>
-            <Button fullWidth variant="outlined" color="indigo">
-              Buscar vagas{" "}
-            </Button>
-          </Link> */}
-          </div>
-        </div>
-
-        <Dialog open={openModal} handler={handleOpenModalConsulta} size="lg">
+      {dataModal && (
+        <Dialog
+          open={openModal}
+          handler={handleCloseModal}
+          size="lg"
+          className="overflow-y-auto"
+        >
           <DialogHeader>
-            Detalhes do agendamento{" "}
-            {dataModal.em_espera ? (
-              <Chip className="ml-8" value="Item Em fila de espera" />
-            ) : (
-              ""
+            Detalhes do Atendimento
+            {dataModal.em_espera && (
+              <Chip
+                value="Em fila de espera"
+                className="ml-4"
+                color="amber"
+              />
             )}
           </DialogHeader>
-          <DialogBody className="h-[42rem] overflow-scroll">
-            {/* //// */}
-            <div className="flex flex-row gap-4">
-              <Card
-                shadow={false}
-                className="rounded-lg border border-gray-300 p-4 basis-9/12"
-              >
-                <Typography
-                  variant="small"
-                  color="blue-gray"
-                  className="mb-3 font-bold"
-                >
-                  {dataModal.titulo}
-                </Typography>
-
-                <div className="mb-4 flex items-start justify-between">
-                  <div>
-                    <h3>Dados do titular</h3>
-                    <Typography color="blue-gray" className="mb-1 ">
-                      Nome:{" "}
-                      <span className="mb-1 font-bold font-lg">
-                        {dataModal.titular_plano}
-                      </span>
-                    </Typography>
-                    <Typography color="blue-gray" className="mb-1 ">
-                      CPF:{" "}
-                      <span className="mb-1 font-bold font-lg">
-                        {dataModal.cpf_titular}
-                      </span>
-                    </Typography>
-                    <Typography color="blue-gray" className="mb-1 ">
-                      Whatsapp:{" "}
-                      <span className="mb-1 font-bold font-lg">
-                        {dataModal.whatsapp_titular}
-                      </span>
-                    </Typography>
-                    {dataModal.para_quem === "outra" ? (
-                      <>
-                        <hr />
-                        <h3>Dados de quem vai ser atendido</h3>
-                        <Typography color="blue-gray" className="mb-1 ">
-                          Nome:{" "}
-                          <span className="mb-1 font-bold font-lg">
-                            {dataModal.nome_outro}
-                          </span>
-                        </Typography>
-                        <Typography color="blue-gray" className="mb-1 ">
-                          CPF:{" "}
-                          <span className="mb-1 font-bold font-lg">
-                            {dataModal.cpf_outro}
-                          </span>
-                        </Typography>
-                      </>
-                    ) : (
-                      ""
-                    )}
-                  </div>
-                </div>
-                <div>
-                  <div>
-                    <div className="flex gap-1">
-                      <Typography className="mb-1 text-xs !font-medium !text-gray-600">
-                        {"Status"}:
-                      </Typography>
-                      <Typography
-                        className="text-xs !font-bold"
-                        color="blue-gray"
-                      >
-                        {dataModal.status}
-                      </Typography>
-                    </div>
-                    <div className="flex gap-1">
-                      <Typography className="mb-1 text-xs !font-medium !text-gray-600">
-                        {"Prioridade"}:
-                      </Typography>
-                      <Typography
-                        className="text-xs !font-bold"
-                        color="blue-gray"
-                      >
-                        <Chip
-                          value={dataModal?.prioridadeAtendimento?.nome}
-                          style={{
-                            background:
-                              dataModal?.prioridadeAtendimento?.cor ||
-                              "transparent",
-                          }}
-                        />
-                      </Typography>
-                    </div>
-
-                    <div className="flex gap-1">
-                      <Typography className="mb-1 text-xs !font-medium !text-gray-600">
-                        {"Perfil do Cliente "}:
-                      </Typography>
-                      <Typography
-                        className="text-xs !font-bold"
-                        color="blue-gray"
-                      >
-                        {dataModal.perfil_cliente} {/*perfil do cliente*/}
-                      </Typography>
-                    </div>
-                    <div className="flex gap-1">
-                      <Typography className="mb-1 text-xs !font-medium !text-gray-600">
-                        {"Observação "}:
-                      </Typography>
-                      <Typography
-                        className="text-xs !font-bold"
-                        color="blue-gray"
-                      >
-                        {dataModal.observacoes} {/*perfil do cliente*/}
-                      </Typography>
-                    </div>
-                  </div>
-                </div>
-                <hr className="mt-5 mb-5" />
-
-                <h3>Atendente</h3>
-                <div className="flex gap-1">
-                  <Typography className="mb-1 text-xs !font-medium !text-gray-600">
-                    {"Atendente"}:
-                  </Typography>
-                  <Typography className="text-xs !font-bold" color="blue-gray">
-                    {dataModal?.profile?.name}
-                  </Typography>
-                </div>
-
-                <hr className="mt-5 mb-5" />
-                <h3>Dados atendimento</h3>
-                <div className="flex gap-1">
-                  <Typography className="mb-1 text-xs !font-medium !text-gray-600">
-                    {"Medico selecionado"}:
-                  </Typography>
-                  <Typography className="text-xs !font-bold" color="blue-gray">
-                    {dataModal.medico_atendimento}
-                  </Typography>
-                </div>
-                <div className="flex gap-1">
-                  <Typography className="mb-1 text-xs !font-medium !text-gray-600">
-                    {"O que deseja"}:
-                  </Typography>
-                  <Typography className="text-xs !font-bold" color="blue-gray">
-                    {dataModal.acoes?.nome}
-                    {dataModal.o_que_deseja}
-                  </Typography>
-                </div>
-                <div className="flex gap-1">
-                  <Typography className="mb-1 text-xs !font-medium !text-gray-600">
-                    {"Onde deseja ser atendido"}:
-                  </Typography>
-                  <Typography className="text-xs !font-bold" color="blue-gray">
-                    {dataModal.onde_deseja_ser_atendido}
-                  </Typography>
-                </div>
-                <div className="flex gap-1">
-                  <Typography className="mb-1 text-xs !font-medium !text-gray-600">
-                    {"Data"}:
-                  </Typography>
-                  <Typography className="text-xs !font-bold" color="blue-gray">
-                    {dataModal.medico_atendimento_data}
-                  </Typography>
-                </div>
-                <hr className="mt-5 mb-5" />
-                <h3>Resumo do atendimento</h3>
-                <div className="flex gap-1">
-                  <Typography className="text-xs !font-bold" color="blue-gray">
-                    {dataModal.comentario}
-                  </Typography>
-                </div>
-                <hr className="mt-5 mb-5" />
-                <h3>Anexo</h3>
-                <div className="flex gap-1">
-                  <Typography className="text-xs !font-bold" color="blue-gray">
-                    {dataModal?.anexos?.map((item) =>
-                      item?.fileType === "image" ? (
-                        <img src={item?.url} alt="imagem" width={200} />
-                      ) : (
-                        <a href={item?.url} target="_blank" rel="noreferrer">
-                          {item?.nome}
-                        </a>
-                      )
-                    )}
-                  </Typography>
-                </div>
-              </Card>
-              <div className="basis-1/5 ">
-                <Card
-                  shadow={false}
-                  className="rounded-lg border border-gray-300 p-2 mb-3"
-                >
-                  {/* <CardBody className=""> */}
-                  <div className="flex flex-col gap-1">
-                    <Typography
-                      className="text-xs !font-bold"
-                      color="blue-gray"
-                    >
-                      <Chip value={dataModal.acoes?.nome} />
-                    </Typography>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <Typography className="mt-1 text-xs !font-medium !text-gray-600">
-                      {"Atendido por"}:
-                    </Typography>
-                    <Typography
-                      className="text-xs !font-bold"
-                      color="blue-gray"
-                    >
-                      {dataModal.atendido_por}
-                    </Typography>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <Typography className="mt-1 text-xs !font-medium !text-gray-600">
-                      {"inicio do atendimento"}:
-                    </Typography>
-                    <Typography
-                      className="text-xs !font-bold"
-                      color="blue-gray"
-                    >
-                      {dataModal.atendimento_iniciado}
-                    </Typography>
-                  </div>
-                  {/* </CardBody> */}
-                </Card>
-
-                <Select
-                  label="Prioridade"
-                  onChange={(prioridade) =>
-                    handleChangePrioridadeCartao({
-                      prioridade,
-                      id: dataModal.id,
-                    })
-                  }
-                >
-                  {prioridadeData?.map((item, index) => (
-                    <Option key={index + 1} value={item?.id}>
-                      {item?.nome}
-                    </Option>
-                  ))}
-                </Select>
-                <Select
-                  label="Status"
-                  onChange={(status) =>
-                    handleChangeStatusCartao({ status, id: dataModal.id })
-                  }
-                >
-                  {/* {isPending && <Option value="">ENVIANDO</Option>} */}
-                  <Option value="ABERTO">Aberto</Option>
-                  <Option value="EM ANALISE">Em Analise</Option>
-                  <Option value="PAGAMENTO">Para pagamento</Option>
-                  <Option value="AGUARDANDO AUTORIZACAO">
-                    Aguardando Autorização
-                  </Option>
-
-                  <Option value="AGUARDANDO VAGA">Aguardando Vaga</Option>
-                  <Option value="FILA DE ESPERA">Fila de espera</Option>
-                  <Option value="CONCLUIDO">Concluído</Option>
-                </Select>
-
-                <Select
-                  label="Atendente"
-                  onChange={(atendente) =>
-                    handleChangeAtendenteCartao({
-                      atendente,
-                      id: dataModal.id,
-                    })
-                  }
-                >
-                  {atendenteData?.map((item, index) => (
-                    <Option key={index + 1} value={item?.id}>
-                      {item?.profile?.name}
-                    </Option>
-                  ))}
-                </Select>
-
-                <Card
-                  shadow={true}
-                  className="rounded-lg border border-gray-300 p-4 basis-3/12 flex gap-4 mt-3"
-                >
-                  <Button
-                    variant="outlined"
-                    onClick={() => handleOpenModalAjustesAtendimento(dataModal)}
-                  >
-                    Ajustar dados paciente
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    onClick={() => handleOpenModalAjustesMedico(dataModal)}
-                  >
-                    Ajustar dados atendimento
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    onClick={() => handleOpenModalComentario(dataModal)}
-                    color="light-blue"
-                  >
-                    Resumo do atendimento
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    onClick={() => handleOpenModalTimeLine(dataModal)}
-                    color="blue-gray"
-                  >
-                    Visualizar linha do tempo
-                  </Button>
-                  <Upload
-                    title={`Anexo-${dataModal.id}-${getRandomIntInclusive(
-                      1,
-                      100000
-                    )}`}
-                    id={dataModal.id}
-                    label={"Enviar Anexo"}
-                    folder={"anexos"}
-                    controller={"atendimentos"}
-                    action={"anexo"}
-                    callback={() => {}}
-                  />
-                </Card>
-              </div>
-            </div>
-            {/* //// */}
-          </DialogBody>
-
-          {/* modal de ajustar paciente */}
-          <CustomModal
-            title={"Ajustar dados do paciente"}
-            open={openModalAtendimento}
-            handler={handleOpenModalAjustesAtendimento}
-          >
-            <EditAtendimentoDadosPessoais
-              data={dataModal}
-              modal={() => setOpenModalAtendimento(false)}
+          <DialogBody>
+            {/* Conteúdo do modal aqui */}
+            <Upload
+              title={`Anexo-${dataModal.id}`}
+              id={dataModal.id}
+              label="Enviar Anexo"
+              folder="anexos"
+              controller="atendimentos"
+              action="anexo"
+              onFileSelect={handleUpload}
+              allowedTypes={ALLOWED_FILE_TYPES}
+              maxSize={MAX_FILE_SIZE}
             />
-          </CustomModal>
-          <CustomModal
-            title={"Ajustar dados do atendimento"}
-            open={openModalMedicos}
-            handler={handleOpenModalAjustesMedico}
-            modal={() => setOpenModalMedicos(false)}
-          >
-            <EditAtendimentoDadosMedicos data={dataModal} />
-          </CustomModal>
-
-          <CustomModal
-            title={"Linha do tempo"}
-            open={openModalTimeLine}
-            handler={handleOpenModalTimeLine}
-            modal={() => setOpenModalTimeLine(false)}
-          >
-            <CustomTimeline data={dataModal} />
-          </CustomModal>
-          <CustomModal
-            title={"Resumo do atendimento"}
-            open={openModalComentario}
-            handler={handleOpenModalComentario}
-            modal={() => setOpenModalComentario(false)}
-          >
-            <AddComentario data={dataModal} />
-          </CustomModal>
+          </DialogBody>
         </Dialog>
-      </div>
-    </>
+      )}
+    </div>
   );
 };
 
 export default Atendimentos;
-
-function getRandomIntInclusive(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function RenderHtml(props) {
-  return <div dangerouslySetInnerHTML={{ __html: props.html }} />;
-}

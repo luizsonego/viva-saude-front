@@ -7,6 +7,8 @@ import {
   Select,
   Typography,
   Checkbox,
+  Spinner,
+  Alert,
 } from "@material-tailwind/react";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -19,7 +21,9 @@ import "react-datetime-picker/dist/DateTimePicker.css";
 import "react-calendar/dist/Calendar.css";
 import "react-clock/dist/Clock.css";
 import { useNavigate } from "react-router-dom";
+// import { toast } from "react-hot-toast";
 
+// Reusable Input Component
 const InputForm = ({
   label = "",
   name,
@@ -27,13 +31,14 @@ const InputForm = ({
   register,
   required,
   type = "text",
+  error,
 }) => {
   return (
-    <>
+    <div className="w-full">
       <Typography
         variant="h6"
         color="blue-gray"
-        className="-mb-3"
+        className="mb-2"
         style={{ textTransform: "capitalize" }}
       >
         {label}
@@ -41,33 +46,49 @@ const InputForm = ({
       <Input
         size="lg"
         placeholder={placeholder}
-        className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+        className={`!border-t-blue-gray-200 focus:!border-t-gray-900 ${error ? '!border-red-500' : ''}`}
         labelProps={{
           className: "before:content-none after:content-none",
         }}
         type={type}
         {...register(name, { required })}
       />
-    </>
+      {error && (
+        <Typography variant="small" color="red" className="mt-1">
+          {error}
+        </Typography>
+      )}
+    </div>
   );
 };
 
+// Form Section Component
+const FormSection = ({ title, children }) => (
+  <fieldset className="mb-4 flex flex-col gap-6 border rounded-lg p-6 bg-white shadow-sm">
+    <Typography variant="h5" color="blue-gray" className="mb-4">
+      {title}
+    </Typography>
+    {children}
+  </fieldset>
+);
+
 const CreateAtendimento = () => {
   const navigate = useNavigate();
-  const { register, handleSubmit, setValue } = useForm();
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm();
 
+  // State management
   const [queDeseja, setQueDeseja] = useState("");
   const [paraQuem, setParaQuem] = useState("");
   const [outro, setOutro] = useState(false);
   const [qualMedico, setQualMedico] = useState("");
   const [valuePerfilAtendimento, setValuePerfilAtendimento] = useState("");
   const [openLocal, setOpenLocal] = useState(false);
-
   const [localEscolhido, setLocalEscolhido] = useState(false);
   const [emEspera, setEmEspera] = useState(0);
   const [aguardandoVaga, setAguardandoVaga] = useState(0);
   const [valueDateAgendamento, setValueDateAgendamento] = useState(new Date());
 
+  // Data fetching
   const { data: procedimentosData, isLoading: loadingProcedimentos } =
     useGetResources("medicos", "procedimentos");
 
@@ -88,78 +109,91 @@ const CreateAtendimento = () => {
       qualMedico
     );
 
+  // Mutation
   const { mutateAsync, isPending } = useMutation({
     mutationFn: useAtendimentoPost,
     onSuccess: () => {
+      // toast.success("Atendimento criado com sucesso!");
       navigate(-1);
+    },
+    onError: (error) => {
+      // toast.error(`Erro ao criar atendimento: ${error.message}`);
     },
   });
 
   useEffect(() => {
     setValue("atendido_por", "Criado manualmente");
     if (paraQuem === "outra") setOutro(true);
-
     if (paraQuem !== "outra") setOutro(false);
   }, [paraQuem, setValue]);
 
-  const onSubmit = (sendData) => {
-    const opcoes = {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false,
-    };
-    const dataFormatada = new Intl.DateTimeFormat("pt-BR", opcoes)
-      .format(valueDateAgendamento)
-      .replace(/\//g, "-")
-      .replace(",", "");
+  const onSubmit = async (sendData) => {
+    try {
+      const opcoes = {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      };
+      
+      const dataFormatada = new Intl.DateTimeFormat("pt-BR", opcoes)
+        .format(valueDateAgendamento)
+        .replace(/\//g, "-")
+        .replace(",", "");
 
-    let dataForm = {
-      para_quem: paraQuem,
-      medico_atendimento: qualMedico,
-      medico: qualMedico,
-      onde_deseja_ser_atendido: localEscolhido,
-      medico_atendimento_data: dataFormatada,
-      o_que_deseja: queDeseja,
-      em_espera: emEspera,
-      aguardando_vaga: aguardandoVaga,
-      perfil_cliente: valuePerfilAtendimento,
-      ...sendData,
-    };
+      const dataForm = {
+        para_quem: paraQuem,
+        medico_atendimento: qualMedico,
+        medico: qualMedico,
+        onde_deseja_ser_atendido: localEscolhido,
+        medico_atendimento_data: dataFormatada,
+        o_que_deseja: queDeseja,
+        em_espera: emEspera,
+        aguardando_vaga: aguardandoVaga,
+        perfil_cliente: valuePerfilAtendimento,
+        ...sendData,
+      };
 
-    mutateAsync(dataForm);
+      await mutateAsync(dataForm);
+    } catch (error) {
+      // toast.error("Erro ao processar o formulário");
+    }
   };
 
   return (
-    <Card shadow={false} className="w-full justify-center">
+    <Card shadow={false} className="w-full max-w-4xl mx-auto my-8">
       <CardBody>
-        <form
-          className="mt-8 mb-2 max-w-screen-lg "
-          onSubmit={handleSubmit(onSubmit)}
-        >
-          <fieldset className="mb-1 flex flex-col gap-6 border p-5">
+        <Typography variant="h4" color="blue-gray" className="mb-8 text-center">
+          Novo Atendimento
+        </Typography>
+        
+        <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+          <FormSection title="Informações do Plano">
             <InputForm
               label="Titular do plano"
               name="titular_plano"
               register={register}
+              error={errors.titular_plano?.message}
             />
             <InputForm
               label="Telefone titular plano"
               name="whatsapp_titular"
               register={register}
+              error={errors.whatsapp_titular?.message}
             />
             <InputForm
               label="Cpf titular plano"
               name="cpf_titular"
               register={register}
+              error={errors.cpf_titular?.message}
             />
             <Select
               label="Perfil do cliente"
               name="perfil_cliente"
-              value={acaoData}
+              value={valuePerfilAtendimento}
               onChange={(val) => setValuePerfilAtendimento(val)}
             >
               <Option value="Áudio">Áudio</Option>
@@ -167,9 +201,9 @@ const CreateAtendimento = () => {
               <Option value="Ligação">Ligação</Option>
               <Option value="Site">Site</Option>
             </Select>
-          </fieldset>
+          </FormSection>
 
-          <fieldset className="mb-1 flex flex-col gap-6 border p-5">
+          <FormSection title="Detalhes da Consulta">
             <Select
               label="Para quem é a consulta?"
               name="para_quem"
@@ -179,27 +213,30 @@ const CreateAtendimento = () => {
               <Option value="titular">Para titular</Option>
               <Option value="outra">Para outra pessoa</Option>
             </Select>
-            {outro ? (
-              <>
+            
+            {outro && (
+              <div className="space-y-4">
                 <InputForm
                   label="Nome outro"
                   name="nome_outro"
                   register={register}
+                  error={errors.nome_outro?.message}
                 />
                 <InputForm
                   label="Cpf outro"
                   name="cpf_outro"
                   register={register}
+                  error={errors.cpf_outro?.message}
                 />
-              </>
-            ) : (
-              ""
+              </div>
             )}
-          </fieldset>
+          </FormSection>
 
-          <fieldset className="mb-1 flex flex-col gap-6 border p-5">
+          <FormSection title="Procedimento e Médico">
             {loadingProcedimentos ? (
-              "carregando..."
+              <div className="flex justify-center">
+                <Spinner className="h-8 w-8" />
+              </div>
             ) : (
               <Select
                 label="O que deseja realizar?"
@@ -217,90 +254,126 @@ const CreateAtendimento = () => {
                 ))}
               </Select>
             )}
-            {loadingMedicos ? (
-              "carregando..."
-            ) : (
-              <Select
-                disabled={!queDeseja || loadingMedicos}
-                label="Selecione o medico que deseja"
-                name="medico_atendimento"
-                value={qualMedico}
-                onChange={(val) => {
-                  setQualMedico(val);
-                  setOpenLocal(true);
-                }}
-              >
-                {searchMedicos?.map((item) => (
-                  <Option key={item.id} value={item.id}>
-                    {item.nome}
-                  </Option>
-                ))}
-              </Select>
+
+            {queDeseja && (
+              loadingMedicos ? (
+                <div className="flex justify-center">
+                  <Spinner className="h-8 w-8" />
+                </div>
+              ) : (
+                <Select
+                  label="Selecione o médico"
+                  name="medico_atendimento"
+                  value={qualMedico}
+                  onChange={(val) => {
+                    setQualMedico(val);
+                    setOpenLocal(true);
+                  }}
+                >
+                  {searchMedicos?.map((item) => (
+                    <Option key={item.id} value={item.id}>
+                      {item.nome}
+                    </Option>
+                  ))}
+                </Select>
+              )
             )}
-            {qualMedico && openLocal
-              ? searchLocalMedico?.map((item, index) => (
-                  <div key={index + 1}>
-                    {item?.local?.map((lc, i) => (
-                      <Radio
-                        onClick={(e) => setLocalEscolhido(e.target.value)}
-                        name="local_atendimento"
-                        key={i + 1}
-                        label={lc.local}
-                        value={lc.local}
-                      />
-                    ))}
+
+            {qualMedico && openLocal && (
+              <div className="space-y-2">
+                <Typography variant="h6" color="blue-gray">
+                  Local de Atendimento
+                </Typography>
+                {loadingLocalMedico ? (
+                  <div className="flex justify-center">
+                    <Spinner className="h-8 w-8" />
                   </div>
-                ))
-              : ""}
-          </fieldset>
-          <fieldset className="mb-1 flex flex-col gap-6 border p-5">
-            <DateTimePicker
-              onChange={setValueDateAgendamento}
-              value={valueDateAgendamento}
-              minDate={new Date()}
-              format="dd/MM/y H:mm"
-            />
-            {/* <InputForm
-              label="Data de agendamento"
-              name="medico_atendimento_data"
-              register={register}
-              type=""
-            /> */}
-          </fieldset>
-          <fieldset className="mb-1 flex flex-col gap-6 border p-5">
+                ) : (
+                  searchLocalMedico?.map((item, index) => (
+                    <div key={index + 1} className="space-y-2">
+                      {item?.local?.map((lc, i) => (
+                        <Radio
+                          key={i + 1}
+                          name="local_atendimento"
+                          label={lc.local}
+                          value={lc.local}
+                          onChange={(e) => setLocalEscolhido(e.target.value)}
+                          className="hover:bg-blue-gray-50 p-2 rounded"
+                        />
+                      ))}
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+          </FormSection>
+
+          <FormSection title="Agendamento">
+            <div className="w-full">
+              <Typography variant="h6" color="blue-gray" className="mb-2">
+                Data e Hora do Atendimento
+              </Typography>
+              <DateTimePicker
+                onChange={setValueDateAgendamento}
+                value={valueDateAgendamento}
+                minDate={new Date()}
+                format="dd/MM/y H:mm"
+                className="w-full"
+              />
+            </div>
+          </FormSection>
+
+          <FormSection title="Informações Adicionais">
             <InputForm
-              label="Forma de pagamento "
+              label="Forma de pagamento"
               name="telefone"
               register={register}
+              error={errors.telefone?.message}
             />
-          </fieldset>
-          <fieldset className="mb-1 flex flex-col gap-6 border p-5">
             <InputForm
-              label="Observação "
+              label="Observação"
               name="observacoes"
               register={register}
+              error={errors.observacoes?.message}
             />
-          </fieldset>
-          <fieldset className="mb-1 flex flex-col gap-6 border p-5">
-            <Checkbox
-              name="em_espera"
-              label="Colocar em fila de espera"
-              value={emEspera}
-              onChange={(e) => setEmEspera(e.target.checked)}
-            />
-            <Checkbox
-              name="aguardando_vaga"
-              label="Colocar em Aguardando vaga"
-              value={aguardandoVaga}
-              onChange={(e) => setAguardandoVaga(e.target.checked)}
-            />
-          </fieldset>
+          </FormSection>
 
-          <input
-            value={isPending ? "Enviando..." : "Enviar"}
+          <FormSection title="Status do Atendimento">
+            <div className="space-y-4">
+              <Checkbox
+                name="em_espera"
+                label="Colocar em fila de espera"
+                checked={emEspera}
+                onChange={(e) => setEmEspera(e.target.checked ? 1 : 0)}
+                className="hover:bg-blue-gray-50 p-2 rounded"
+              />
+              <Checkbox
+                name="aguardando_vaga"
+                label="Colocar em Aguardando vaga"
+                checked={aguardandoVaga}
+                onChange={(e) => setAguardandoVaga(e.target.checked ? 1 : 0)}
+                className="hover:bg-blue-gray-50 p-2 rounded"
+              />
+            </div>
+          </FormSection>
+
+          <button
             type="submit"
-            className="bg-green-500 text-white p-2 rounded-md w-full mt-10"
-          />
+            disabled={isPending}
+            className={`w-full py-3 px-4 rounded-lg text-white font-medium transition-all
+              ${isPending 
+                ? 'bg-gray-400 cursor-not-allowed' 
+                : 'bg-green-500 hover:bg-green-600'}`}
+          >
+            {isPending ? (
+              <div className="flex items-center justify-center">
+                <Spinner className="h-5 w-5 mr-2" />
+                Enviando...
+              </div>
+            ) : (
+              'Enviar'
+            )}
+          </button>
         </form>
       </CardBody>
     </Card>
