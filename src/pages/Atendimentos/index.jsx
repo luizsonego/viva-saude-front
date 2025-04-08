@@ -15,7 +15,7 @@ import {
   useGetResources,
 } from "../../hooks/get/useGet.query";
 import { useResourcePut } from "../../hooks/update/useUpdate.query";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { CustomModal } from "../Configuracoes/Components";
 import EditAtendimentoDadosPessoais from "./edits/dadosPessoais";
 import EditAtendimentoDadosMedicos from "./edits/dadosMedicos";
@@ -37,13 +37,18 @@ const classTdTable = "py-3 px-5 border-b border-blue-gray-50 ";
 
 const Atendimentos = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [openModal, setOpenModal] = useState(false);
   const [openModalAtendimento, setOpenModalAtendimento] = useState(false);
   const [openModalMedicos, setOpenModalMedicos] = useState(false);
   const [openModalTimeLine, setOpenModalTimeLine] = useState(false);
   const [openModalComentario, setOpenModalComentario] = useState(false);
   const [dataModal, setDataModal] = useState(null);
-  const [statusSelecionado, setStatusSelecionado] = useState("ABERTO");
+  
+  // Get status from URL or use default
+  const statusFromUrl = searchParams.get("status") || "ABERTO";
+  const [statusSelecionado, setStatusSelecionado] = useState(statusFromUrl);
+  
   const [filtros, setFiltros] = useState({
     prioridade: "",
     medico: "",
@@ -192,6 +197,16 @@ const Atendimentos = () => {
     return true;
   }, []);
 
+  // Update status in URL when it changes
+  const handleStatusChange = useCallback((status) => {
+    setStatusSelecionado(status);
+    setSearchParams(prev => {
+      const newParams = new URLSearchParams(prev);
+      newParams.set("status", status);
+      return newParams;
+    });
+  }, [setSearchParams]);
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -249,7 +264,7 @@ const Atendimentos = () => {
                 ? "bg-blue-500 text-white hover:bg-blue-600" 
                 : "hover:bg-gray-100"
             }`}
-            onClick={() => setStatusSelecionado(status)}
+            onClick={() => handleStatusChange(status)}
             aria-pressed={statusSelecionado === status}
           >
             {status}
