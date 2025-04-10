@@ -22,3 +22,20 @@ export function converterSegundosMinutos(segundos) {
     const segundosRestantes = segundos % 60;
     return `${minutos}:${segundosRestantes.toString().padStart(2, '0')}`;
 }
+
+export function converterSegundosHorasMinutos(segundos) {
+    if (segundos <= 0 || segundos === null || segundos === undefined) {
+        return 'sem calculo de tempo';
+    }
+    const horas = Math.floor(segundos / 3600);
+    const minutos = Math.floor((segundos % 3600) / 60);
+    const segundosRestantes = segundos % 60;
+
+    if (horas > 0) {
+        return `${horas}h ${minutos}m ${segundosRestantes}s`;
+    } else if (minutos > 0) {
+        return `${minutos}m ${segundosRestantes}s`;
+    } else {
+        return `${segundosRestantes}s`;
+    }
+}

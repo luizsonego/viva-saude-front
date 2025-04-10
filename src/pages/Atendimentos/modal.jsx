@@ -21,7 +21,11 @@ import EditAtendimentoDadosMedicos from "./edits/dadosMedicos";
 import CustomTimeline from "./timeline";
 import AddComentario from "./edits/comentario";
 import { formatarDataBr } from "../../helpers";
-import { converterSegundosMinutos } from "../../helpers/formatarDataBr";
+import { 
+  converterSegundosMinutos, 
+  converterSegundosHorasMinutos,
+  formatarTempoExpirado 
+} from "../../helpers/formatarDataBr";
 
 const ModalAtendimento = () => {
   const { id, resource } = useParams();
@@ -34,6 +38,7 @@ const ModalAtendimento = () => {
   const [openModalComentario, setOpenModalComentario] = useState(false);
   const [dataModal, setDataModal] = useState({});
   const [error, setError] = useState(null);
+  const [countdown, setCountdown] = useState(null);
 
   const { data = {}, isLoading, error: fetchError, refetch } = useGetResource(
     "atendimento",
@@ -72,6 +77,24 @@ const ModalAtendimento = () => {
       document.body.classList.remove("overflow-hidden");
     };
   }, []);
+
+  React.useEffect(() => {
+    if (data?.temporizador?.tempo_restante && !data?.temporizador?.em_atraso) {
+      setCountdown(data.temporizador.tempo_restante);
+      
+      const timer = setInterval(() => {
+        setCountdown(prevCountdown => {
+          if (prevCountdown <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prevCountdown - 1;
+        });
+      }, 1000);
+      
+      return () => clearInterval(timer);
+    }
+  }, [data?.temporizador?.tempo_restante, data?.temporizador?.em_atraso]);
 
   const handleChangePrioridadeCartao = ({ id, prioridade }) => {
     let dataStatus = {
@@ -216,13 +239,29 @@ const ModalAtendimento = () => {
             </DialogHeader>
             <DialogHeader>
               <small>
-              
                 Expira em: {data?.temporizador?.em_atraso ? 
                 <span 
-                className="inline-flex items-center rounded-md bg-red-900 px-14 py-5 text-xs font-medium text-red-50 ring-1 ring-red-800 ring-inset">
-                  Em atraso
-                  </span> : formatarDataBr(data?.temporizador?.expira_em)} {" - "}
-                  {!data?.temporizador?.em_atraso ? `Resta: ${converterSegundosMinutos(data?.temporizador?.tempo_restante)}` : ''}
+                className="inline-flex items-center rounded-md bg-red-900 px-4 py-2 text-sm font-medium text-red-50 ring-1 ring-red-800 ring-inset animate-pulse">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                  ATENDIMENTO ATRASADO
+                </span> : formatarDataBr(data?.temporizador?.expira_em)} {" - "}
+                {!data?.temporizador?.em_atraso ? (
+                  <span className="inline-flex items-center rounded-md bg-blue-100 px-3 py-1 text-sm font-medium text-blue-700 ring-1 ring-blue-700/10">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                    </svg>
+                    Resta: {converterSegundosHorasMinutos(countdown !== null ? countdown : data?.temporizador?.tempo_restante)}
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center rounded-md bg-red-100 px-3 py-1 text-sm font-medium text-red-700 ring-1 ring-red-700/10">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                    </svg>
+                    Atrasado há: {converterSegundosHorasMinutos(Math.abs(data?.temporizador?.tempo_restante || 0))}
+                  </span>
+                )}
               </small>
             </DialogHeader>
             <CardBody className="flex-1 overflow-y-auto custom-scrollbar">

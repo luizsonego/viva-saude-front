@@ -479,13 +479,13 @@ const Atendimentos = () => {
                 <tr
                   key={item?.id}
                   className={`${
-                    item?.temporizador?.tempo_restante <= 0
+                    item?.temporizador?.em_atraso
                       ? "text-gray-100 bold"
                       : "hover:bg-gray-50"
                   }`}
                   style={{
                     background:
-                    item?.temporizador?.tempo_restante <= 0
+                    item?.temporizador?.em_atraso 
                     && "red"
                   }}
                 >
