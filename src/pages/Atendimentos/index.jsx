@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { Select, Option, Chip, Input } from "@material-tailwind/react";
 import {
   Button,
@@ -49,15 +49,141 @@ const Atendimentos = () => {
   const statusFromUrl = searchParams.get("status") || "ABERTO";
   const [statusSelecionado, setStatusSelecionado] = useState(statusFromUrl);
   
+  // Get pagination from URL or use defaults
+  const pageFromUrl = parseInt(searchParams.get("page")) || 1;
+  const pageSizeFromUrl = parseInt(searchParams.get("pageSize")) || 20;
+  
   const [filtros, setFiltros] = useState({
-    prioridade: "",
-    medico: "",
-    local: "",
-    cliente: "",
-    atendente: ""
+    prioridade: searchParams.get("prioridade") || "",
+    medico: searchParams.get("medico") || "",
+    local: searchParams.get("local") || "",
+    cliente: searchParams.get("cliente") || "",
+    atendente: searchParams.get("atendente") || ""
   });
 
-  const { data, isLoading, error } = useAtendimentosFetch();
+  // Pagination state
+  const [pagination, setPagination] = useState({
+    page: pageFromUrl,
+    pageSize: pageSizeFromUrl,
+    total: 0,
+    totalPages: 0
+  });
+
+  // Add debounce for cliente filter
+  const [clienteInput, setClienteInput] = useState(filtros.cliente);
+
+  const handleFiltroChange = useCallback((key, value) => {
+    setFiltros(prev => ({ ...prev, [key]: value }));
+    // Reset to first page when filters change
+    setPagination(prev => ({ ...prev, page: 1 }));
+    
+    // Update URL with filter
+    setSearchParams(prev => {
+      const newParams = new URLSearchParams(prev);
+      if (value) {
+        newParams.set(key, value);
+      } else {
+        newParams.delete(key);
+      }
+      newParams.set("page", "1"); // Reset to first page
+      return newParams;
+    });
+  }, [setSearchParams]);
+  
+  // Debounce cliente filter changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (clienteInput !== filtros.cliente) {
+        handleFiltroChange('cliente', clienteInput);
+      }
+    }, 500); // 500ms debounce
+    
+    return () => clearTimeout(timer);
+  }, [clienteInput, handleFiltroChange, filtros.cliente]);
+
+  // Otimizar as chamadas de API com staleTime e cacheTime
+  const { data, isLoading, error, refetch } = useAtendimentosFetch({
+    page: pagination.page,
+    pageSize: pagination.pageSize,
+    status: statusSelecionado !== "TODOS" && statusSelecionado !== "ABERTOS" ? statusSelecionado : "",
+    ...filtros
+  });
+
+  // Update pagination when data changes
+  useEffect(() => {
+    if (data?.pagination) {
+      setPagination(prev => ({
+        ...prev,
+        total: data.pagination.total,
+        totalPages: data.pagination.totalPages
+      }));
+    }
+  }, [data]);
+
+  // Update filters and pagination when URL changes
+  useEffect(() => {
+    const status = searchParams.get("status") || "ABERTO";
+    const page = parseInt(searchParams.get("page")) || 1;
+    const pageSize = parseInt(searchParams.get("pageSize")) || 20;
+    
+    // Update status if changed
+    if (status !== statusSelecionado) {
+      setStatusSelecionado(status);
+    }
+    
+    // Update pagination if changed
+    if (page !== pagination.page || pageSize !== pagination.pageSize) {
+      setPagination(prev => ({
+        ...prev,
+        page,
+        pageSize
+      }));
+    }
+    
+    // Update filters if changed
+    const newFiltros = {
+      prioridade: searchParams.get("prioridade") || "",
+      medico: searchParams.get("medico") || "",
+      local: searchParams.get("local") || "",
+      cliente: searchParams.get("cliente") || "",
+      atendente: searchParams.get("atendente") || ""
+    };
+    
+    // Check if any filter has changed
+    const hasFilterChanged = Object.keys(newFiltros).some(
+      key => newFiltros[key] !== filtros[key]
+    );
+    
+    if (hasFilterChanged) {
+      setFiltros(newFiltros);
+      setClienteInput(newFiltros.cliente);
+    }
+  }, [searchParams, statusSelecionado, pagination.page, pagination.pageSize, filtros]);
+
+  // Handle pagination
+  const handlePageChange = useCallback((newPage) => {
+    setPagination(prev => ({ ...prev, page: newPage }));
+    
+    // Update URL with page
+    setSearchParams(prev => {
+      const newParams = new URLSearchParams(prev);
+      newParams.set("page", newPage.toString());
+      return newParams;
+    });
+  }, [setSearchParams]);
+
+  const handlePageSizeChange = useCallback((newPageSize) => {
+    setPagination(prev => ({ ...prev, pageSize: newPageSize, page: 1 }));
+    
+    // Update URL with pageSize and reset page
+    setSearchParams(prev => {
+      const newParams = new URLSearchParams(prev);
+      newParams.set("pageSize", newPageSize.toString());
+      newParams.set("page", "1");
+      return newParams;
+    });
+  }, [setSearchParams]);
+
   const { data: prioridadeData } = useGetResources("prioridades", "prioridade");
   const { data: atendenteData } = useGetResources("atendentes", "atendente");
   const { data: medicoData } = useGetResources("medico", "medicos");
@@ -67,67 +193,33 @@ const Atendimentos = () => {
     "atendimentos",
     "troca-status",
     {
-      // onSuccess: () => toast.success("Status atualizado com sucesso!"),
-      // onError: (error) => toast.error("Erro ao atualizar status: " + error.message)
+      onSuccess: () => {
+        // Atualizar os dados após a mudança de status
+        refetch();
+      }
     }
   );
 
   const { mutateAsync: mutatePrioridade, isPending: isPendingPrioridade } =
     useResourcePut("atendimentos", "troca-prioridade", {
-      // onSuccess: () => toast.success("Prioridade atualizada com sucesso!"),
-      // onError: (error) => toast.error("Erro ao atualizar prioridade: " + error.message)
+      onSuccess: () => {
+        // Atualizar os dados após a mudança de prioridade
+        refetch();
+      }
     });
 
   const { mutateAsync: mutateAtendente, isPending: isPendingAtendente } =
     useResourcePut("atendimentos", "troca-atendente", {
-      // onSuccess: () => toast.success("Atendente atualizado com sucesso!"),
-      // onError: (error) => toast.error("Erro ao atualizar atendente: " + error.message)
+      onSuccess: () => {
+        // Atualizar os dados após a mudança de atendente
+        refetch();
+      }
     });
 
-  const handleFiltroChange = useCallback((key, value) => {
-    setFiltros(prev => ({ ...prev, [key]: value }));
-  }, []);
-
+  // No need to filter data client-side anymore as it's done on the server
   const atendimentosFiltrados = useMemo(() => {
-    if (!data) return [];
-    
-    return data.filter((item) => {
-      const statusFiltro =
-        statusSelecionado === "TODOS" ||
-        statusSelecionado === "ABERTOS" ||
-        item?.status === statusSelecionado;
-      
-      const prioridadeFiltro = filtros.prioridade
-        ? item?.prioridadeAtendimento?.nome === filtros.prioridade
-        : true;
-      
-      const medicoFiltro = filtros.medico
-        ? item?.medico_atendimento === filtros.medico
-        : true;
-      
-      const localFiltro = filtros.local
-        ? item?.onde_deseja_ser_atendido === filtros.local
-        : true;
-      
-      const atendenteFiltro = filtros.atendente
-        ? item?.profile?.name === filtros.atendente
-        : true;
-      
-      const clienteFiltro = filtros.cliente
-        ? item?.titular_plano?.toLowerCase().includes(filtros.cliente.toLowerCase()) ||
-          item?.cpf_titular?.includes(filtros.cliente)
-        : true;
-
-      return (
-        statusFiltro &&
-        prioridadeFiltro &&
-        medicoFiltro &&
-        localFiltro &&
-        atendenteFiltro &&
-        clienteFiltro
-      );
-    });
-  }, [data, statusSelecionado, filtros]);
+    return data?.items || [];
+  }, [data]);
 
   const handleOpenModalConsulta = useCallback((item) => {
     if (!item) return;
@@ -137,7 +229,10 @@ const Atendimentos = () => {
 
   const handleCloseModal = useCallback(() => {
     setOpenModal(false);
-    setDataModal(null);
+    // Limpar os dados do modal ao fechar
+    setTimeout(() => {
+      setDataModal(null);
+    }, 300); // Aguardar a animação de fechamento do modal
   }, []);
 
   const handleChangeAtendenteCartao = useCallback(async ({ id, atendente }) => {
@@ -178,6 +273,8 @@ const Atendimentos = () => {
 
   const handleViewCartao = useCallback((resource, id) => {
     if (!resource || !id) return;
+    // Limpar o estado antes de navegar
+    setDataModal(null);
     navigate(`ver/${resource}/${id}`);
   }, [navigate]);
 
@@ -203,9 +300,20 @@ const Atendimentos = () => {
     setSearchParams(prev => {
       const newParams = new URLSearchParams(prev);
       newParams.set("status", status);
+      newParams.set("page", "1"); // Reset to page 1 when status changes
       return newParams;
     });
+    // Reset to first page when status changes
+    setPagination(prev => ({ ...prev, page: 1 }));
   }, [setSearchParams]);
+
+  // Limpar o estado quando o componente for desmontado
+  useEffect(() => {
+    return () => {
+      setDataModal(null);
+      setOpenModal(false);
+    };
+  }, []);
 
   if (isLoading) {
     return (
@@ -345,8 +453,8 @@ const Atendimentos = () => {
 
           <Input
             label="Filtrar Cliente"
-            value={filtros.cliente}
-            onChange={(e) => handleFiltroChange('cliente', e.target.value)}
+            value={clienteInput}
+            onChange={(e) => setClienteInput(e.target.value)}
             placeholder="Nome ou CPF"
             className="border p-2 rounded"
           />
@@ -416,6 +524,53 @@ const Atendimentos = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Controls */}
+        <div className="flex justify-between items-center p-4 border-t">
+          <div className="flex items-center">
+            <span className="mr-2">Itens por página:</span>
+            <select
+              value={pagination.pageSize}
+              onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+              className="border rounded p-1"
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+          </div>
+          
+          <div className="flex items-center">
+            <span className="mr-2">
+              {pagination.total > 0 
+                ? `${(pagination.page - 1) * pagination.pageSize + 1} - ${Math.min(pagination.page * pagination.pageSize, pagination.total)} de ${pagination.total}`
+                : 'Nenhum resultado'}
+            </span>
+            
+            <div className="flex">
+              <button
+                onClick={() => handlePageChange(pagination.page - 1)}
+                disabled={pagination.page <= 1}
+                className={`px-3 py-1 mx-1 rounded ${
+                  pagination.page <= 1 ? 'bg-gray-200 text-gray-500' : 'bg-blue-500 text-white hover:bg-blue-600'
+                }`}
+              >
+                Anterior
+              </button>
+              
+              <button
+                onClick={() => handlePageChange(pagination.page + 1)}
+                disabled={pagination.page >= pagination.totalPages}
+                className={`px-3 py-1 mx-1 rounded ${
+                  pagination.page >= pagination.totalPages ? 'bg-gray-200 text-gray-500' : 'bg-blue-500 text-white hover:bg-blue-600'
+                }`}
+              >
+                Próximo
+              </button>
+            </div>
+          </div>
+        </div>
       </Card>
 
       {dataModal && (
@@ -424,6 +579,10 @@ const Atendimentos = () => {
           handler={handleCloseModal}
           size="lg"
           className="overflow-y-auto"
+          animate={{
+            mount: { scale: 1, y: 0 },
+            unmount: { scale: 0.9, y: -100 },
+          }}
         >
           <DialogHeader>
             Detalhes do Atendimento

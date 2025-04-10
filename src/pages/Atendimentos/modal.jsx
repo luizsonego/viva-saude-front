@@ -11,6 +11,7 @@ import {
   Option,
   Select,
   Typography,
+  Spinner,
 } from "@material-tailwind/react";
 import { useResourcePut } from "../../hooks/update/useUpdate.query";
 import Upload from "../../components/uploads";
@@ -34,7 +35,7 @@ const ModalAtendimento = () => {
   const [dataModal, setDataModal] = useState({});
   const [error, setError] = useState(null);
 
-  const { data = {}, isLoading, error: fetchError } = useGetResource(
+  const { data = {}, isLoading, error: fetchError, refetch } = useGetResource(
     "atendimento",
     "atendimento",
     id
@@ -78,7 +79,9 @@ const ModalAtendimento = () => {
       prioridade,
     };
     try {
-      mutatePrioridade(dataStatus);
+      mutatePrioridade(dataStatus).then(() => {
+        refetch();
+      });
     } catch (error) {
       setError("Erro ao alterar prioridade. Tente novamente.");
     }
@@ -89,7 +92,9 @@ const ModalAtendimento = () => {
       status,
     };
     try {
-      mutateAsync(dataStatus);
+      mutateAsync(dataStatus).then(() => {
+        refetch();
+      });
     } catch (error) {
       setError("Erro ao alterar status. Tente novamente.");
     }
@@ -100,7 +105,9 @@ const ModalAtendimento = () => {
       atendente,
     };
     try {
-      mutateAtendente(dataStatus);
+      mutateAtendente(dataStatus).then(() => {
+        refetch();
+      });
     } catch (error) {
       setError("Erro ao alterar atendente. Tente novamente.");
     }
@@ -125,11 +132,20 @@ const ModalAtendimento = () => {
     setOpenModalComentario(!openModalComentario);
   };
 
-  if (isLoading) return "carregando...";
+  if (isLoading) return (
+    <div className="absolute inset-0 w-screen h-screen bg-black bg-opacity-60 flex items-center justify-center backdrop-blur-sm">
+      <div className="flex flex-col items-center justify-center">
+        <Spinner className="h-12 w-12 text-blue-500" />
+        <Typography variant="h6" color="white" className="mt-4">
+          Carregando dados do atendimento...
+        </Typography>
+      </div>
+    </div>
+  );
   
   if (fetchError || prioridadeError || atendenteError) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="absolute inset-0 w-screen h-screen bg-black bg-opacity-60 flex items-center justify-center backdrop-blur-sm">
         <div className="text-red-500 text-center">
           <h2 className="text-xl font-bold mb-2">Erro ao carregar dados</h2>
           <p>{fetchError?.message || prioridadeError?.message || atendenteError?.message || "Ocorreu um erro ao carregar os dados. Tente novamente."}</p>
@@ -253,7 +269,7 @@ const ModalAtendimento = () => {
                     color="blue-gray"
                     className="mb-3 font-bold"
                   >
-                    {atendimentoData.titulo}
+                    {atendimentoData?.titulo}
                   </Typography>
                   <div className="mb-4 flex items-start justify-between">
                     <div>
@@ -261,35 +277,35 @@ const ModalAtendimento = () => {
                       <Typography color="blue-gray" className="mb-1 ">
                         Nome:{" "}
                         <span className="mb-1 font-bold font-lg">
-                          {atendimentoData.titular_plano}
+                          {atendimentoData?.titular_plano}
                         </span>
                       </Typography>
                       <Typography color="blue-gray" className="mb-1 ">
                         CPF:{" "}
                         <span className="mb-1 font-bold font-lg">
-                          {atendimentoData.cpf_titular}
+                          {atendimentoData?.cpf_titular}
                         </span>
                       </Typography>
                       <Typography color="blue-gray" className="mb-1 ">
                         Whatsapp:{" "}
                         <span className="mb-1 font-bold font-lg">
-                          {atendimentoData.whatsapp_titular}
+                          {atendimentoData?.whatsapp_titular}
                         </span>
                       </Typography>
-                      {atendimentoData.para_quem === "outra" ? (
+                      {atendimentoData?.para_quem === "outra" ? (
                         <>
                           <hr />
                           <h3>Dados de quem vai ser atendido</h3>
                           <Typography color="blue-gray" className="mb-1 ">
                             Nome:{" "}
                             <span className="mb-1 font-bold font-lg">
-                              {atendimentoData.nome_outro}
+                              {atendimentoData?.nome_outro}
                             </span>
                           </Typography>
                           <Typography color="blue-gray" className="mb-1 ">
                             CPF:{" "}
                             <span className="mb-1 font-bold font-lg">
-                              {atendimentoData.cpf_outro}
+                              {atendimentoData?.cpf_outro}
                             </span>
                           </Typography>
                         </>
@@ -308,7 +324,7 @@ const ModalAtendimento = () => {
                           className="text-xs !font-bold"
                           color="blue-gray"
                         >
-                          {atendimentoData.status}
+                          {atendimentoData?.status}
                         </Typography>
                       </div>
                       <div className="flex gap-1">
@@ -338,7 +354,7 @@ const ModalAtendimento = () => {
                           className="text-xs !font-bold"
                           color="blue-gray"
                         >
-                          {atendimentoData.perfil_cliente}{" "}
+                          {atendimentoData?.perfil_cliente}{" "}
                           {/*perfil do cliente*/}
                         </Typography>
                       </div>
@@ -350,7 +366,7 @@ const ModalAtendimento = () => {
                           className="text-xs !font-bold"
                           color="blue-gray"
                         >
-                          {atendimentoData.observacoes} {/*perfil do cliente*/}
+                          {atendimentoData?.observacoes} {/*perfil do cliente*/}
                         </Typography>
                       </div>
                     </div>
@@ -378,7 +394,7 @@ const ModalAtendimento = () => {
                       className="text-xs !font-bold"
                       color="blue-gray"
                     >
-                      {atendimentoData.medico_atendimento}
+                      {atendimentoData?.medico_atendimento}
                     </Typography>
                   </div>
                   <div className="flex gap-1">
@@ -389,8 +405,8 @@ const ModalAtendimento = () => {
                       className="text-xs !font-bold"
                       color="blue-gray"
                     >
-                      {atendimentoData.acoes?.nome}
-                      {atendimentoData.o_que_deseja}
+                      {atendimentoData?.acoes?.nome}
+                      {atendimentoData?.o_que_deseja}
                     </Typography>
                   </div>
                   <div className="flex gap-1">
@@ -401,7 +417,7 @@ const ModalAtendimento = () => {
                       className="text-xs !font-bold"
                       color="blue-gray"
                     >
-                      {atendimentoData.onde_deseja_ser_atendido}
+                      {atendimentoData?.onde_deseja_ser_atendido}
                     </Typography>
                   </div>
                   <div className="flex gap-1">
@@ -412,7 +428,7 @@ const ModalAtendimento = () => {
                       className="text-xs !font-bold"
                       color="blue-gray"
                     >
-                      {atendimentoData.medico_atendimento_data}
+                      {atendimentoData?.medico_atendimento_data}
                     </Typography>
                   </div>
                   <hr className="mt-5 mb-5" />
@@ -422,7 +438,7 @@ const ModalAtendimento = () => {
                       className="text-xs !font-bold"
                       color="blue-gray"
                     >
-                      {atendimentoData.comentario}
+                      {atendimentoData?.comentario}
                     </Typography>
                   </div>
                   <hr className="mt-5 mb-5" />
@@ -461,7 +477,7 @@ const ModalAtendimento = () => {
                       <Typography className="mt-3 text-xs !font-medium !text-gray-600">
                         {"Atendido por"}:{" "}
                         <span className="text-xs !font-bold" color="blue-gray">
-                          {atendimentoData.atendido_por}
+                          {atendimentoData?.atendido_por}
                         </span>
                       </Typography>
                     </div>
@@ -469,7 +485,7 @@ const ModalAtendimento = () => {
                       <Typography className="mt-1 text-xs !font-medium !text-gray-600">
                         {"inicio do atendimento"}:{" "}
                         <span className="text-xs !font-bold" color="blue-gray">
-                          {atendimentoData.atendimento_iniciado}
+                          {atendimentoData?.atendimento_iniciado}
                         </span>
                       </Typography>
                     </div>
@@ -483,7 +499,7 @@ const ModalAtendimento = () => {
                         onChange={(prioridade) =>
                           handleChangePrioridadeCartao({
                             prioridade,
-                            id: atendimentoData.id,
+                            id: atendimentoData?.id,
                           })
                         }
                       >
@@ -503,7 +519,7 @@ const ModalAtendimento = () => {
                         onChange={(status) =>
                           handleChangeStatusCartao({
                             status,
-                            id: atendimentoData.id,
+                            id: atendimentoData?.id,
                           })
                         }
                       >
@@ -532,7 +548,7 @@ const ModalAtendimento = () => {
                         onChange={(atendente) =>
                           handleChangeAtendenteCartao({
                             atendente,
-                            id: atendimentoData.id,
+                            id: atendimentoData?.id,
                           })
                         }
                       >

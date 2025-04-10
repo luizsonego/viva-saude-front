@@ -29,13 +29,23 @@ export const useResourcePut = (queries, resource, onSuccessCallback) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data) => updateResource(resource, data),
-    onSuccess: () => {
+    onSuccess: (data) => {
+    // Invalidar a query específica para forçar uma nova busca
       queryClient.invalidateQueries({ queryKey: [queries] });
+
+      // Atualizar o cache com os novos dados se disponíveis
+      if (data?.data?.data) {
+        queryClient.setQueryData([queries], data.data.data);
+      }
 
       if (onSuccessCallback) {
         onSuccessCallback();
       }
     },
+    onError: (error) => {
+      console.error(`Erro ao atualizar ${resource}:`, error);
+      // Não invalidar o cache em caso de erro para manter os dados antigos
+    }
   });
 };
 

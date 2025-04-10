@@ -104,10 +104,32 @@ export function useAccessFetchRequest() {
   });
 }
 
-const getAtendimentos = async (values) => {
+const getAtendimentos = async (params = {}) => {
   try {
-    const request = await api.patch(
-      `${process.env.REACT_APP_API}/v1/get/atendimentos`,
+    const {
+      page = 1,
+      pageSize = 20,
+      status = '',
+      prioridade = '',
+      medico = '',
+      local = '',
+      atendente = '',
+      cliente = ''
+    } = params;
+
+    const queryParams = new URLSearchParams({
+      page,
+      pageSize,
+      ...(status && { status }),
+      ...(prioridade && { prioridade }),
+      ...(medico && { medico }),
+      ...(local && { local }),
+      ...(atendente && { atendente }),
+      ...(cliente && { cliente })
+    });
+
+    const request = await api.get(
+      `${process.env.REACT_APP_API}/v1/get/atendimentos?${queryParams.toString()}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -117,10 +139,10 @@ const getAtendimentos = async (values) => {
         },
       }
     );
-    const { data } = request.data;
-    return data;
+    return request.data.data;
   } catch (error) {
-    console.log(error.message);
+    console.error("Erro ao buscar atendimentos:", error.message);
+    throw error;
   }
 };
 
@@ -303,10 +325,14 @@ const getAtendente = async () => {
   }
 };
 
-export function useAtendimentosFetch() {
+export function useAtendimentosFetch(params = {}) {
   return useQuery({
-    queryKey: ["atendimentos"],
-    queryFn: getAtendimentos,
+    queryKey: ["atendimentos", params],
+    queryFn: () => getAtendimentos(params),
+    staleTime: 30000,
+    cacheTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
   });
 }
 
