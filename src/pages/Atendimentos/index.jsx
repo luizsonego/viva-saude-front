@@ -58,7 +58,12 @@ const Atendimentos = () => {
     medico: searchParams.get("medico") || "",
     local: searchParams.get("local") || "",
     cliente: searchParams.get("cliente") || "",
-    atendente: searchParams.get("atendente") || ""
+    atendente: searchParams.get("atendente") || "",
+    dataInicio: searchParams.get("dataInicio") || "",
+    dataFim: searchParams.get("dataFim") || "",
+    procedimento: searchParams.get("procedimento") || "",
+    convenio: searchParams.get("convenio") || "",
+    especialidade: searchParams.get("especialidade") || ""
   });
 
   // Pagination state
@@ -71,8 +76,11 @@ const Atendimentos = () => {
 
   // Add debounce for cliente filter
   const [clienteInput, setClienteInput] = useState(filtros.cliente);
+  const [isSearching, setIsSearching] = useState(false);
 
   const handleFiltroChange = useCallback((key, value) => {
+    console.log(`Alterando filtro ${key} para:`, value);
+    
     setFiltros(prev => ({ ...prev, [key]: value }));
     // Reset to first page when filters change
     setPagination(prev => ({ ...prev, page: 1 }));
@@ -94,9 +102,10 @@ const Atendimentos = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       if (clienteInput !== filtros.cliente) {
+        setIsSearching(true);
         handleFiltroChange('cliente', clienteInput);
       }
-    }, 500); // 500ms debounce
+    }, 500); // Aumentado para 500ms para reduzir chamadas à API
     
     return () => clearTimeout(timer);
   }, [clienteInput, handleFiltroChange, filtros.cliente]);
@@ -107,7 +116,17 @@ const Atendimentos = () => {
     pageSize: pagination.pageSize,
     status: statusSelecionado !== "TODOS" && statusSelecionado !== "ABERTOS" ? statusSelecionado : "",
     ...filtros
+  }, {
+    staleTime: 30000, // 30 segundos
+    cacheTime: 300000, // 5 minutos
   });
+
+  // Reset searching state when data is loaded
+  useEffect(() => {
+    if (!isLoading) {
+      setIsSearching(false);
+    }
+  }, [isLoading]);
 
   // Update pagination when data changes
   useEffect(() => {
@@ -146,7 +165,12 @@ const Atendimentos = () => {
       medico: searchParams.get("medico") || "",
       local: searchParams.get("local") || "",
       cliente: searchParams.get("cliente") || "",
-      atendente: searchParams.get("atendente") || ""
+      atendente: searchParams.get("atendente") || "",
+      dataInicio: searchParams.get("dataInicio") || "",
+      dataFim: searchParams.get("dataFim") || "",
+      procedimento: searchParams.get("procedimento") || "",
+      // convenio: searchParams.get("convenio") || "",
+      especialidade: searchParams.get("especialidade") || ""
     };
     
     // Check if any filter has changed
@@ -188,6 +212,18 @@ const Atendimentos = () => {
   const { data: atendenteData } = useGetResources("atendentes", "atendente");
   const { data: medicoData } = useGetResources("medico", "medicos");
   const { data: locaisData } = useGetResources("locais", "onde-ser-atendido");
+  const { data: procedimentosData } = useGetResources("procedimentos", "procedimentos");
+  // const { data: conveniosData } = useGetResources("convenios", "convenios");
+  const { data: especialidadesData } = useGetResources("especialidades", "especialidade");
+
+  // Adicionar log para debug dos convênios
+  // useEffect(() => {
+  //   console.log("Dados dos convênios:", conveniosData);
+  // }, [conveniosData]);
+
+  // Adicionar verificações de loading
+  const isResourcesLoading = !prioridadeData || !atendenteData || !medicoData || !locaisData || 
+                           !procedimentosData  || !especialidadesData;
 
   const { mutateAsync: mutateStatus, isPending: isPendingStatus } = useResourcePut(
     "atendimentos",
@@ -218,6 +254,7 @@ const Atendimentos = () => {
 
   // No need to filter data client-side anymore as it's done on the server
   const atendimentosFiltrados = useMemo(() => {
+    console.log("Dados recebidos da API:", data);
     return data?.items || [];
   }, [data]);
 
@@ -307,6 +344,37 @@ const Atendimentos = () => {
     setPagination(prev => ({ ...prev, page: 1 }));
   }, [setSearchParams]);
 
+  const handleClearFilters = useCallback(() => {
+    setFiltros({
+      prioridade: "",
+      medico: "",
+      local: "",
+      cliente: "",
+      atendente: "",
+      dataInicio: "",
+      dataFim: "",
+      procedimento: "",
+      convenio: "",
+      especialidade: ""
+    });
+    setClienteInput("");
+    setSearchParams(prev => {
+      const newParams = new URLSearchParams(prev);
+      newParams.delete("prioridade");
+      newParams.delete("medico");
+      newParams.delete("local");
+      newParams.delete("cliente");
+      newParams.delete("atendente");
+      newParams.delete("dataInicio");
+      newParams.delete("dataFim");
+      newParams.delete("procedimento");
+      newParams.delete("convenio");
+      newParams.delete("especialidade");
+      newParams.set("page", "1");
+      return newParams;
+    });
+  }, [setSearchParams]);
+
   // Limpar o estado quando o componente for desmontado
   useEffect(() => {
     return () => {
@@ -315,7 +383,20 @@ const Atendimentos = () => {
     };
   }, []);
 
-  if (isLoading) {
+  // Função para depuração
+  const debugParams = useCallback(() => {
+    console.log("Parâmetros atuais:", {
+      page: pagination.page,
+      pageSize: pagination.pageSize,
+      status: statusSelecionado !== "TODOS" && statusSelecionado !== "ABERTOS" ? statusSelecionado : "",
+      ...filtros
+    });
+    
+    // Forçar uma nova busca
+    refetch();
+  }, [pagination.page, pagination.pageSize, statusSelecionado, filtros, refetch]);
+
+  if (isResourcesLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <Spinner className="h-8 w-8" />
@@ -348,6 +429,30 @@ const Atendimentos = () => {
                 Criar Cartão
               </Button>
             </Link>
+          </div>
+          <div className="flex gap-2">
+            {Object.values(filtros).some(value => value) && (
+              <Button
+                variant="text"
+                color="red"
+                className="flex items-center gap-2"
+                onClick={handleClearFilters}
+                aria-label="Limpar todos os filtros"
+              >
+                <i className="fas fa-times-circle"></i>
+                Limpar Filtros
+              </Button>
+            )}
+            <Button
+              variant="text"
+              color="blue"
+              className="flex items-center gap-2"
+              onClick={debugParams}
+              aria-label="Depurar parâmetros"
+            >
+              <i className="fas fa-bug"></i>
+              Depurar
+            </Button>
           </div>
         </div>
       </div>
@@ -391,16 +496,19 @@ const Atendimentos = () => {
           </Typography>
         </CardHeader>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 p-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
           <Select
             label="Prioridade"
             value={filtros.prioridade}
-            onChange={(value) => handleFiltroChange('prioridade', value)}
+            onChange={(value) => {
+              console.log("Valor da prioridade selecionada:", value);
+              handleFiltroChange('prioridade', value);
+            }}
             className="border p-2 rounded"
           >
             <Option value="">Todas Prioridades</Option>
-            {prioridadeData?.map((item) => (
-              <Option key={item?.id} value={item?.nome}>
+            {Array.isArray(prioridadeData) && prioridadeData.map((item) => (
+              <Option key={item?.id} value={item?.id}>
                 {item?.nome}
               </Option>
             ))}
@@ -409,13 +517,16 @@ const Atendimentos = () => {
           <Select
             label="Médico"
             value={filtros.medico}
-            onChange={(value) => handleFiltroChange('medico', value)}
+            onChange={(value) => {
+              console.log("Valor do médico selecionado:", value);
+              handleFiltroChange('medico', value);
+            }}
             className="border p-2 rounded"
           >
             <Option value="">Todos Médicos</Option>
-            {medicoData?.map((item) => (
-              <Option key={item?.id} value={item?.nome}>
-                {item?.nome}
+            {Array.isArray(medicoData) && medicoData.map((item) => (
+              <Option key={item?.id} value={item?.id}>
+                {item?.nome || item?.nome_medico}
               </Option>
             ))}
           </Select>
@@ -423,11 +534,14 @@ const Atendimentos = () => {
           <Select
             label="Local"
             value={filtros.local}
-            onChange={(value) => handleFiltroChange('local', value)}
+            onChange={(value) => {
+              console.log("Valor do local selecionado:", value);
+              handleFiltroChange('local', value);
+            }}
             className="border p-2 rounded"
           >
             <Option value="">Todos Locais</Option>
-            {locaisData?.map((item) => (
+            {Array.isArray(locaisData) && locaisData.map((item) => (
               <Option
                 key={item?.onde_deseja_ser_atendido}
                 value={item?.onde_deseja_ser_atendido}
@@ -440,24 +554,90 @@ const Atendimentos = () => {
           <Select
             label="Atendente"
             value={filtros.atendente}
-            onChange={(value) => handleFiltroChange('atendente', value)}
+            onChange={(value) => {
+              console.log("Valor do atendente selecionado:", value);
+              handleFiltroChange('atendente', value);
+            }}
             className="border p-2 rounded"
           >
             <Option value="">Todos Atendentes</Option>
-            {atendenteData?.map((item) => (
-              <Option key={item?.id} value={item?.profile?.name}>
+            {Array.isArray(atendenteData) && atendenteData.map((item) => (
+              <Option key={item?.id} value={item?.id}>
                 {item?.profile?.name}
               </Option>
             ))}
           </Select>
 
-          <Input
+           <Input
             label="Filtrar Cliente"
             value={clienteInput}
-            onChange={(e) => setClienteInput(e.target.value)}
-            placeholder="Nome ou CPF"
+            onChange={(e) => {
+              const value = e.target.value;
+              setClienteInput(value);
+            }}
+            placeholder="Nome, CPF ou procedimento"
+            className="border p-2 rounded"
+            icon={isSearching ? <Spinner className="h-4 w-4" /> : <i className="fas fa-search" />}
+          />
+            {/*
+
+          <Input
+            type="date"
+            label="Data Início"
+            value={filtros.dataInicio}
+            onChange={(e) => handleFiltroChange('dataInicio', e.target.value)}
             className="border p-2 rounded"
           />
+
+          <Input
+            type="date"
+            label="Data Fim"
+            value={filtros.dataFim}
+            onChange={(e) => handleFiltroChange('dataFim', e.target.value)}
+            className="border p-2 rounded"
+          /> */}
+
+          {/* <Select
+            label="Procedimento"
+            value={filtros.procedimento}
+            onChange={(value) => handleFiltroChange('procedimento', value)}
+            className="border p-2 rounded"
+          >
+            <Option value="">Todos Procedimentos</Option>
+            {Array.isArray(procedimentosData) && procedimentosData.map((item) => (
+              <Option key={item} value={item}>
+                {item}
+              </Option>
+            ))}
+          </Select> */}
+
+          {/* <Select
+            label="Convênio"
+            value={filtros.convenio}
+            onChange={(value) => handleFiltroChange('convenio', value)}
+            className="border p-2 rounded"
+          >
+            <Option value="">Todos Convênios</Option>
+            {Array.isArray(conveniosData) && conveniosData.map((item) => (
+              <Option key={item?.id} value={item?.id}>
+                {item?.nome}
+              </Option>
+            ))}
+          </Select> */}
+
+          {/* <Select
+            label="Especialidade"
+            value={filtros.especialidade}
+            onChange={(value) => handleFiltroChange('especialidade', value)}
+            className="border p-2 rounded"
+          >
+            <Option value="">Todas Especialidades</Option>
+            {Array.isArray(especialidadesData) && especialidadesData.map((item) => (
+              <Option key={item?.id} value={item?.id}>
+                {item?.nome}
+              </Option>
+            ))}
+          </Select> */}
         </div>
 
         <div className="overflow-x-auto">
@@ -475,52 +655,77 @@ const Atendimentos = () => {
               </tr>
             </thead>
             <tbody>
-              {atendimentosFiltrados.map((item) => (
-                <tr
-                  key={item?.id}
-                  className={`${
-                    item?.temporizador?.em_atraso
-                      ? "text-gray-100 bold"
-                      : "hover:bg-gray-50"
-                  }`}
-                  style={{
-                    background:
-                    item?.temporizador?.em_atraso 
-                    && "red"
-                  }}
-                >
-
-                  <td className={classTdTable}>{item?.titular_plano}</td>
-                  <td className={classTdTable}>{item?.o_que_deseja}</td>
-                  <td className={classTdTable} style={{
-                        backgroundColor: item?.prioridadeAtendimentos?.cor || "transparent"
-                      }}>
-                    <Chip
-                      value={item?.prioridadeAtendimentos?.nome}
-                      className="w-fit"
-                      style={{
-                        backgroundColor: item?.prioridadeAtendimentos?.cor || "transparent"
-                      }}
-                    />
-                  </td>
-                  <td className={classTdTable}>{item?.medico_atendimento}</td>
-                  <td className={classTdTable}>{item?.onde_deseja_ser_atendido}</td>
-                  <td className={classTdTable}>{item?.status}</td>
-                  <td className={classTdTable}>
-                    {formatarDataBr(item?.medico_atendimento_data)}
-                  </td>
-                  <td className={classTdTable}>
-                    <Button
-                      onClick={() => handleViewCartao("atendimento", item?.id)}
-                      variant="text"
-                      className="text-blue-500 hover:text-blue-700"
-                      aria-label={`Ver detalhes do atendimento ${item?.id}`}
-                    >
-                      Ver
-                    </Button>
+              {atendimentosFiltrados.length > 0 ? (
+                atendimentosFiltrados.map((item) => (
+                  <tr
+                    key={item?.id}
+                    className={`${
+                      item?.temporizador?.em_atraso
+                        ? "text-gray-100 bold"
+                        : "hover:bg-gray-50"
+                    }`}
+                    style={{
+                      background:
+                      item?.temporizador?.em_atraso 
+                      && "red"
+                    }}
+                  >
+                    <td className={classTdTable}>{item?.titular_plano}</td>
+                    <td className={classTdTable}>{item?.o_que_deseja}</td>
+                    <td className={classTdTable} style={{
+                          backgroundColor: item?.prioridadeAtendimentos?.cor || "transparent"
+                        }}>
+                      <Chip
+                        value={item?.prioridadeAtendimentos?.nome}
+                        className="w-fit"
+                        style={{
+                          backgroundColor: item?.prioridadeAtendimentos?.cor || "transparent"
+                        }}
+                      />
+                    </td>
+                    <td className={classTdTable}>{item?.medico_atendimento}</td>
+                    <td className={classTdTable}>{item?.onde_deseja_ser_atendido}</td>
+                    <td className={classTdTable}>{item?.status}</td>
+                    <td className={classTdTable}>
+                      {formatarDataBr(item?.medico_atendimento_data)}
+                    </td>
+                    <td className={classTdTable}>
+                      <Button
+                        onClick={() => handleViewCartao("atendimento", item?.id)}
+                        variant="text"
+                        className="text-blue-500 hover:text-blue-700"
+                        aria-label={`Ver detalhes do atendimento ${item?.id}`}
+                      >
+                        Ver
+                      </Button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="8" className="py-8 text-center text-gray-500">
+                    {isSearching ? (
+                      <div className="flex justify-center items-center">
+                        <Spinner className="h-6 w-6 mr-2" />
+                        <span>Buscando atendimentos...</span>
+                      </div>
+                    ) : (
+                      <div>
+                        <p className="mb-2">Nenhum atendimento encontrado</p>
+                        {Object.values(filtros).some(value => value) && (
+                          <Button
+                            variant="text"
+                            color="blue"
+                            onClick={handleClearFilters}
+                          >
+                            Limpar filtros
+                          </Button>
+                        )}
+                      </div>
+                    )}
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

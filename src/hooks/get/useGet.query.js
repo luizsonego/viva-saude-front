@@ -117,16 +117,24 @@ const getAtendimentos = async (params = {}) => {
       cliente = ''
     } = params;
 
-    const queryParams = new URLSearchParams({
+    // Criar objeto de parâmetros apenas com valores não vazios
+    const queryParamsObj = {
       page,
-      pageSize,
-      ...(status && { status }),
-      ...(prioridade && { prioridade }),
-      ...(medico && { medico }),
-      ...(local && { local }),
-      ...(atendente && { atendente }),
-      ...(cliente && { cliente })
-    });
+      pageSize
+    };
+
+    // Adicionar apenas parâmetros com valores não vazios
+    if (status) queryParamsObj.status = status;
+    if (prioridade) queryParamsObj.prioridade = prioridade;
+    if (medico) queryParamsObj.medico = medico;
+    if (local) queryParamsObj.local = local;
+    if (atendente) queryParamsObj.atendente = atendente;
+    if (cliente) queryParamsObj.cliente = cliente;
+
+    // Log para depuração
+    console.log("Parâmetros enviados para a API:", queryParamsObj);
+
+    const queryParams = new URLSearchParams(queryParamsObj);
 
     const request = await api.get(
       `${process.env.REACT_APP_API}/v1/get/atendimentos?${queryParams.toString()}`,
@@ -139,6 +147,10 @@ const getAtendimentos = async (params = {}) => {
         },
       }
     );
+
+    // Log para depuração
+    console.log("Resposta da API:", request.data);
+
     return request.data.data;
   } catch (error) {
     console.error("Erro ao buscar atendimentos:", error.message);
@@ -188,7 +200,7 @@ const getEtiquetas = async (values) => {
 
 const getMedicos = async (values) => {
   try {
-    const request = await api.patch(
+    const request = await api.get(
       `${process.env.REACT_APP_API}/v1/get/medicos`,
       {
         headers: {
@@ -202,7 +214,8 @@ const getMedicos = async (values) => {
     const { data } = request.data;
     return data;
   } catch (error) {
-    console.log(error.message);
+    console.error("Erro ao buscar médicos:", error.message);
+    throw error;
   }
 };
 
