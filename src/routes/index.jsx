@@ -24,6 +24,7 @@ import EditarAtendente from "../pages/Atendente/editar";
 
 import ModalAtendimento from "../pages/Atendimentos/modal";
 import { useAccessFetchRequest } from "../hooks/get/useGet.query";
+import MarkdownComponent from "../pages/Doc";
 
 export default function MainRouter() {
   const navigate = useNavigate();
@@ -143,6 +144,10 @@ export default function MainRouter() {
           element: <Autoatendimento />,
         },
       ],
+    },
+    {
+      path: "/documentacao",
+      element: <MarkdownComponent />,
     },
     {
       path: "*",

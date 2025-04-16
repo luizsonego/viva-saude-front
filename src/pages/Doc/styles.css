@@ -1,0 +1,278 @@
+.markdown-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.6;
+    color: #24292e;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.markdown-container h1 {
+    font-size: 2.5em;
+    font-weight: 600;
+    margin: 1.5em 0 0.5em;
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid #eaecef;
+    color: #24292e;
+}
+
+.markdown-container h2 {
+    font-size: 1.8em;
+    font-weight: 600;
+    margin: 1.5em 0 0.5em;
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid #eaecef;
+    color: #24292e;
+}
+
+.markdown-container h3 {
+    font-size: 1.5em;
+    font-weight: 600;
+    margin: 1.2em 0 0.5em;
+    color: #24292e;
+}
+
+.markdown-container p {
+    margin-bottom: 1.2em;
+    font-size: 1.1em;
+    line-height: 1.7;
+    color: #24292e;
+}
+
+.markdown-container code {
+    background-color: #f6f8fa;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.9em;
+    color: #24292e;
+}
+
+.markdown-container pre {
+    background-color: #f6f8fa;
+    padding: 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 1em 0;
+    border: 1px solid #e1e4e8;
+}
+
+.markdown-container pre code {
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
+    font-size: 0.9em;
+    color: #24292e;
+}
+
+.markdown-container ul,
+.markdown-container ol {
+    margin: 1em 0;
+    padding-left: 2em;
+}
+
+.markdown-container li {
+    margin-bottom: 0.5em;
+    font-size: 1.1em;
+    line-height: 1.7;
+}
+
+.markdown-container a {
+    color: #0366d6;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.markdown-container a:hover {
+    text-decoration: underline;
+}
+
+.markdown-container blockquote {
+    border-left: 4px solid #dfe2e5;
+    margin: 1.5em 0;
+    padding: 0 1em;
+    color: #6a737d;
+    font-style: italic;
+}
+
+.markdown-container img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+    margin: 1.5em 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.markdown-container table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1.5em 0;
+    border: 1px solid #e1e4e8;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.markdown-container th,
+.markdown-container td {
+    border: 1px solid #e1e4e8;
+    padding: 12px 16px;
+    text-align: left;
+}
+
+.markdown-container th {
+    background-color: #f6f8fa;
+    font-weight: 600;
+    color: #24292e;
+}
+
+.markdown-container tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.markdown-container tr:hover {
+    background-color: #f6f8fa;
+}
+
+.markdown-container hr {
+    height: 1px;
+    background-color: #e1e4e8;
+    border: none;
+    margin: 2em 0;
+}
+
+.markdown-container .error {
+    color: #cb2431;
+    text-align: center;
+    padding: 20px;
+    background-color: #ffebe9;
+    border-radius: 6px;
+    border: 1px solid #ffd7d5;
+    margin: 1em 0;
+}
+
+/* Estilo para links internos */
+.markdown-container a[href^="#"] {
+    color: #0366d6;
+    text-decoration: none;
+}
+
+/* Estilo para links externos */
+.markdown-container a[href^="http"] {
+    color: #0366d6;
+    text-decoration: none;
+}
+
+/* Estilo para código inline dentro de parágrafos */
+.markdown-container p code {
+    font-size: 0.9em;
+    padding: 0.2em 0.4em;
+    margin: 0 0.2em;
+}
+
+/* Estilo para listas aninhadas */
+.markdown-container ul ul,
+.markdown-container ol ol {
+    margin: 0.5em 0;
+}
+
+/* Estilo para checkboxes em listas */
+.markdown-container input[type="checkbox"] {
+    margin-right: 0.5em;
+}
+
+/* Estilo para código com syntax highlighting */
+.markdown-container pre {
+    position: relative;
+}
+
+.markdown-container pre::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 4px 8px;
+    font-size: 0.8em;
+    color: #6a737d;
+    background-color: #f6f8fa;
+    border-bottom-left-radius: 6px;
+}
+
+/* Estilo para citações dentro de listas */
+.markdown-container li>blockquote {
+    margin: 0.5em 0;
+}
+
+/* Estilo para tabelas responsivas */
+@media (max-width: 768px) {
+    .markdown-container {
+        padding: 20px;
+    }
+
+    .markdown-container table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    color: #0366d6;
+    font-size: 1.2em;
+    position: relative;
+}
+
+.loading-spinner::after {
+    content: "";
+    width: 20px;
+    height: 20px;
+    margin-left: 15px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #0366d6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Error State */
+.markdown-container.error {
+    text-align: center;
+    padding: 40px;
+}
+
+.markdown-container.error h3 {
+    color: #cb2431;
+    margin-bottom: 1em;
+}
+
+.markdown-container.error button {
+    background-color: #0366d6;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 1em;
+}
+
+.markdown-container.error button:hover {
+    background-color: #035fc7;
+}
