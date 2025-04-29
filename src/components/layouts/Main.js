@@ -34,6 +34,12 @@ export const routes = [
       },
       {
         icon: <InformationCircleIcon {...icon} />,
+        name: "vagas",
+        path: "/medicos/vagas",
+        roles: ["atendente", "gerente", "supervisor"],
+      },
+      {
+        icon: <InformationCircleIcon {...icon} />,
         name: "cadastros",
         path: "/cadastros",
         roles: ["gerente", "supervisor"],

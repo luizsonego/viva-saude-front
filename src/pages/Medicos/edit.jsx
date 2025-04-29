@@ -162,7 +162,7 @@ const EditMedico = () => {
     setListaProcedimentos(novaLista);
   }
   function handleRemoveLocalAtendimento(id) {
-    const novaLista = listaLocalAtendimento.filter((item) => {
+    const novaLista = listaLocalAtendimento?.filter((item) => {
       return item.id !== id;
     });
 
@@ -271,7 +271,7 @@ const EditMedico = () => {
               ) : (
                 <Card className="w-full md:w-full overflow-hidden rounded-md">
                   <List>
-                    {listaLocalAtendimento?.map((item) => (
+                      {listaLocalAtendimento.isArray ? listaLocalAtendimento?.map((item) => (
                       <ListItem key={item.id}>
                         <List>
                           <div>
@@ -305,7 +305,7 @@ const EditMedico = () => {
                           </Button>
                         </ListItemSuffix>
                       </ListItem>
-                    ))}
+                      )) : ""}
                   </List>
                 </Card>
               )}
@@ -395,7 +395,7 @@ const EditMedico = () => {
               ) : (
                 <Card className="w-full md:w-96 overflow-hidden rounded-md">
                   <List>
-                    {listaProcedimentos?.map((item) => (
+                      {listaProcedimentos?.isArray ? listaProcedimentos?.map((item) => (
                       <ListItem key={item.id}>
                         {item.procedimento}
                         <ListItemSuffix>{item.valor}</ListItemSuffix>
@@ -409,7 +409,7 @@ const EditMedico = () => {
                           </Button>
                         </ListItemPrefix>
                       </ListItem>
-                    ))}
+                      )) : ""}
                   </List>
                 </Card>
               )}

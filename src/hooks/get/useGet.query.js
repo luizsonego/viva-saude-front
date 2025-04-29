@@ -43,6 +43,27 @@ const getResource = async (resource, id) => {
     throw error;
   }
 };
+const getResourceProps = async (resource, query) => {
+  try {
+    const response = await api.get(
+      `${process.env.REACT_APP_API}/v1/get/${resource}?${query}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem(
+            process.env.REACT_APP_ACCESS_TOKEN
+          )}`,
+        },
+      }
+    );
+
+    const { data } = response;
+    return data;
+  } catch (error) {
+    console.error(`Erro ao deletar ${resource}:`, error.message);
+    throw error;
+  }
+};
 
 /**
  * Essa função é responsavel por buscar no controllet GET da api, ela trás os dados de todas as colunas do controller
@@ -65,7 +86,7 @@ export function useGetResources(queries, resource) {
  *  useGetResource("querie", "controller", id)
  *
  * @param {String} queries  é a querie responsavel por armazenas os dados, usado para recarregar os dados
- * @param {String} resource é o controller para buscar na api
+ * @param {String} resource é a action para buscar na api
  * @param {Number} id é o o parametro de id para busca na api
  */
 export function useGetResource(queries, resource, id) {
@@ -74,6 +95,23 @@ export function useGetResource(queries, resource, id) {
     queryFn: () => getResource(resource, id),
   });
 }
+
+/**
+ * Essa função é responsavel por buscar no controllet VIEW da api, ela trás os dados especificos da tabela buscando pelo ID
+ * @example
+ *  useGetResourceProps("querie", "controller", "query")
+ *
+ * @param {String} queries  é a querie responsavel por armazenas os dados, usado para recarregar os dados
+ * @param {String} resource é o controller para buscar na api
+ * @param {String} query é o parametro de query para buscar na api
+ */
+export function useGetResourceProps(queries, resource, query) {
+  return useQuery({
+    queryKey: [queries],
+    queryFn: () => getResourceProps(resource, query),
+  });
+}
+
 const getAccess = async () => {
   try {
     const { data } = await api.get(

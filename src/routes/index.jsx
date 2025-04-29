@@ -23,8 +23,8 @@ import CreateAtendimento from "../pages/Atendimentos/create";
 import EditarAtendente from "../pages/Atendente/editar";
 
 import ModalAtendimento from "../pages/Atendimentos/modal";
-import { useAccessFetchRequest } from "../hooks/get/useGet.query";
 import MarkdownComponent from "../pages/Doc";
+import Vagas from "../pages/Medicos/vagas";
 
 export default function MainRouter() {
   const navigate = useNavigate();
@@ -111,6 +111,10 @@ export default function MainRouter() {
               path: "editar/:id",
               element: <EditMedico />,
             },
+            {
+              path: "vagas",
+              element: <Vagas />,
+            }
           ],
         },
         {
