@@ -22,6 +22,8 @@ const Grupos = () => {
   const [openModalCadastroEtiqueta, setOpenModalCadastroEtiqueta] =
     React.useState(false);
   const [openModalGroup, setOpenModalGroup] = React.useState(false);
+  const [openDeleteConfirmation, setOpenDeleteConfirmation] = React.useState(false);
+  const [groupToDelete, setGroupToDelete] = React.useState(null);
 
   const { data: grupoData, isLoading: loadingGrupos } = useGetResources(
     "grupos",
@@ -68,8 +70,23 @@ const Grupos = () => {
   const handleOpenCreateGroup = () => setOpenModalGroup(!openModalGroup);
 
   const handleDeleteGrupo = (id) => {
-    deleteGrupo(id);
+    setGroupToDelete(id);
+    setOpenDeleteConfirmation(true);
   };
+
+  const confirmDelete = () => {
+    if (groupToDelete) {
+      deleteGrupo(groupToDelete);
+      setOpenDeleteConfirmation(false);
+      setGroupToDelete(null);
+    }
+  };
+
+  const cancelDelete = () => {
+    setOpenDeleteConfirmation(false);
+    setGroupToDelete(null);
+  };
+
   const handleEditGrupo = (id, resource) => {
     navigate(`editar/${resource}/${id}`);
   };
@@ -89,6 +106,30 @@ const Grupos = () => {
         message={dataError}
         color={"red"}
       />
+      <CustomModal
+        title="Confirmar Exclusão"
+        open={openDeleteConfirmation}
+        handler={cancelDelete}
+      >
+        <div className="flex flex-col gap-4">
+          <p className="text-lg">Tem certeza que deseja excluir este grupo?</p>
+          <p className="text-lg">
+            Todas as etiquetas associadas a este grupo também serão excluídas.
+          </p>
+          <div className="flex gap-2 justify-end">
+            <Button color="blue" onClick={cancelDelete}>
+              Cancelar
+            </Button>
+            <Button
+              color="red"
+              onClick={confirmDelete}
+              disabled={deletingGrupo}
+            >
+              {deletingGrupo ? "Excluindo..." : "Confirmar Exclusão"}
+            </Button>
+          </div>
+        </div>
+      </CustomModal>
       <CustomCard title="Grupos" handleAction={handleOpenCreateGroup}>
         <GenericTable
           columns={[
