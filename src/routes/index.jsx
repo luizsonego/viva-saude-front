@@ -27,7 +27,7 @@ import MarkdownComponent from "../pages/Doc";
 import Vagas from "../pages/Medicos/vagas";
 
 export default function MainRouter() {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   // const { data, isLoading: loading, status } = useAccessFetchRequest();
   // const access = data?.data?.access;
 

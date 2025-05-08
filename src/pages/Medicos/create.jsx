@@ -2,13 +2,10 @@ import {
   Button,
   Card,
   CardBody,
-  Checkbox,
-  Chip,
   Dialog,
   DialogBody,
   DialogFooter,
   DialogHeader,
-  IconButton,
   Input,
   List,
   ListItem,
@@ -25,16 +22,9 @@ import { useMedicoPost } from "../../hooks/post/usePost.query";
 import {
   useAcoesFetch,
   useGetResources,
-  useGruposFetch,
   useUnidadesFetch,
 } from "../../hooks/get/useGet.query";
-import { format } from "date-fns";
 // import { DayPicker } from "react-day-picker";
-import {
-  ChevronRightIcon,
-  ChevronLeftIcon,
-  TrashIcon,
-} from "@heroicons/react/24/outline";
 import { useSearchResource } from "../../hooks/search/useSearch.query";
 import MultiSelectDropdown from "../../components/Forms/MultiSelectDropdown";
 
@@ -94,6 +84,10 @@ const Create = () => {
   const [listaLocalAtendimento, setListaLocalAtendimento] = useState([]);
   const [addLocalAtendimento, setAddLocalAtendimento] = useState("");
   const [
+    addLocalDataAtendimento,
+    setAddLocalDataAtendimento,
+  ] = useState();
+  const [
     addLocalAtendimentoVagasConsulta,
     setAddLocalAtendimentoVagasConsulta,
   ] = useState();
@@ -103,6 +97,7 @@ const Create = () => {
     addLocalAtendimentoVagasProcedimento,
     setAddLocalAtendimentoVagasProcedimento,
   ] = useState();
+  const [addLocalAtendimentoData, setAddLocalAtendimentoData] = useState("");
 
   const [schedule, setSchedule] = useState([]);
 
@@ -226,8 +221,14 @@ const Create = () => {
     );
   };
 
+  function handleChangeDataAtendimento(e) {
+    setAddLocalDataAtendimento(e.target.value);
+  }
   function handleChangeLocalAtendimento(e) {
     setAddLocalAtendimento(e.target.value);
+  }
+  function handleChangeLocalAtendimentoData(e) {
+    setAddLocalAtendimentoData(e.target.value);
   }
   function handleChangeLocalAtendimentoVagasConsulta(e) {
     setAddLocalAtendimentoVagasConsulta(e.target.value);
@@ -252,6 +253,7 @@ const Create = () => {
     const novaLista = listaLocalAtendimento.concat({
       id: Math.floor(Math.random() * (max - min) + min) * mt,
       local: addLocalAtendimento,
+      data: addLocalAtendimentoData,
       consulta: addLocalAtendimentoVagasConsulta,
       retorno: addLocalAtendimentoVagasRetorno,
       procedimento: addLocalAtendimentoVagasProcedimento,
@@ -264,12 +266,13 @@ const Create = () => {
       <Card shadow={false} className="w-full justify-center">
         <CardBody>
           <form
-            className="mt-8 mb-2 max-w-screen-lg "
+            className="mt-8 mb-2 px-5 "
             onSubmit={handleSubmit(onSubmit)}
           >
             <div className="mb-1 flex flex-col gap-6">
               <InputForm label="Nome" name="nome" register={register} />
 
+              {/* local de atendimento */}
               <div className="flex gap-4">
                 <div>
                   <div className="mb-1 flex flex-row gap-6">
@@ -282,8 +285,20 @@ const Create = () => {
                         value={addLocalAtendimento}
                       />
                     </fieldset>
-                    <fieldset className="flex flex-row gap-1 border p-5 grid grid-cols-3 w-2/4">
+                    <fieldset className="flex flex-row gap-1 border p-5 grid grid-cols-4 w-2/4">
                       <legend>Vagas</legend>
+                      <Input
+                        style={{ width: "140px" }}
+                        label="DATA"
+                        type="date"
+                        onChange={handleChangeLocalAtendimentoData}
+                        value={addLocalAtendimentoData}
+                        placeholder="DATA"
+                        labelProps={{
+                          className: "hidden",
+                        }}
+                        className="!border !border-gray-300 bg-white text-gray-900 shadow-lg shadow-gray-900/5 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:!border-gray-900 focus:!border-t-gray-900 focus:ring-gray-900/10"
+                      />
                       <Input
                         style={{ width: "140px" }}
                         label="Consultas"
@@ -325,7 +340,7 @@ const Create = () => {
                       type="button"
                       onClick={handleAddLocalAtendimento}
                       className="mt-6"
-                      variant="text"
+                      variant="outlined"
                     >
                       Adicionar
                     </Button>
@@ -350,6 +365,7 @@ const Create = () => {
                               className="font-normal"
                             >
                               <div className="flex flex-row gap-4">
+                                <span>- Data: {item.data}</span>
                                 <span>- Consultas: {item.consulta}</span>
                                 <span>- Retorno: {item.retorno}</span>
                                 <span>
@@ -370,17 +386,6 @@ const Create = () => {
                             x
                           </Button>
                         </ListItemSuffix>
-                        {/* <ListItemPrefix>
-                          <Button
-                            variant="gradient"
-                            className="h-5 p-4 pt-1 pb-3 ml-5"
-                            onClick={() =>
-                              handleRemoveLocalAtendimento(item.id)
-                            }
-                          >
-                            x
-                          </Button>
-                        </ListItemPrefix> */}
                       </ListItem>
                     ))}
                   </List>

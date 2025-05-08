@@ -66,6 +66,7 @@ const EditMedico = () => {
   const [addProcedimentoValor, setAddProcedimentoValor] = useState("");
   const [listaLocalAtendimento, setListaLocalAtendimento] = useState([]);
   const [addLocalAtendimento, setAddLocalAtendimento] = useState("");
+  const [addLocalAtendimentoData, setAddLocalAtendimentoData] = useState("");
   const [queGrupo, setQueGrupo] = useState("");
   const [queEtiqueta, setQueEtiqueta] = useState("");
   const [etiquetas, setEtiquetas] = useState([]);
@@ -153,6 +154,9 @@ const EditMedico = () => {
   function handleChangeLocalAtendimentoVagasProcedimento(e) {
     setAddLocalAtendimentoVagasProcedimento(e.target.value);
   }
+  function handleChangeLocalAtendimentoData(e) {
+    setAddLocalAtendimentoData(e.target.value);
+  }
 
   function handleRemove(id) {
     const novaLista = listaProcedimentos.filter((item) => {
@@ -187,6 +191,7 @@ const EditMedico = () => {
     const novaLista = listaLocalAtendimento.concat({
       id: Math.floor(Math.random() * (max - min) + min) * mt,
       local: addLocalAtendimento,
+      data: addLocalAtendimentoData,
       consulta: addLocalAtendimentoVagasConsulta,
       retorno: addLocalAtendimentoVagasRetorno,
       procedimento: addLocalAtendimentoVagasProcedimento,
@@ -199,7 +204,7 @@ const EditMedico = () => {
       <Card shadow={false} className="w-full justify-center">
         <CardBody>
           <form
-            className="mt-8 mb-2 max-w-screen-lg "
+            className="mt-8 mb-2 px-5"
             onSubmit={handleSubmit(onSubmit)}
           >
             <div className="mb-1 flex flex-col gap-6">
@@ -216,8 +221,20 @@ const EditMedico = () => {
                         value={addLocalAtendimento}
                       />
                     </fieldset>
-                    <fieldset className="flex flex-row gap-1 border p-5 grid grid-cols-3 w-2/4">
+                    <fieldset className="flex flex-row gap-1 border p-5 grid grid-cols-4 w-2/4">
                       <legend>Vagas</legend>
+                      <Input
+                        style={{ width: "140px" }}
+                        label="DATA"
+                        type="date"
+                        onChange={handleChangeLocalAtendimentoData}
+                        value={addLocalAtendimentoData}
+                        placeholder="DATA"
+                        labelProps={{
+                          className: "hidden",
+                        }}
+                        className="!border !border-gray-300 bg-white text-gray-900 shadow-lg shadow-gray-900/5 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:!border-gray-900 focus:!border-t-gray-900 focus:ring-gray-900/10"
+                      />
                       <Input
                         style={{ width: "140px" }}
                         label="Consultas"
@@ -266,12 +283,10 @@ const EditMedico = () => {
                   </div>
                 </div>
               </div>
-              {listaLocalAtendimento?.length < 1 ? (
-                ""
-              ) : (
+              {Array.isArray(listaLocalAtendimento) && listaLocalAtendimento.length > 0 ? (
                 <Card className="w-full md:w-full overflow-hidden rounded-md">
                   <List>
-                      {listaLocalAtendimento?.map((item) => (
+                    {listaLocalAtendimento.map((item) => (
                       <ListItem key={item.id}>
                         <List>
                           <div>
@@ -284,11 +299,10 @@ const EditMedico = () => {
                               className="font-normal"
                             >
                               <div className="flex flex-row gap-4">
+                                <span>- Data: {item.data ? item.data : "-"}</span>
                                 <span>- Consultas: {item.consulta}</span>
                                 <span>- Retorno: {item.retorno}</span>
-                                <span>
-                                  - Procedimentos: {item.procedimento}
-                                </span>
+                                <span>- Procedimentos: {item.procedimento}</span>
                               </div>
                             </Typography>
                           </div>
@@ -297,18 +311,16 @@ const EditMedico = () => {
                           <Button
                             variant="gradient"
                             className="pb-5 ml-5 pt-5"
-                            onClick={() =>
-                              handleRemoveLocalAtendimento(item.id)
-                            }
+                            onClick={() => handleRemoveLocalAtendimento(item.id)}
                           >
                             x
                           </Button>
                         </ListItemSuffix>
                       </ListItem>
-                      ))}
+                    ))}
                   </List>
                 </Card>
-              )}
+              ) : null}
               {loadingEspecialidade ? (
                 "carregando..."
               ) : (
@@ -393,7 +405,7 @@ const EditMedico = () => {
               {listaProcedimentos?.length < 1 ? (
                 ""
               ) : (
-                <Card className="w-full md:w-96 overflow-hidden rounded-md">
+                  <Card className="w-full md:w-[50%] overflow-hidden rounded-md">
                   <List>
                       {listaProcedimentos?.map((item) => (
                       <ListItem key={item.id}>
