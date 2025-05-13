@@ -39,3 +39,12 @@ export function converterSegundosHorasMinutos(segundos) {
         return `${segundosRestantes}s`;
     }
 }
+
+export function formatDate(input) {
+    if (!input || typeof input !== 'string') return '';
+    // Espera-se o formato 'YYYY-MM-DD'
+    const parts = input.split('-');
+    if (parts.length !== 3) return input;
+    const [year, month, day] = parts;
+    return `${day}-${month}-${year}`;
+}
