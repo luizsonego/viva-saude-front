@@ -9,6 +9,8 @@ import {
 import { useResourcePut } from "../../../hooks/update/useUpdate.query";
 import { useSearchResource } from "../../../hooks/search/useSearch.query";
 import DateTimePicker from "react-datetime-picker";
+import { formatarDataBr } from "../../../helpers";
+import { spanSpecialCharacteres, specialCharacteres } from "../../../helpers/specialcharacteres";
 
 const EditAtendimentoDadosMedicos = ({ data, modal }) => {
   const { register, handleSubmit, setValue, control } = useForm();
@@ -155,7 +157,7 @@ const EditAtendimentoDadosMedicos = ({ data, modal }) => {
                   onClick={(e) => setLocalEscolhido(e.target.value)}
                   name="local_atendimento"
                   key={i + 1}
-                  label={lc.local}
+                  label={`${formatarDataBr(lc.data)} ${lc.local} - (consultas:${lc.consulta}, procedimentos:${lc.procedimento}, retorno:${lc.retorno})`}
                   value={lc.local}
                 />
               ))}
@@ -163,10 +165,10 @@ const EditAtendimentoDadosMedicos = ({ data, modal }) => {
           ))
         : ""}
 
-      <DateTimePicker
+      {/* <DateTimePicker
         onChange={setValueDateAgendamento}
         value={valueDateAgendamento}
-      />
+      /> */}
 
       <Input
         className="hidden"

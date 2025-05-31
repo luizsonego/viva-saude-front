@@ -23,6 +23,7 @@ import CustomTimeline from "./timeline";
 import AddComentario from "./edits/comentario";
 import Upload from "../../components/uploads";
 import { formatarDataBr } from "../../helpers";
+import { formatarDataBrHora } from "../../helpers/formatarDataBr";
 // import { toast } from "react-toastify";
 
 // Constantes para tipos de arquivo permitidos e tamanho máximo
@@ -443,7 +444,7 @@ const Atendimentos = () => {
                 Limpar Filtros
               </Button>
             )}
-            <Button
+            {/* <Button
               variant="text"
               color="blue"
               className="flex items-center gap-2"
@@ -452,7 +453,7 @@ const Atendimentos = () => {
             >
               <i className="fas fa-bug"></i>
               Depurar
-            </Button>
+            </Button> */}
           </div>
         </div>
       </div>
@@ -687,7 +688,7 @@ const Atendimentos = () => {
                     <td className={classTdTable}>{item?.onde_deseja_ser_atendido}</td>
                     <td className={classTdTable}>{item?.status}</td>
                     <td className={classTdTable}>
-                      {formatarDataBr(item?.medico_atendimento_data)}
+                      {formatarDataBrHora(item?.medico_atendimento_data)}
                     </td>
                     <td className={classTdTable}>
                       <Button

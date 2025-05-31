@@ -2,6 +2,20 @@ export default function formatarDataBr(dataIso) {
     if (dataIso === null || dataIso === undefined) {
         return 'sem data definida, consulte a gerência';
     }
+    // Garante que a data seja tratada como local, não UTC, e remove as horas
+    const data = new Date(dataIso + 'T00:00:00');
+    return data.toLocaleDateString('pt-BR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    });
+}
+
+export function formatarDataBrHora(dataIso) {
+    if (dataIso === null || dataIso === undefined) {
+        return 'sem data definida, consulte a gerência';
+    }
+    // Garante que a data seja tratada como local, não UTC, e remove as horas
     const data = new Date(dataIso);
     return data.toLocaleString('pt-BR', {
         year: 'numeric',
@@ -10,9 +24,9 @@ export default function formatarDataBr(dataIso) {
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit'
-    }).replace(',', '');
-  }
-  
+    });
+}
+
 
 export function converterSegundosMinutos(segundos) {
     if (segundos <= 0 || segundos === null || segundos === undefined) {

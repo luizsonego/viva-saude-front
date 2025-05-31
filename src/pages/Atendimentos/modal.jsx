@@ -24,7 +24,8 @@ import { formatarDataBr } from "../../helpers";
 import { 
   converterSegundosMinutos, 
   converterSegundosHorasMinutos,
-  formatarTempoExpirado 
+  formatarTempoExpirado, 
+  formatarDataBrHora
 } from "../../helpers/formatarDataBr";
 
 const ModalAtendimento = () => {
@@ -467,7 +468,7 @@ const ModalAtendimento = () => {
                       className="text-xs !font-bold"
                       color="blue-gray"
                     >
-                      {atendimentoData?.medico_atendimento_data}
+                      {formatarDataBrHora(atendimentoData?.medico_atendimento_data)}
                     </Typography>
                   </div>
                   <hr className="mt-5 mb-5" />
@@ -524,7 +525,7 @@ const ModalAtendimento = () => {
                       <Typography className="mt-1 text-xs !font-medium !text-gray-600">
                         {"inicio do atendimento"}:{" "}
                         <span className="text-xs !font-bold" color="blue-gray">
-                          {atendimentoData?.atendimento_iniciado}
+                          {formatarDataBrHora(atendimentoData?.atendimento_iniciado)}
                         </span>
                       </Typography>
                     </div>
@@ -672,6 +673,7 @@ const ModalAtendimento = () => {
           handler={handleOpenModalAjustesMedico}
           modal={() => setOpenModalMedicos(false)}
           aria-labelledby="modal-title-atendimento"
+          width={1000}
         >
           <EditAtendimentoDadosMedicos
             data={atendimentoData}

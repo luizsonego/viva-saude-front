@@ -163,6 +163,19 @@ const CreateAtendimento = () => {
     }
   };
 
+  // Agrupa locais únicos
+  const uniqueLocais = [];
+  const localNames = new Set();
+
+  searchLocalMedico?.forEach(item => {
+    item?.local?.forEach(lc => {
+      if (lc?.local && !localNames.has(lc.local)) {
+        localNames.add(lc.local);
+        uniqueLocais.push(lc.local);
+      }
+    });
+  });
+
   return (
     <Card shadow={false} className="w-full max-w-4xl mx-auto my-8">
       <CardBody>
@@ -289,19 +302,15 @@ const CreateAtendimento = () => {
                     <Spinner className="h-8 w-8" />
                   </div>
                 ) : (
-                  searchLocalMedico?.map((item, index) => (
-                    <div key={index + 1} className="space-y-2">
-                      {item?.local?.map((lc, i) => (
-                        <Radio
-                          key={i + 1}
-                          name="local_atendimento"
-                          label={lc.local}
-                          value={lc.local}
-                          onChange={(e) => setLocalEscolhido(e.target.value)}
-                          className="hover:bg-blue-gray-50 p-2 rounded"
-                        />
-                      ))}
-                    </div>
+                  uniqueLocais.map((local, i) => (
+                    <Radio
+                      key={i}
+                      name="local_atendimento"
+                      label={local}
+                      value={local}
+                      onChange={(e) => setLocalEscolhido(e.target.value)}
+                      className="hover:bg-blue-gray-50 p-2 rounded"
+                    />
                   ))
                 )}
               </div>
