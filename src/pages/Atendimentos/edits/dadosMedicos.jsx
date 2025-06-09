@@ -50,9 +50,9 @@ const EditAtendimentoDadosMedicos = ({ data, modal }) => {
   );
 
   useEffect(() => {
-    setValue("medico_atendimento", data.medico_atendimento);
-    setValueDateAgendamento(data.medico_atendimento_data);
-  }, [data.medico_atendimento, data.medico_atendimento_data, setValue]);
+    setValue("medico_atendimento", data?.medico_atendimento);
+    setValueDateAgendamento(data?.medico_atendimento_data);
+  }, [data?.medico_atendimento, data?.medico_atendimento_data, setValue]);
 
   const onSubmit = (data) => {
     const opcoes = {
@@ -76,32 +76,35 @@ const EditAtendimentoDadosMedicos = ({ data, modal }) => {
         /(\d{2})-(\d{2})-(\d{4})/,
         "$3-$2-$1"
       );
-      console.log("so no ifizinho");
+      
     } else {
-      console.log("assume aqui");
+      
       // Assume que é um objeto Date ou string compatível com new Date()
-      const data = new Date(valueDateAgendamento);
-      formattedDate = new Intl.DateTimeFormat("pt-BR", opcoes)
-        .format(data)
-        .replace(/\//g, "-")
-        .replace(",", "");
+      // const data = new Date(valueDateAgendamento);
+      // formattedDate = new Intl.DateTimeFormat("pt-BR", opcoes)
+      //   .format(data)
+      //   .replace(/\//g, "-")
+      //   .replace(",", "");
 
-      formattedDate = formattedDate.replace(
-        /(\d{2})-(\d{2})-(\d{4})/,
-        "$3-$2-$1"
-      );
+      // formattedDate = formattedDate.replace(
+      //   /(\d{2})-(\d{2})-(\d{4})/,
+      //   "$3-$2-$1"
+      // );
     }
 
-    console.log(formattedDate);
+    console.log('localEscolhido',localEscolhido);
 
     let dataForm = {
       medico_atendimento: qualMedico || data.medico_atendimento,
       medico: qualMedico || data.medico,
-      onde_deseja_ser_atendido: localEscolhido || data.onde_deseja_ser_atendido,
+      onde_deseja_ser_atendido: localEscolhido.local,
+      data_local_atendimento: localEscolhido.data,
       o_que_deseja: queDeseja || data.o_que_deseja,
       medico_atendimento_data: formattedDate,
+      local_escolhido: localEscolhido,
       ...data,
     };
+    console.log('>>>',dataForm);
     mutateAsync(dataForm);
   };
 
@@ -154,27 +157,28 @@ const EditAtendimentoDadosMedicos = ({ data, modal }) => {
             <div key={index + 1}>
               {item?.local?.map((lc, i) => (
                 <Radio
-                  onClick={(e) => setLocalEscolhido(e.target.value)}
-                  name="local_atendimento"
                   key={i + 1}
+                  name="local_atendimento"
                   label={`${formatarDataBr(lc.data)} ${lc.local} - (consultas:${lc.consulta}, procedimentos:${lc.procedimento}, retorno:${lc.retorno})`}
                   value={lc.local}
+                  onClick={() => setLocalEscolhido({ id: item.id, local: lc.local, data: lc.data })}
                 />
               ))}
             </div>
           ))
         : ""}
 
-      {/* <DateTimePicker
-        onChange={setValueDateAgendamento}
-        value={valueDateAgendamento}
-      /> */}
+      <input
+        type="time"
+        {...register("hora_atendimento")}
+        className="w-full bg-white rounded-md p-2 border border-gray-300"
+      />
 
       <Input
         className="hidden"
         disabled
-        value={data.id}
-        defaultValue={data.id}
+        value={data?.id}
+        defaultValue={data?.id}
         {...register("id")}
       />
 

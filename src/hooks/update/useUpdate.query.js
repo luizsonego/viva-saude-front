@@ -3,7 +3,6 @@ import api from "../../services/api";
 
 const updateResource = async (resource, data) => {
   try {
-    console.log("uodate");
     const response = await api.post(
       `${process.env.REACT_APP_API}/v1/update/${resource}`,
       data,

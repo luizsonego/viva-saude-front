@@ -182,7 +182,7 @@ const ModalAtendimento = () => {
     <>
       <div
         className="
-          absolute inset-0 w-screen h-screen bg-black bg-opacity-60 
+          absolute inset-0 w-screen  bg-black bg-opacity-60 
           flex items-center justify-center backdrop-blur-sm 
           transition-opacity duration-300 ease-in-out
         "
