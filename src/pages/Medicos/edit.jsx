@@ -103,7 +103,7 @@ const EditMedico = () => {
       data?.etiquetas,
       data?.etiquetas
     );
-  console.log(dataEtiquetas);
+
   const { mutate, isPending } = useResourcePut("medico", "medico", () => {
     history(-1);
   });

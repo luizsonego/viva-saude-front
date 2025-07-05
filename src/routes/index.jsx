@@ -25,6 +25,8 @@ import EditarAtendente from "../pages/Atendente/editar";
 import ModalAtendimento from "../pages/Atendimentos/modal";
 import MarkdownComponent from "../pages/Doc";
 import Vagas from "../pages/Medicos/vagas";
+import AdicionarVaga from "../pages/Medicos/adicionarVaga";
+import EditarVaga from "../pages/Medicos/editarVaga";
 
 export default function MainRouter() {
   // const navigate = useNavigate();
@@ -114,6 +116,14 @@ export default function MainRouter() {
             {
               path: "vagas",
               element: <Vagas />,
+            },
+            {
+              path: "add-vaga/:id",
+              element: <AdicionarVaga />,
+            },
+            {
+              path: "editar-vaga/:id",
+              element: <EditarVaga />,
             }
           ],
         },

@@ -93,6 +93,7 @@ export function useGetResource(queries, resource, id) {
   return useQuery({
     queryKey: [queries],
     queryFn: () => getResource(resource, id),
+    enabled: !!id,
   });
 }
 

@@ -34,6 +34,14 @@ const Medicos = () => {
     mutate(id);
   };
 
+  const handleAddVaga = (id) => {
+    navigate(`add-vaga/${id}`);
+  };
+
+  const handleEditVaga = (id) => {
+    navigate(`editar-vaga/${id}`);
+  };
+
   return (
     <div>
       <Link to="criar">
@@ -50,6 +58,8 @@ const Medicos = () => {
           title="Lista de médicos"
           edit={handleEdit}
           del={handleDelete}
+            addVaga={handleAddVaga}
+            editVaga={handleEditVaga}
           loadingDel={isPending}
         />
       )}

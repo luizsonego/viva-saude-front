@@ -27,6 +27,9 @@ import {
   formatarTempoExpirado, 
   formatarDataBrHora
 } from "../../helpers/formatarDataBr";
+import Vagas from "./edits/vagas";
+import DadosAtendimento from "./dadosAtendimento";
+import Section from "../../components/Section";
 
 const ModalAtendimento = () => {
   const { id, resource } = useParams();
@@ -37,6 +40,7 @@ const ModalAtendimento = () => {
   const [openModalMedicos, setOpenModalMedicos] = useState(false);
   const [openModalTimeLine, setOpenModalTimeLine] = useState(false);
   const [openModalComentario, setOpenModalComentario] = useState(false);
+  const [openModalVagas, setOpenModalVagas] = useState(false);
   const [dataModal, setDataModal] = useState({});
   const [error, setError] = useState(null);
   const [countdown, setCountdown] = useState(null);
@@ -156,6 +160,10 @@ const ModalAtendimento = () => {
     setOpenModalComentario(!openModalComentario);
   };
 
+  const handleOpenModalVagas = () => {
+    setOpenModalVagas(!openModalVagas);
+  };
+
   if (isLoading) return (
     <div className="absolute inset-0 w-screen h-screen bg-black bg-opacity-60 flex items-center justify-center backdrop-blur-sm">
       <div className="flex flex-col items-center justify-center">
@@ -181,14 +189,8 @@ const ModalAtendimento = () => {
   return (
     <>
       <div
-        className="
-          absolute inset-0 w-screen  bg-black bg-opacity-60 
-          flex items-center justify-center backdrop-blur-sm 
-          transition-opacity duration-300 ease-in-out
-        "
-        style={{
-          zIndex: 999,
-        }}
+        className="absolute inset-0 w-screen bg-black bg-opacity-60 flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 ease-in-out"
+        style={{ zIndex: 999 }}
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
@@ -199,10 +201,7 @@ const ModalAtendimento = () => {
           </div>
         )}
         <span
-          className="
-          inline-block absolute top-0 right-0 mr-4 mt-4 cursor-pointer
-          transition-transform duration-200 ease-in-out hover:scale-110
-          "
+          className="inline-block absolute top-0 right-0 mr-4 mt-4 cursor-pointer transition-transform duration-200 ease-in-out hover:scale-110"
           onClick={closeModal}
         >
           <svg
@@ -231,23 +230,20 @@ const ModalAtendimento = () => {
             }}
           >
             <DialogHeader>
-              Detalhes do agendamento{" "}
-              {atendimentoData?.em_espera ? (
+              Detalhes do agendamento {atendimentoData?.em_espera && (
                 <Chip className="ml-8" value="Item Em fila de espera" />
-              ) : (
-                ""
               )}
             </DialogHeader>
             <DialogHeader>
               <small>
-                Expira em: {data?.temporizador?.em_atraso ? 
-                <span 
-                className="inline-flex items-center rounded-md bg-red-900 px-4 py-2 text-sm font-medium text-red-50 ring-1 ring-red-800 ring-inset animate-pulse">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
-                  ATENDIMENTO ATRASADO
-                </span> : formatarDataBr(data?.temporizador?.expira_em)} {" - "}
+                Expira em: {data?.temporizador?.em_atraso ? (
+                  <span className="inline-flex items-center rounded-md bg-red-900 px-4 py-2 text-sm font-medium text-red-50 ring-1 ring-red-800 ring-inset animate-pulse">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                    ATENDIMENTO ATRASADO
+                  </span>
+                ) : formatarDataBr(data?.temporizador?.expira_em)} {" - "}
                 {!data?.temporizador?.em_atraso ? (
                   <span className="inline-flex items-center rounded-md bg-blue-100 px-3 py-1 text-sm font-medium text-blue-700 ring-1 ring-blue-700/10">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
@@ -270,387 +266,175 @@ const ModalAtendimento = () => {
                 .custom-scrollbar::-webkit-scrollbar {
                   width: 6px;
                 }
-                
                 .custom-scrollbar::-webkit-scrollbar-track {
                   background: rgba(241, 241, 241, 0.5);
                   border-radius: 10px;
                   box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
                 }
-                
                 .custom-scrollbar::-webkit-scrollbar-thumb {
                   background: rgba(136, 136, 136, 0.7);
                   border-radius: 10px;
                   transition: all 0.3s ease;
                   border: 1px solid rgba(255, 255, 255, 0.1);
                 }
-                
                 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
                   background: rgba(85, 85, 85, 0.9);
                   box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
                 }
-                
                 .custom-scrollbar {
                   scrollbar-width: thin;
                   scrollbar-color: rgba(136, 136, 136, 0.7) rgba(241, 241, 241, 0.5);
                   scroll-behavior: smooth;
                 }
-                
                 .custom-scrollbar:hover::-webkit-scrollbar-thumb {
                   background: rgba(85, 85, 85, 0.9);
                 }
               `}</style>
-              <div className="flex flex-row gap-4">
-                <Card
-                  shadow={false}
-                  className="rounded-lg border border-gray-300 p-4 basis-9/12"
-                >
-                  <Typography
-                    variant="small"
-                    color="blue-gray"
-                    className="mb-3 font-bold"
-                  >
-                    {atendimentoData?.titulo}
-                  </Typography>
-                  <div className="mb-4 flex items-start justify-between">
-                    <div>
-                      <h3>Dados do titular</h3>
-                      <Typography color="blue-gray" className="mb-1 ">
-                        Nome:{" "}
-                        <span className="mb-1 font-bold font-lg">
-                          {atendimentoData?.titular_plano}
-                        </span>
+              <div className="flex flex-row gap-8">
+                <div className="flex-1 flex flex-col gap-4">
+                  <Section title="Dados do Titular">
+                    <Typography color="blue-gray" className="mb-1">
+                      Nome: <span className="mb-1 font-bold font-lg">{atendimentoData?.titular_plano}</span>
+                    </Typography>
+                    <Typography color="blue-gray" className="mb-1">
+                      CPF: <span className="mb-1 font-bold font-lg">{atendimentoData?.cpf_titular}</span>
+                    </Typography>
+                    <Typography color="blue-gray" className="mb-1">
+                      Whatsapp: <span className="mb-1 font-bold font-lg">{atendimentoData?.whatsapp_titular}</span>
+                    </Typography>
+                  </Section>
+                  {atendimentoData?.para_quem === "outra" && (
+                    <Section title="Dados do Paciente">
+                      <Typography color="blue-gray" className="mb-1">
+                        Nome: <span className="mb-1 font-bold font-lg">{atendimentoData?.nome_outro}</span>
                       </Typography>
-                      <Typography color="blue-gray" className="mb-1 ">
-                        CPF:{" "}
-                        <span className="mb-1 font-bold font-lg">
-                          {atendimentoData?.cpf_titular}
-                        </span>
+                      <Typography color="blue-gray" className="mb-1">
+                        CPF: <span className="mb-1 font-bold font-lg">{atendimentoData?.cpf_outro}</span>
                       </Typography>
-                      <Typography color="blue-gray" className="mb-1 ">
-                        Whatsapp:{" "}
-                        <span className="mb-1 font-bold font-lg">
-                          {atendimentoData?.whatsapp_titular}
-                        </span>
-                      </Typography>
-                      {atendimentoData?.para_quem === "outra" ? (
-                        <>
-                          <hr />
-                          <h3>Dados de quem vai ser atendido</h3>
-                          <Typography color="blue-gray" className="mb-1 ">
-                            Nome:{" "}
-                            <span className="mb-1 font-bold font-lg">
-                              {atendimentoData?.nome_outro}
-                            </span>
-                          </Typography>
-                          <Typography color="blue-gray" className="mb-1 ">
-                            CPF:{" "}
-                            <span className="mb-1 font-bold font-lg">
-                              {atendimentoData?.cpf_outro}
-                            </span>
-                          </Typography>
-                        </>
-                      ) : (
-                        ""
-                      )}
-                    </div>
-                  </div>
-                  <div>
-                    <div>
-                      <div className="flex gap-1">
-                        <Typography className="mb-1 text-xs !font-medium !text-gray-600">
-                          {"Status"}:
-                        </Typography>
-                        <Typography
-                          className="text-xs !font-bold"
-                          color="blue-gray"
-                        >
-                          {atendimentoData?.status}
-                        </Typography>
+                    </Section>
+                  )}
+                  <Section title="Dados do Atendimento">
+                    <div className="flex gap-2 flex-wrap">
+                      <div className="flex gap-1 items-center">
+                        <Typography className="text-xs !font-medium !text-gray-600">Status:</Typography>
+                        <Typography className="text-xs !font-bold" color="blue-gray">{atendimentoData?.status}</Typography>
                       </div>
-                      <div className="flex gap-1">
-                        <Typography className="mb-1 text-xs !font-medium !text-gray-600">
-                          {"Prioridade"}:
-                        </Typography>
-                        <Typography
-                          className="text-xs !font-bold"
-                          color="blue-gray"
-                        >
-                          <Chip
-                            value={atendimentoData?.prioridadeAtendimentos?.nome}
-                            style={{
-                              background:
-                                atendimentoData?.prioridadeAtendimentos?.cor ||
-                                "transparent",
-                            }}
-                          />
-                        </Typography>
+                      <div className="flex gap-1 items-center">
+                        <Typography className="text-xs !font-medium !text-gray-600">Prioridade:</Typography>
+                        <Chip value={atendimentoData?.prioridadeAtendimentos?.nome} style={{ background: atendimentoData?.prioridadeAtendimentos?.cor || "transparent" }} />
                       </div>
-
-                      <div className="flex gap-1">
-                        <Typography className="mb-1 text-xs !font-medium !text-gray-600">
-                          {"Perfil do Cliente "}:
-                        </Typography>
-                        <Typography
-                          className="text-xs !font-bold"
-                          color="blue-gray"
-                        >
-                          {atendimentoData?.perfil_cliente}{" "}
-                          {/*perfil do cliente*/}
-                        </Typography>
+                      <div className="flex gap-1 items-center">
+                        <Typography className="text-xs !font-medium !text-gray-600">Perfil do Cliente:</Typography>
+                        <Typography className="text-xs !font-bold" color="blue-gray">{atendimentoData?.perfil_cliente}</Typography>
                       </div>
-                      <div className="flex gap-1">
-                        <Typography className="mb-1 text-xs !font-medium !text-gray-600">
-                          {"Observação "}:
-                        </Typography>
-                        <Typography
-                          className="text-xs !font-bold"
-                          color="blue-gray"
-                        >
-                          {atendimentoData?.observacoes} {/*perfil do cliente*/}
-                        </Typography>
+                      <div className="flex gap-1 items-center">
+                        <Typography className="text-xs !font-medium !text-gray-600">Observação:</Typography>
+                        <Typography className="text-xs !font-bold" color="blue-gray">{atendimentoData?.observacoes}</Typography>
                       </div>
                     </div>
-                  </div>
-                  <hr className="mt-5 mb-5" />
-                  <h3>Atendente</h3>
-                  <div className="flex gap-1">
-                    <Typography className="mb-1 text-xs !font-medium !text-gray-600">
-                      {"Atendente"}:
-                    </Typography>
-                    <Typography
-                      className="text-xs !font-bold"
-                      color="blue-gray"
-                    >
-                      {atendimentoData?.profile?.name}
-                    </Typography>
-                  </div>
-                  <hr className="mt-5 mb-5" />
-                  <h3>Dados atendimento</h3>
-                  <div className="flex gap-1">
-                    <Typography className="mb-1 text-xs !font-medium !text-gray-600">
-                      {"Medico selecionado"}:
-                    </Typography>
-                    <Typography
-                      className="text-xs !font-bold"
-                      color="blue-gray"
-                    >
-                      {atendimentoData?.medico_atendimento}
-                    </Typography>
-                  </div>
-                  <div className="flex gap-1">
-                    <Typography className="mb-1 text-xs !font-medium !text-gray-600">
-                      {"O que deseja"}:
-                    </Typography>
-                    <Typography
-                      className="text-xs !font-bold"
-                      color="blue-gray"
-                    >
-                      {atendimentoData?.acoes?.nome}
-                      {atendimentoData?.o_que_deseja}
-                    </Typography>
-                  </div>
-                  <div className="flex gap-1">
-                    <Typography className="mb-1 text-xs !font-medium !text-gray-600">
-                      {"Onde deseja ser atendido"}:
-                    </Typography>
-                    <Typography
-                      className="text-xs !font-bold"
-                      color="blue-gray"
-                    >
-                      {atendimentoData?.onde_deseja_ser_atendido}
-                    </Typography>
-                  </div>
-                  <div className="flex gap-1">
-                    <Typography className="mb-1 text-xs !font-medium !text-gray-600">
-                      {"Data"}:
-                    </Typography>
-                    <Typography
-                      className="text-xs !font-bold"
-                      color="blue-gray"
-                    >
-                      {formatarDataBrHora(atendimentoData?.medico_atendimento_data)}
-                    </Typography>
-                  </div>
-                  <hr className="mt-5 mb-5" />
-                  <h3>Resumo do atendimento</h3>
-                  <div className="flex gap-1">
-                    <Typography
-                      className="text-xs !font-bold"
-                      color="blue-gray"
-                    >
-                      {atendimentoData?.comentario}
-                    </Typography>
-                  </div>
-                  <hr className="mt-5 mb-5" />
-                  <h3>Anexo</h3>
-                  <div className="flex gap-1">
-                    <Typography
-                      className="text-xs !font-bold"
-                      color="blue-gray"
-                    >
-                      {atendimentoData?.anexos?.map((item) =>
+                  </Section>
+                  <Section title="Resumo do Atendimento">
+                    <Typography className="text-xs !font-bold" color="blue-gray">{atendimentoData?.comentario}</Typography>
+                  </Section>
+                  <Section title="Anexos">
+                    <div className="flex flex-wrap gap-2">
+                      {atendimentoData?.anexos?.map((item, idx) =>
                         item.fileType === "image" ? (
-                          <img src={item.url} alt="imagem" width={200} />
+                          <img key={idx} src={item.url} alt="imagem" width={120} className="rounded shadow" />
                         ) : (
-                          <a href={item.url} target="_blank" rel="noreferrer">
+                          <a key={idx} href={item.url} target="_blank" rel="noreferrer" className="text-blue-600 underline">
                             {item.nome}
                           </a>
                         )
                       )}
-                    </Typography>
-                  </div>
-                </Card>
-                <div className="basis-1/5 ">
-                  <Card
-                    shadow={false}
-                    className="rounded-lg border border-gray-300 p-2 mb-3"
-                  >
-                    <div className="flex flex-col gap-1">
-                      <Typography
-                        className="text-xs !font-bold"
-                        color="blue-gray"
-                      >
-                        {atendimentoData?.o_que_deseja}
-                      </Typography>
                     </div>
-                    <div className="flex flex-col gap-1">
-                      <Typography className="mt-3 text-xs !font-medium !text-gray-600">
-                        {"Atendido por"}:{" "}
-                        <span className="text-xs !font-bold" color="blue-gray">
-                          {atendimentoData?.atendido_por}
-                        </span>
-                      </Typography>
+                  </Section>
+                  <Section title="Detalhes do Atendimento">
+                    <DadosAtendimento data={atendimentoData} />
+                  </Section>
+                </div>
+                <div className="w-80 flex flex-col gap-4">
+                  <Section title="Ações Rápidas">
+                    <div className="flex flex-col gap-2">
+                      {pendingPrioridade ? (
+                        <Spinner size="sm" className="mx-auto" />
+                      ) : (
+                        <Select
+                          label="Prioridade"
+                          onChange={(prioridade) => handleChangePrioridadeCartao({ prioridade, id: atendimentoData?.id })}
+                          value={atendimentoData?.prioridadeAtendimentos?.id}
+                        >
+                          {prioridadeData?.map((item, index) => (
+                            <Option key={index + 1} value={item.id}>{item.nome}</Option>
+                          ))}
+                        </Select>
+                      )}
+                      {pendingStatus ? (
+                        <Spinner size="sm" className="mx-auto" />
+                      ) : (
+                        <Select
+                          label="Status"
+                          onChange={(status) => handleChangeStatusCartao({ status, id: atendimentoData?.id })}
+                          value={atendimentoData?.status}
+                        >
+                          <Option value="ABERTO">Aberto</Option>
+                          <Option value="AGUARDANDO AUTORIZACAO">Aguardando Autorização</Option>
+                          <Option value="AGUARDANDO PAGAMENTO">Aguardando pagamento</Option>
+                          <Option value="AGUARDANDO VAGA">Aguardando Vaga</Option>
+                          <Option value="CONCLUIDO">Concluído</Option>
+                          <Option value="EM ANALISE">Em Analise</Option>
+                          <Option value="FILA DE ESPERA">Fila de espera</Option>
+                          <Option value="INATIVIDADE">Inatividade</Option>
+                          <Option value="PAGAMENTO EFETUADO">Pagamento efetuado</Option>
+                        </Select>
+                      )}
+                      {pendingAtendente ? (
+                        <Spinner size="sm" className="mx-auto" />
+                      ) : (
+                        <Select
+                          label="Atendente"
+                          onChange={(atendente) => handleChangeAtendenteCartao({ atendente, id: atendimentoData?.id })}
+                          value={atendimentoData?.profile?.id}
+                        >
+                          {atendenteData?.map((item, index) => (
+                            <Option key={index + 1} value={item.id}>{item?.profile?.name}</Option>
+                          ))}
+                        </Select>
+                      )}
                     </div>
-                    <div className="flex flex-col gap-1">
-                      <Typography className="mt-1 text-xs !font-medium !text-gray-600">
-                        {"inicio do atendimento"}:{" "}
-                        <span className="text-xs !font-bold" color="blue-gray">
-                          {formatarDataBrHora(atendimentoData?.atendimento_iniciado)}
-                        </span>
-                      </Typography>
+                    <div className="flex flex-col gap-2 mt-4">
+                      <Button variant="gradient" color="light-blue" onClick={() => handleOpenModalVagas(atendimentoData)}>
+                        Vagas
+                      </Button>
+                      <Button variant="outlined" onClick={() => handleOpenModalAjustesAtendimento(atendimentoData)} aria-label="Ajustar dados do paciente">
+                        Ajustar dados paciente
+                      </Button>
+                      <Button variant="outlined" onClick={() => handleOpenModalAjustesMedico(atendimentoData)} aria-label="Ajustar dados do atendimento">
+                        Ajustar Medico
+                      </Button>
+                      <Button variant="outlined" onClick={() => handleOpenModalComentario(atendimentoData)} color="light-blue" aria-label="Adicionar resumo do atendimento">
+                        Resumo do atendimento
+                      </Button>
+                      <Button variant="outlined" onClick={() => handleOpenModalTimeLine(atendimentoData)} color="blue-gray" aria-label="Visualizar linha do tempo">
+                        Visualizar linha do tempo
+                      </Button>
+                      <Upload
+                        title={`Anexo-${atendimentoData?.id}-${getRandomIntInclusive(1, 100000)}`}
+                        id={atendimentoData?.id}
+                        label={"Enviar Anexo"}
+                        folder={"anexos"}
+                        controller={"atendimentos"}
+                        action={"anexo"}
+                        callback={() => {}}
+                      />
                     </div>
-                  </Card>
-                  <div className={"flex flex-col gap-2"}>
-                    {pendingPrioridade ? (
-                      "Enviando..."
-                    ) : (
-                      <Select
-                        label="Prioridade"
-                        onChange={(prioridade) =>
-                          handleChangePrioridadeCartao({
-                            prioridade,
-                            id: atendimentoData?.id,
-                          })
-                        }
-                      >
-                        {prioridadeData?.map((item, index) => (
-                          <Option key={index + 1} value={item.id}>
-                            {item.nome}
-                          </Option>
-                        ))}
-                      </Select>
-                    )}
-
-                    {pendingStatus ? (
-                      "Enviando..."
-                    ) : (
-                      <Select
-                        label="Status"
-                        onChange={(status) =>
-                          handleChangeStatusCartao({
-                            status,
-                            id: atendimentoData?.id,
-                          })
-                        }
-                      >
-                        <Option value="ABERTO">Aberto</Option>
-                        <Option value="AGUARDANDO AUTORIZACAO">
-                          Aguardando Autorização
-                        </Option>
-                        <Option value="AGUARDANDO PAGAMENTO">
-                          Aguardando pagamento
-                        </Option>
-                        <Option value="AGUARDANDO VAGA">Aguardando Vaga</Option>
-                        <Option value="CONCLUIDO">Concluído</Option>
-                        <Option value="EM ANALISE">Em Analise</Option>
-                        <Option value="FILA DE ESPERA">Fila de espera</Option>
-                        <Option value="INATIVIDADE">Inatividade</Option>
-                        <Option value="PAGAMENTO EFETUADO">
-                          Pagamento efetuado
-                        </Option>
-                      </Select>
-                    )}
-                    {pendingAtendente ? (
-                      "Enviando..."
-                    ) : (
-                      <Select
-                        label="Atendente"
-                        onChange={(atendente) =>
-                          handleChangeAtendenteCartao({
-                            atendente,
-                            id: atendimentoData?.id,
-                          })
-                        }
-                      >
-                        {atendenteData?.map((item, index) => (
-                          <Option key={index + 1} value={item.id}>
-                            {item?.profile?.name}
-                          </Option>
-                        ))}
-                      </Select>
-                    )}
-                  </div>
-
-                  <Card
-                    shadow={true}
-                    className="rounded-lg border border-gray-300 p-4 basis-3/12 flex gap-4 mt-3"
-                  >
-                    <Button
-                      variant="outlined"
-                      onClick={() =>
-                        handleOpenModalAjustesAtendimento(atendimentoData)
-                      }
-                      aria-label="Ajustar dados do paciente"
-                    >
-                      Ajustar dados paciente
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      onClick={() =>
-                        handleOpenModalAjustesMedico(atendimentoData)
-                      }
-                      aria-label="Ajustar dados do atendimento"
-                    >
-                      Ajustar dados atendimento
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      onClick={() => handleOpenModalComentario(atendimentoData)}
-                      color="light-blue"
-                      aria-label="Adicionar resumo do atendimento"
-                    >
-                      Resumo do atendimento
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      onClick={() => handleOpenModalTimeLine(atendimentoData)}
-                      color="blue-gray"
-                      aria-label="Visualizar linha do tempo"
-                    >
-                      Visualizar linha do tempo
-                    </Button>
-                    <Upload
-                      title={`Anexo-${
-                        atendimentoData?.id
-                      }-${getRandomIntInclusive(1, 100000)}`}
-                      id={atendimentoData?.id}
-                      label={"Enviar Anexo"}
-                      folder={"anexos"}
-                      controller={"atendimentos"}
-                      action={"anexo"}
-                      callback={() => {}}
-                    />
-                  </Card>
+                  </Section>
+                  <Section title="Atendente">
+                    <Typography className="mb-1 text-xs !font-medium !text-gray-600">Atendente:</Typography>
+                    <Typography className="text-xs !font-bold" color="blue-gray">{atendimentoData?.profile?.name}</Typography>
+                    <Typography className="mt-3 text-xs !font-medium !text-gray-600">Atendido por: <span className="text-xs !font-bold" color="blue-gray">{atendimentoData?.atendido_por}</span></Typography>
+                    <Typography className="mt-1 text-xs !font-medium !text-gray-600">Início do atendimento: <span className="text-xs !font-bold" color="blue-gray">{formatarDataBrHora(atendimentoData?.atendimento_iniciado)}</span></Typography>
+                  </Section>
                 </div>
               </div>
             </CardBody>
@@ -701,6 +485,16 @@ const ModalAtendimento = () => {
             data={atendimentoData}
             modal={() => setOpenModalComentario(false)}
           />
+        </CustomModal>
+
+        <CustomModal
+          title={"Vagas"}
+          open={openModalVagas}
+          handler={handleOpenModalVagas}
+          modal={() => setOpenModalVagas(false)}
+          aria-labelledby="modal-title-vagas"
+        >
+          <Vagas data={atendimentoData} modal={() => setOpenModalVagas(false)} />
         </CustomModal>
       </div>
     </>

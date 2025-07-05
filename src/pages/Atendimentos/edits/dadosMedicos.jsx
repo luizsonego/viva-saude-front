@@ -92,7 +92,6 @@ const EditAtendimentoDadosMedicos = ({ data, modal }) => {
       // );
     }
 
-    console.log('localEscolhido',localEscolhido);
 
     let dataForm = {
       medico_atendimento: qualMedico || data.medico_atendimento,
@@ -104,11 +103,16 @@ const EditAtendimentoDadosMedicos = ({ data, modal }) => {
       local_escolhido: localEscolhido,
       ...data,
     };
-    console.log('>>>',dataForm);
     mutateAsync(dataForm);
   };
 
+    console.log('localEscolhido',data);
   return (
+    <>
+      <p>Medico: <b>{data.medico_atendimento}</b></p>
+      <p>O que deseja: <b>{data.o_que_deseja}</b></p>
+      <p>Onde deseja ser atendido: <b>{data.onde_deseja_ser_atendido}</b></p>
+
     <form
       className="mt-8 mb-2 w-full flex flex-col gap-5"
       onSubmit={handleSubmit(onSubmit)}
@@ -152,7 +156,7 @@ const EditAtendimentoDadosMedicos = ({ data, modal }) => {
           ))}
         </Select>
       )}
-      {qualMedico && openLocal
+      {/* {qualMedico && openLocal
         ? searchLocalMedico?.map((item, index) => (
             <div key={index + 1}>
               {item?.local?.map((lc, i) => (
@@ -166,13 +170,13 @@ const EditAtendimentoDadosMedicos = ({ data, modal }) => {
               ))}
             </div>
           ))
-        : ""}
+        : ""} */}
 
-      <input
+      {/* <input
         type="time"
         {...register("hora_atendimento")}
         className="w-full bg-white rounded-md p-2 border border-gray-300"
-      />
+      /> */}
 
       <Input
         className="hidden"
@@ -187,7 +191,8 @@ const EditAtendimentoDadosMedicos = ({ data, modal }) => {
         type="submit"
         className="bg-green-500 text-white p-2 rounded-md w-full mt-10"
       />
-    </form>
+      </form>
+      </>
   );
 };
 

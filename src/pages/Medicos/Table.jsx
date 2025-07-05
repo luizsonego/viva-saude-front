@@ -19,6 +19,8 @@ const Table = ({
   edit,
   del,
   loadingDel,
+  addVaga,
+  editVaga,
 }) => {
   return (
     <div className="mt-12 mb-8 flex flex-col gap-12">
@@ -30,7 +32,7 @@ const Table = ({
         </CardHeader>
         <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
           <table className="w-full min-w-[640px] table-auto">
-            <thead>
+            <thead style={{position: 'sticky', top: 0, backgroundColor: 'white'}}>
               <tr>
                 {columns.map((column) => (
                   <th
@@ -51,20 +53,17 @@ const Table = ({
                 >
                   <Typography
                     variant="small"
-                    className="text-[11px] font-bold uppercase text-blue-gray-400"
+                    className="text-[11px] font-bold uppercase text-blue-gray-400 text-center"
                   >
-                    Editar
+                    Ações
                   </Typography>
                 </th>
                 <th
                   className="border-b border-blue-gray-50 py-3 px-5 text-left"
                   width={20}
                 >
-                  <Typography
-                    variant="small"
-                    className="text-[11px] font-bold uppercase text-blue-gray-400"
-                  >
-                    Excluir
+                  <Typography variant="small" className="text-[11px] font-bold uppercase text-blue-gray-400 text-center">
+                    Vagas
                   </Typography>
                 </th>
               </tr>
@@ -135,20 +134,34 @@ const Table = ({
                             </td>
                             <td className={className}>
                               <Button
-                                variant="text"
-                                className="text-xs font-semibold text-blue-gray-600"
+                                variant="filled"
+                                className="text-xs font-semibold w-full my-1 hover:bg-blue-500 hover:text-white hover:border-blue-500"
                                 onClick={() => edit(id)}
                               >
                                 Editar
+                              </Button>
+                              <Button
+                                variant="outlined"
+                                className="text-xs font-semibold w-full my-1 hover:bg-red-500 hover:text-white hover:border-red-500"
+                                onClick={() => del(id)}
+                              >
+                                {loadingDel ? <Spinner /> : "Excluir"}
                               </Button>
                             </td>
                             <td className={className}>
                               <Button
                                 variant="text"
                                 className="text-xs font-semibold text-blue-gray-600"
-                                onClick={() => del(id)}
+                                onClick={() => addVaga(id)}
                               >
-                                {loadingDel ? <Spinner /> : "Excluir"}
+                                Adicionar vaga
+                              </Button>
+                              <Button
+                                variant="text"
+                                className="text-xs font-semibold text-blue-gray-600"
+                                onClick={() => editVaga(id)}
+                              >
+                                Editar vaga
                               </Button>
                             </td>
                           </tr>
