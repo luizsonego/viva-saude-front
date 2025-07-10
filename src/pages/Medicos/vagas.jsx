@@ -115,7 +115,7 @@ function Vagas() {
                               <div className="flex items-center gap-2">
                                 <span role="img" aria-label="calendar">📅</span>
                                 <Typography variant="paragraph" className="font-medium text-gray-700">
-                                  {data.quantidade} vagas disponíveis para dia {" "}
+                                  {data.quantidade - data.atendimento} vagas disponíveis para dia {" "}
                                   {formatarData(data.data)}
                                 </Typography>
                               </div>
