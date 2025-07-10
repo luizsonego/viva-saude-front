@@ -101,6 +101,8 @@ function Vagas() {
                 {item.tipos.map((tipo, tipoIdx) => (
                   <div key={tipoIdx + 1} className="bg-blue-50 rounded-lg border border-blue-200">
                     {tipo.datas.map((data, dataIdx) => {
+                      const emAtendimento = data.atendimento ? data.atendimento : 0;
+                      const vagasDisponiveis = data.quantidade - emAtendimento;
                       // Filtra as datas se buscaData estiver preenchida
                       if (buscaData && data.data !== buscaData) return null;
                       
@@ -115,7 +117,7 @@ function Vagas() {
                               <div className="flex items-center gap-2">
                                 <span role="img" aria-label="calendar">📅</span>
                                 <Typography variant="paragraph" className="font-medium text-gray-700">
-                                  {data.quantidade - data.atendimento} vagas disponíveis para dia {" "}
+                                  {vagasDisponiveis} vagas disponíveis para dia {" "}
                                   {formatarData(data.data)}
                                 </Typography>
                               </div>
