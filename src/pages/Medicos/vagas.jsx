@@ -448,6 +448,9 @@ function Vagas() {
                                      <span role="img" aria-label="calendar" className="text-lg">📅</span>
                                      <Typography variant="paragraph" className="font-medium text-gray-700">
                                        {formatarData(data.data)}
+                                       <br />
+                                       <small>{data.hora_inicio} - {data.hora_fim}</small>
+                                       
                                      </Typography>
                                    </div>
                                    
