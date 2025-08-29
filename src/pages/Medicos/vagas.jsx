@@ -449,7 +449,7 @@ function Vagas() {
                                      <Typography variant="paragraph" className="font-medium text-gray-700">
                                        {formatarData(data.data)}
                                        <br />
-                                       <small>{data.horario} - {data.horario_fim}</small>
+                                       <small>{data.hora_inicio} - {data.hora_fim}</small>
                                        
                                      </Typography>
                                    </div>
