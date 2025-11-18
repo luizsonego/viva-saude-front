@@ -64,11 +64,11 @@ export function KpiCard({ title, value, color, icon, loading }) {
 
 const Home = () => {
   // Chama os hooks individualmente para cada status
-  const aberto = useAtendimentosFetch({ status: "ABERTO", pageSize: 100000 });
-  const filaEspera = useAtendimentosFetch({ status: "FILA DE ESPERA", pageSize: 100000 });
-  const emAnalise = useAtendimentosFetch({ status: "EM ANALISE", pageSize: 100000 });
-  const aguardandoAutorizacao = useAtendimentosFetch({ status: "AGUARDANDO AUTORIZACAO", pageSize: 100000 });
-  const aguardandoPagamento = useAtendimentosFetch({ status: "AGUARDANDO PAGAMENTO", pageSize: 100000 });
+  const aberto = useAtendimentosFetch({ status: "ABERTO", pageSize: 200 });
+  const filaEspera = useAtendimentosFetch({ status: "FILA DE ESPERA", pageSize: 200 });
+  const emAnalise = useAtendimentosFetch({ status: "EM ANALISE", pageSize: 200 });
+  const aguardandoAutorizacao = useAtendimentosFetch({ status: "AGUARDANDO AUTORIZACAO", pageSize: 200 });
+  const aguardandoPagamento = useAtendimentosFetch({ status: "AGUARDANDO PAGAMENTO", pageSize: 200 });
   const concluido = useAtendimentosFetch({ status: "CONCLUIDO", pageSize: -1 });
 
   const cards = [
