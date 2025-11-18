@@ -24,7 +24,7 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     // Verifica se o erro é 401 (não autorizado) ou se o token é inválido
-    if (error.response?.status === 401) {
+    if (error.response?.status !== 200 || error.response?.status !== 201) {
       // Remove o token e redireciona para login
       logout();
     }
